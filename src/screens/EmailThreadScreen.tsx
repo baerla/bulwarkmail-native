@@ -1022,6 +1022,19 @@ function EmailPane({
 
   React.useEffect(() => () => { readTimers.forEach((cancel) => cancel()); readTimers.clear(); }, [readTimers]);
 
+  // Keeps the quick reply in view while the keyboard opens. Above the
+  // skeleton's early return: a page opened by id alone (a notification)
+  // renders the skeleton first, and a hook after it crashed the app.
+  const scrollRef = React.useRef<ScrollView>(null);
+  const isInputFocused = React.useRef(false);
+  React.useEffect(() => {
+    if (kbObstruction > 0 && isInputFocused.current) {
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 50);
+    }
+  }, [kbObstruction]);
+
   const toggleCard = (mid: string) => {
     setExpanded((prev) => {
       const next = new Set(prev ?? []);
@@ -1069,9 +1082,6 @@ function EmailPane({
     onZoomChange(z);
   };
 
-  const scrollRef = React.useRef<ScrollView>(null);
-  const isInputFocused = React.useRef(false);
-
   const bottomPadding = kbObstruction > 0
     ? kbObstruction + spacing.md
     : bottomBarHeight + spacing.lg;
@@ -1086,14 +1096,6 @@ function EmailPane({
   const handleQuickReplyBlur = () => {
     isInputFocused.current = false;
   };
-
-  React.useEffect(() => {
-    if (kbObstruction > 0 && isInputFocused.current) {
-      setTimeout(() => {
-        scrollRef.current?.scrollToEnd({ animated: true });
-      }, 50);
-    }
-  }, [kbObstruction]);
 
   return (
     <ScrollView
