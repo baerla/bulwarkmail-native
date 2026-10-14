@@ -146,6 +146,17 @@ export default function ContactDetailScreen() {
   const [moreOpen, setMoreOpen] = React.useState(false);
   const [moveOpen, setMoveOpen] = React.useState(false);
   const [groupPickerOpen, setGroupPickerOpen] = React.useState(false);
+  // Every hook runs before the not-found return: deleting the contact (or a
+  // sync removing it) re-renders this screen without it, and a hook that only
+  // ran with a contact crashed React with "fewer hooks than expected".
+  const members = contact?.members;
+  const memberContacts = React.useMemo(() => {
+    if (!members) return [];
+    const memberIds = Object.keys(members).filter((k) => members[k]);
+    return memberIds
+      .map((mid) => allContacts.find((c) => c.id === mid || c.uid === mid))
+      .filter(Boolean) as ContactCard[];
+  }, [members, allContacts]);
 
   if (!contact) {
     return (
@@ -213,14 +224,6 @@ export default function ContactDetailScreen() {
     }
     return 0;
   })();
-
-  const memberContacts = React.useMemo(() => {
-    if (!contact.members) return [];
-    const memberIds = Object.keys(contact.members).filter((k) => contact.members![k]);
-    return memberIds
-      .map((mid) => allContacts.find((c) => c.id === mid || c.uid === mid))
-      .filter(Boolean) as ContactCard[];
-  }, [contact.members, allContacts]);
 
   const openMail = (addr: string) => {
     navigation.navigate('Compose', {

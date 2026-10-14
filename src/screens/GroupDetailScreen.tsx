@@ -54,6 +54,9 @@ export default function GroupDetailScreen() {
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [removingMember, setRemovingMember] = React.useState<ContactCard | null>(null);
+  // Before the not-found return, so deleting the group doesn't change the
+  // number of hooks (React throws on that).
+  const excludedIds = React.useMemo(() => new Set(members.map((m) => m.id)), [members]);
 
   if (!group) {
     return (
@@ -126,8 +129,6 @@ export default function GroupDetailScreen() {
       Alert.alert(t('contacts.groups.delete_failed', 'Failed to delete group'), err instanceof Error ? err.message : t('identities.validation_errors.unknown_error', 'Unknown error'));
     }
   };
-
-  const excludedIds = React.useMemo(() => new Set(members.map((m) => m.id)), [members]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
