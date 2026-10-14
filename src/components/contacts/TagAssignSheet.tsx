@@ -9,6 +9,7 @@ import { useColors } from '../../theme/colors';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { useContactsStore, selectKeywordsUsed } from '../../stores/contacts-store';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 interface Props {
   visible: boolean;
@@ -60,7 +61,7 @@ export default function TagAssignSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>

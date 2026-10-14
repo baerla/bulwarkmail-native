@@ -51,6 +51,7 @@ import { getFullEmail, emptyMailbox as apiEmptyMailbox } from '../api/email';
 import type { RootStackParamList } from '../navigation/types';
 import { usePendingMailSearch } from '../navigation/pending-mail-search';
 import type { Attachment, Email } from '../api/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 function getSenderName(email: Email, unknownLabel: string): string {
   return email.from?.[0]?.name || email.from?.[0]?.email || unknownLabel;
@@ -1132,6 +1133,9 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
         <View style={styles.searchInputArea}>
           <Search size={16} color={c.textMuted} />
           <TextInput
+            // No full-screen keyboard in landscape: it would hide the suggestions
+            // and the text around the field.
+            disableFullscreenUI
             ref={searchInputRef}
             style={styles.searchInput}
             placeholder={t('email_list.search_placeholder', 'Search mail...')}
@@ -1466,7 +1470,7 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
       <SidebarDrawer visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
       <ListAttachmentOpener ref={attachmentOpenerRef} />
 
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={filterMenuOpen}
         transparent
         animationType="fade"
@@ -1672,7 +1676,7 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
         };
         if (Platform.OS === 'ios') {
           return (
-            <Modal transparent animationType="fade" onRequestClose={() => setDatePickerField(null)}>
+            <Modal supportedOrientations={MODAL_ORIENTATIONS} transparent animationType="fade" onRequestClose={() => setDatePickerField(null)}>
               <Pressable style={styles.pickerOverlay} onPress={() => setDatePickerField(null)} />
               <View style={styles.pickerSheet}>
                 <View style={styles.pickerHeader}>

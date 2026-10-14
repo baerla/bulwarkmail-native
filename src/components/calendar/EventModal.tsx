@@ -67,6 +67,7 @@ import { Button } from '..';
 import { ParticipantInput } from './ParticipantInput';
 import { useContactNameResolver } from '../../lib/contact-name-resolver';
 import { RecurrenceEditor } from './RecurrenceEditor';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type RecurrenceOption = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 
@@ -410,7 +411,7 @@ export function EventModal({
   );
 
   return (
-    <Modal
+    <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"

@@ -9,6 +9,7 @@ import { spacing, radius, typography, componentSizes, type ThemePalette } from '
 import { useColors } from '../../theme/colors';
 import Button from '../Button';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 interface SieveEditorSheetProps {
   visible: boolean;
@@ -62,7 +63,7 @@ export function SieveEditorSheet({ visible, content, onSave, onClose, onValidate
   }, [script, showSaveWarning, onSave]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.header}>
           <Pressable

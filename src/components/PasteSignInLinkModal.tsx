@@ -19,6 +19,7 @@ import Button from './Button';
 import { useLocaleStore } from '../stores/locale-store';
 import { insecurePairingLinkError, parsePastedSignInLink, type QrLoginPayload } from '../lib/oauth';
 import { describeLoginError } from '../lib/login-errors';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface PasteSignInLinkModalProps {
   visible: boolean;
@@ -80,7 +81,7 @@ export function PasteSignInLinkModal({ visible, onClose, onSubmit }: PasteSignIn
   const title = t('login.mobile.paste_title', 'Paste sign-in link');
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
           <View style={styles.header}>

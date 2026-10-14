@@ -4,7 +4,7 @@ import {
   Modal, useWindowDimensions, Animated, Easing, Alert, FlatList,
   Keyboard, Dimensions, Platform,
 } from 'react-native';
-import type { NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import type { LayoutChangeEvent, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
@@ -35,6 +35,7 @@ import {
 import { shareEmailEml } from '../lib/email-export';
 import { useKeywordsStore, keywordToken, type KeywordDef } from '../stores/keywords-store';
 import { useSheetDrag } from '../lib/use-sheet-drag';
+import { useKeyboardObstruction } from '../lib/use-keyboard-obstruction';
 import { useLocaleStore } from '../stores/locale-store';
 import {
   findArchiveMailbox, findTrashMailbox, mailboxAccountId, mailboxesOfAccount, mailboxOfEmail,
@@ -46,6 +47,7 @@ import { viewerInstance, viewerPages, type ViewerInstance } from '../lib/viewer-
 import { accountScopedId } from '../lib/thread-utils';
 import type { Email, EmailAddress, Identity } from '../api/types';
 import type { RootStackParamList } from '../navigation/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EmailThread'>;
 
@@ -87,6 +89,10 @@ function EmailViewer({ route, navigation }: Props) {
   const [activeEmailId, setActiveEmailId] = React.useState(route.params.emailId);
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
+  // Pages are as wide as the pager itself, which is the window on a phone
+  // but only the detail pane in a split view. Measured, so a rotation or a
+  // pane resize re-sizes them.
+  const [pageWidth, setPageWidth] = React.useState(windowWidth);
   const markRead = useEmailStore((s) => s.markRead);
   const setKeywordForEmails = useEmailStore((s) => s.setKeywordForEmails);
   const deleteEmail = useEmailStore((s) => s.deleteEmail);
@@ -262,22 +268,34 @@ function EmailViewer({ route, navigation }: Props) {
   const goToIndex = React.useCallback((index: number) => {
     if (index < 0 || index >= emails.length) return;
     releaseNeighbours();
-    listRef.current?.scrollToOffset({ offset: index * windowWidth, animated: true });
+    listRef.current?.scrollToOffset({ offset: index * pageWidth, animated: true });
     const target = emails[index];
     if (target) setActiveEmailId(target.id);
-  }, [emails, windowWidth, releaseNeighbours]);
+  }, [emails, pageWidth, releaseNeighbours]);
 
   const onMomentumEnd = React.useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.x / windowWidth);
+    const index = Math.round(e.nativeEvent.contentOffset.x / pageWidth);
     const target = emails[index];
     if (target && target.id !== activeEmailId) setActiveEmailId(target.id);
-  }, [emails, windowWidth, activeEmailId]);
+  }, [emails, pageWidth, activeEmailId]);
 
-  React.useLayoutEffect(() => {
+  // A width change (rotation, split-screen, pane resize) leaves the native
+  // scroll offset where it was in pixels, so the pager would show half of a
+  // neighbour. Snap back to the open message once the pages have their new
+  // width, which is when the content size changes; the layout effect covers
+  // a width change that doesn't change the content size.
+  const snapToActive = React.useCallback(() => {
     const index = emails.findIndex((e) => e.id === activeEmailId);
-    if (index >= 0) listRef.current?.scrollToOffset({ offset: index * windowWidth, animated: false });
+    if (index >= 0) listRef.current?.scrollToOffset({ offset: index * pageWidth, animated: false });
+  }, [emails, activeEmailId, pageWidth]);
+  React.useLayoutEffect(() => {
+    snapToActive();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [windowWidth]);
+  }, [pageWidth]);
+  const onPagerLayout = React.useCallback((e: LayoutChangeEvent) => {
+    const width = Math.round(e.nativeEvent.layout.width);
+    if (width > 0) setPageWidth((prev) => (prev === width ? prev : width));
+  }, []);
 
   const pagerExtraData = React.useMemo(
     () => [cacheVersion, neighboursReady],
@@ -642,39 +660,8 @@ function EmailViewer({ route, navigation }: Props) {
   const bottomBarHeight = 60 + Math.max(insets.bottom, 4);
 
   // Track the visible keyboard obstruction so quick reply stays visible and
-  // the bottom bar hides while typing. On Android edge-to-edge, the IME inset
-  // is measured from the top of the gesture bar rather than screen bottom,
-  // so we derive obstruction height from Dimensions.screen.
-  const [kbObstruction, setKbObstruction] = React.useState(0);
-  React.useEffect(() => {
-    const recompute = (endY?: number, height?: number) => {
-      const screenH = Dimensions.get('screen').height;
-      if (typeof endY === 'number' && screenH - endY > 0) {
-        setKbObstruction(screenH - endY);
-      } else if (typeof height === 'number' && height > 0) {
-        setKbObstruction(height);
-      } else {
-        setKbObstruction(0);
-      }
-    };
-    const subs =
-      Platform.OS === 'ios'
-        ? [
-            Keyboard.addListener('keyboardWillChangeFrame', (e) => {
-              recompute(e.endCoordinates?.screenY, e.endCoordinates?.height);
-            }),
-            Keyboard.addListener('keyboardWillHide', () => setKbObstruction(0)),
-          ]
-        : [
-            Keyboard.addListener('keyboardDidShow', (e) => {
-              recompute(e.endCoordinates?.screenY, e.endCoordinates?.height);
-            }),
-            Keyboard.addListener('keyboardDidHide', () => setKbObstruction(0)),
-          ];
-    return () => {
-      for (const s of subs) s.remove();
-    };
-  }, []);
+  // the bottom bar hides while typing.
+  const kbObstruction = useKeyboardObstruction(insets.bottom);
 
   // Drop optional toolbar buttons on narrow screens.
   const showMarkUnread = windowWidth >= 340;
@@ -763,6 +750,8 @@ function EmailViewer({ route, navigation }: Props) {
           <FlatList
             ref={listRef}
             style={styles.pagerViewport}
+            onLayout={onPagerLayout}
+            onContentSizeChange={snapToActive}
             data={emails}
             extraData={pagerExtraData}
             keyExtractor={(item) => item.id}
@@ -770,7 +759,7 @@ function EmailViewer({ route, navigation }: Props) {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             initialScrollIndex={initialIndexRef.current}
-            getItemLayout={(_, index) => ({ length: windowWidth, offset: windowWidth * index, index })}
+            getItemLayout={(_, index) => ({ length: pageWidth, offset: pageWidth * index, index })}
             windowSize={3}
             initialNumToRender={1}
             maxToRenderPerBatch={2}
@@ -779,7 +768,7 @@ function EmailViewer({ route, navigation }: Props) {
             onScrollBeginDrag={releaseNeighbours}
             onMomentumScrollEnd={onMomentumEnd}
             renderItem={({ item, index }) => (
-              <View style={{ width: windowWidth }}>
+              <View style={{ width: pageWidth }}>
                 <EmailPane
                   id={item.id}
                   active={item.id === activeEmailId}
@@ -1288,7 +1277,7 @@ function MoreMenuSheet({
   }, [visible, slideY, overlayOpacity]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.sheetOverlayPress} onPress={onClose} />
       </Animated.View>
@@ -1437,7 +1426,7 @@ function TagMenuSheet({ visible, onClose, keywords, activeKeywords, onToggle }: 
   }, [visible, slideY, overlayOpacity]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.sheetOverlayPress} onPress={onClose} />
       </Animated.View>

@@ -18,6 +18,7 @@ import { getContactDisplayName, getContactKeywords, isGroup } from '../../lib/co
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -161,7 +162,7 @@ export default function ContactsSidebarDrawer({ visible, onClose }: Props) {
   );
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose} onShow={runOpen}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose} onShow={runOpen}>
       <Animated.View style={[styles.overlay, { opacity: overlay }]}>
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>

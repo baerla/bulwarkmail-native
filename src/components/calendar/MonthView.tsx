@@ -38,6 +38,8 @@ export const MONTH_ROW_HEIGHT = 54;
 export const MONTH_ROW_HEIGHT_CHIPS = 74;
 // Smallest week row of the full-screen month grid.
 export const MONTH_ROW_HEIGHT_FULL_MIN = 72;
+/** Smallest row of the paged month grid, which can't scroll to hidden weeks. */
+const MONTH_ROW_HEIGHT_FILL_MIN = 36;
 // Corner radius of event bars (repos/branding/APP.md).
 const EVENT_RADIUS = 2;
 
@@ -424,8 +426,11 @@ function MonthViewInner({
   // Today on a clock in the calendar's time zone.
   const today = displayNow();
 
+  // Every week of the month has to show (there is no scrolling here), so in a
+  // short window (phone landscape) rows shrink below the usual minimum and
+  // their chips collapse into "+N".
   const fullRowHeight = fill && gridHeight > 0
-    ? Math.max(MONTH_ROW_HEIGHT_FULL_MIN, Math.floor(gridHeight / rows.length))
+    ? Math.max(MONTH_ROW_HEIGHT_FILL_MIN, Math.floor(gridHeight / rows.length))
     : undefined;
 
   return (

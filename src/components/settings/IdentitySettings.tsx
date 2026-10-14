@@ -27,6 +27,7 @@ import { useLocaleStore } from '../../stores/locale-store';
 import { isValidEmail, parseRecipientList, formatRecipient } from '../../lib/recipients';
 import { sanitizeDisplayName } from '../../lib/rfc5322-mailbox';
 import { sanitizeSignatureHtml } from '../../lib/signature-utils';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type DraftIdentity = {
   id: string;
@@ -298,7 +299,7 @@ export function IdentitySettings() {
         </Pressable>
       ))}
 
-      <Modal visible={!!editing} animationType="slide" transparent onRequestClose={closeEditor}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!editing} animationType="slide" transparent onRequestClose={closeEditor}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>

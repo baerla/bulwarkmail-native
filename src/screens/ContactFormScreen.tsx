@@ -31,6 +31,7 @@ import ContactPickerSheet from '../components/contacts/ContactPickerSheet';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { useLocaleStore, type TranslateFn } from '../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ContactForm'>;
 type Route = RouteProp<RootStackParamList, 'ContactForm'>;
@@ -1802,7 +1803,7 @@ export default function ContactFormScreen() {
         };
         if (Platform.OS === 'ios') {
           return (
-            <Modal transparent animationType="fade" onRequestClose={() => setDatePickerIndex(null)}>
+            <Modal supportedOrientations={MODAL_ORIENTATIONS} transparent animationType="fade" onRequestClose={() => setDatePickerIndex(null)}>
               <Pressable style={styles.pickerOverlay} onPress={() => setDatePickerIndex(null)} />
               <View style={styles.pickerSheet}>
                 <View style={styles.pickerHeader}>

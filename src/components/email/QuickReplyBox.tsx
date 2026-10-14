@@ -147,6 +147,9 @@ export function QuickReplyBox({ email, jmapAccountId, onMoreOptions, onSent, onF
   return (
     <View style={styles.box}>
       <TextInput
+        // No full-screen keyboard in landscape: it would hide the suggestions
+        // and the text around the field.
+        disableFullscreenUI
         value={text}
         onChangeText={setText}
         onFocus={onFocus}

@@ -17,6 +17,7 @@ import { radius, spacing, typography, type ThemePalette } from '../../theme/toke
 import { useColors } from '../../theme/colors';
 import { useTemplatesStore, type EmailTemplate } from '../../stores/templates-store';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 export function TemplateSettings() {
   const c = useColors();
@@ -196,7 +197,7 @@ export function TemplateSettings() {
       </SettingsSection>
 
       {/* Edit/Create modal */}
-      <Modal visible={!!editing} animationType="slide" transparent onRequestClose={closeEditor}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!editing} animationType="slide" transparent onRequestClose={closeEditor}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
@@ -270,7 +271,7 @@ export function TemplateSettings() {
       </Modal>
 
       {/* Import modal */}
-      <Modal visible={importVisible} animationType="slide" transparent onRequestClose={() => setImportVisible(false)}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={importVisible} animationType="slide" transparent onRequestClose={() => setImportVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>

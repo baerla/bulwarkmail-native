@@ -469,6 +469,9 @@ export default function UnifiedInboxScreen({ navigation, route }: Props) {
       <View style={styles.searchBar}>
         <Search size={16} color={c.textMuted} />
         <TextInput
+          // No full-screen keyboard in landscape: it would hide the suggestions
+          // and the text around the field.
+          disableFullscreenUI
           style={styles.searchInput}
           placeholder={t('email_list.search_placeholder', 'Search mail...')}
           placeholderTextColor={c.textMuted}

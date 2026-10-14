@@ -42,6 +42,7 @@ import {
 import { isWritableCalendar } from '../../lib/calendar-editability';
 import { useCalendarLocale } from '../../lib/calendar-locale';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type TaskFilter = 'all' | 'pending' | 'completed' | 'overdue';
 
@@ -230,7 +231,7 @@ export function TasksSheet({
   ];
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>

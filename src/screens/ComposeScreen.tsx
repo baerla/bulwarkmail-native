@@ -31,6 +31,8 @@ import { useEmailStore } from '../stores/email-store';
 import { ownMailboxes } from '../lib/mailbox-tree';
 import { getEmailInitials } from '../lib/avatar-utils';
 import { useContactsStore, type RecipientSuggestion } from '../stores/contacts-store';
+import { useKeyboardObstruction } from '../lib/use-keyboard-obstruction';
+import { useLayout } from '../lib/use-layout';
 import { useLocaleStore } from '../stores/locale-store';
 import { useSettingsStore } from '../stores/settings-store';
 import { useHasContacts } from '../lib/capabilities';
@@ -76,6 +78,7 @@ import {
 import { sanitizeDisplayName } from '../lib/rfc5322-mailbox';
 import type { EmailAddress, Identity } from '../api/types';
 import type { RootStackParamList } from '../navigation/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Compose'>;
 
@@ -365,7 +368,7 @@ function OptionsSheet({
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <Pressable style={styles.scheduleCard} onPress={() => {}}>
           {!!title && <Text style={styles.modalTitle} numberOfLines={2}>{title}</Text>}
@@ -395,34 +398,9 @@ export default function ComposeScreen({ route, navigation }: Props) {
   const timeFormat = useSettingsStore((s) => s.timeFormat);
   const insets = useSafeAreaInsets();
   // Track the visible keyboard obstruction so the format bar stays above it.
-  // On Android edge-to-edge, the IME-inset reported by `keyboardDidShow` is
-  // measured from the top of the gesture-nav bar rather than from the true
-  // screen bottom, so we derive obstruction height from `Dimensions.screen`
-  // instead of trusting `endCoordinates.height` directly. The same trick
-  // works on iOS for the QuickType / autofill / dictation strip.
-  const [kbObstruction, setKbObstruction] = React.useState(0);
-  React.useEffect(() => {
-    const recompute = (endY: number) => {
-      const screenH = Dimensions.get('screen').height;
-      setKbObstruction(Math.max(0, screenH - endY));
-    };
-    const subs =
-      Platform.OS === 'ios'
-        ? [
-            Keyboard.addListener('keyboardWillChangeFrame', (e) => {
-              recompute(e.endCoordinates?.screenY ?? Number.MAX_SAFE_INTEGER);
-            }),
-          ]
-        : [
-            Keyboard.addListener('keyboardDidShow', (e) => {
-              recompute(e.endCoordinates?.screenY ?? Number.MAX_SAFE_INTEGER);
-            }),
-            Keyboard.addListener('keyboardDidHide', () => setKbObstruction(0)),
-          ];
-    return () => {
-      for (const s of subs) s.remove();
-    };
-  }, []);
+  const kbObstruction = useKeyboardObstruction(insets.bottom, () => editorRef.current?.blur());
+  const { shortHeight } = useLayout();
+  const typingInShortWindow = shortHeight && kbObstruction > 0;
   // When the keyboard is up it covers the bottom safe area, so we don't
   // need to add it on top — pad by whichever is larger.
   const bottomPad = Math.max(kbObstruction, insets.bottom);
@@ -2226,6 +2204,9 @@ export default function ComposeScreen({ route, navigation }: Props) {
             />
           ))}
           <TextInput
+            // No full-screen keyboard in landscape: it would hide the suggestions
+            // and the text around the field.
+            disableFullscreenUI
             style={[styles.recipientInput, invalidInput && styles.recipientInputInvalid]}
             placeholder={placeholder}
             placeholderTextColor={c.textMuted}
@@ -2283,8 +2264,8 @@ export default function ComposeScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <View style={[styles.header, typingInShortWindow && styles.headerCompact]}>
         <Pressable
           onPress={onClose}
           style={styles.headerBtn}
@@ -2298,7 +2279,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
           <Text style={styles.headerTitle} numberOfLines={1}>
             {t(titleKey, mode === 'forward' ? 'Forward' : mode === 'replyAll' ? 'Reply All' : replyTo ? 'Reply' : 'New Message')}
           </Text>
-          {!!draftStatusText && (
+          {!!draftStatusText && !typingInShortWindow && (
             <Text style={styles.headerSubtitle} numberOfLines={1}>{draftStatusText}</Text>
           )}
         </View>
@@ -2386,6 +2367,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
           <View style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>{t('email_composer.subject', 'Subject')}</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.subjectInput}
               placeholder={t('email_composer.subject_placeholder', 'Subject')}
               placeholderTextColor={c.textMuted}
@@ -2409,6 +2391,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
 
           {plainTextMode ? (
             <TextInput
+              disableFullscreenUI
               style={styles.plainEditor}
               multiline
               value={plainBody}
@@ -2431,92 +2414,96 @@ export default function ComposeScreen({ route, navigation }: Props) {
           )}
         </ScrollView>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.formatBar}
-          contentContainerStyle={styles.formatActions}
-          keyboardShouldPersistTaps="always"
-        >
-          <ToolbarButton onPress={() => setTemplateSheetOpen(true)}
-            icon={<LayoutTemplate size={18} color={c.textSecondary} />} />
-          <ToolbarButton active={requestReadReceipt} onPress={() => setRequestReadReceipt((v) => !v)}
-            icon={<MailCheck size={18} color={requestReadReceipt ? c.primary : c.textSecondary} />} />
-          <ToolbarButton active={plainTextMode} onPress={() => { void togglePlainTextMode(); }}
-            label={plainTextMode
-              ? t('email_composer.format_rich_text', 'Switch to rich text (HTML)')
-              : t('email_composer.format_plain_text', 'Switch to plain text')}
-            icon={<Type size={18} color={plainTextMode ? c.primary : c.textSecondary} />} />
+        {/* A phone in landscape with the keyboard up has room for a few lines
+            of text only; the format bar comes back with the keyboard down. */}
+        {!typingInShortWindow && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.formatBar}
+            contentContainerStyle={styles.formatActions}
+            keyboardShouldPersistTaps="always"
+          >
+            <ToolbarButton onPress={() => setTemplateSheetOpen(true)}
+              icon={<LayoutTemplate size={18} color={c.textSecondary} />} />
+            <ToolbarButton active={requestReadReceipt} onPress={() => setRequestReadReceipt((v) => !v)}
+              icon={<MailCheck size={18} color={requestReadReceipt ? c.primary : c.textSecondary} />} />
+            <ToolbarButton active={plainTextMode} onPress={() => { void togglePlainTextMode(); }}
+              label={plainTextMode
+                ? t('email_composer.format_rich_text', 'Switch to rich text (HTML)')
+                : t('email_composer.format_plain_text', 'Switch to plain text')}
+              icon={<Type size={18} color={plainTextMode ? c.primary : c.textSecondary} />} />
 
-          {!plainTextMode && (
-            <>
-              <View style={styles.formatSep} />
+            {!plainTextMode && (
+              <>
+                <View style={styles.formatSep} />
 
-              <ToolbarButton active={selState.bold} onPress={() => editorRef.current?.exec('bold')}
-                icon={<Bold size={18} color={selState.bold ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.italic} onPress={() => editorRef.current?.exec('italic')}
-                icon={<Italic size={18} color={selState.italic ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.underline} onPress={() => editorRef.current?.exec('underline')}
-                icon={<Underline size={18} color={selState.underline ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.strikeThrough} onPress={() => editorRef.current?.exec('strikeThrough')}
-                icon={<Strikethrough size={18} color={selState.strikeThrough ? c.primary : c.textSecondary} />} />
-              <ToolbarButton onPress={() => setColorTarget('text')}
-                label={t('email_composer.toolbar.text_color', 'Text color')}
-                icon={<Palette size={18} color={c.textSecondary} />} />
-              <ToolbarButton onPress={() => setColorTarget('background')}
-                label={t('email_composer.toolbar.background_color', 'Background color')}
-                icon={<Highlighter size={18} color={c.textSecondary} />} />
+                <ToolbarButton active={selState.bold} onPress={() => editorRef.current?.exec('bold')}
+                  icon={<Bold size={18} color={selState.bold ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.italic} onPress={() => editorRef.current?.exec('italic')}
+                  icon={<Italic size={18} color={selState.italic ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.underline} onPress={() => editorRef.current?.exec('underline')}
+                  icon={<Underline size={18} color={selState.underline ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.strikeThrough} onPress={() => editorRef.current?.exec('strikeThrough')}
+                  icon={<Strikethrough size={18} color={selState.strikeThrough ? c.primary : c.textSecondary} />} />
+                <ToolbarButton onPress={() => setColorTarget('text')}
+                  label={t('email_composer.toolbar.text_color', 'Text color')}
+                  icon={<Palette size={18} color={c.textSecondary} />} />
+                <ToolbarButton onPress={() => setColorTarget('background')}
+                  label={t('email_composer.toolbar.background_color', 'Background color')}
+                  icon={<Highlighter size={18} color={c.textSecondary} />} />
 
-              <View style={styles.formatSep} />
+                <View style={styles.formatSep} />
 
-              <ToolbarButton active={selState.h1} onPress={() => editorRef.current?.exec('formatBlock:H1')}
-                icon={<Heading1 size={18} color={selState.h1 ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.h2} onPress={() => editorRef.current?.exec('formatBlock:H2')}
-                icon={<Heading2 size={18} color={selState.h2 ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.h1} onPress={() => editorRef.current?.exec('formatBlock:H1')}
+                  icon={<Heading1 size={18} color={selState.h1 ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.h2} onPress={() => editorRef.current?.exec('formatBlock:H2')}
+                  icon={<Heading2 size={18} color={selState.h2 ? c.primary : c.textSecondary} />} />
 
-              <View style={styles.formatSep} />
+                <View style={styles.formatSep} />
 
-              <ToolbarButton active={selState.ul} onPress={() => editorRef.current?.exec('insertUnorderedList')}
-                icon={<List size={18} color={selState.ul ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.ol} onPress={() => editorRef.current?.exec('insertOrderedList')}
-                icon={<ListOrdered size={18} color={selState.ol ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.blockquote} onPress={() => editorRef.current?.exec('formatBlock:BLOCKQUOTE')}
-                icon={<Quote size={18} color={selState.blockquote ? c.primary : c.textSecondary} />} />
-              <ToolbarButton onPress={() => setTableMenuOpen(true)}
-                icon={<Table size={18} color={c.textSecondary} />} />
+                <ToolbarButton active={selState.ul} onPress={() => editorRef.current?.exec('insertUnorderedList')}
+                  icon={<List size={18} color={selState.ul ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.ol} onPress={() => editorRef.current?.exec('insertOrderedList')}
+                  icon={<ListOrdered size={18} color={selState.ol ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.blockquote} onPress={() => editorRef.current?.exec('formatBlock:BLOCKQUOTE')}
+                  icon={<Quote size={18} color={selState.blockquote ? c.primary : c.textSecondary} />} />
+                <ToolbarButton onPress={() => setTableMenuOpen(true)}
+                  icon={<Table size={18} color={c.textSecondary} />} />
 
-              <View style={styles.formatSep} />
+                <View style={styles.formatSep} />
 
-              <ToolbarButton active={selState.alignLeft} onPress={() => editorRef.current?.exec('justifyLeft')}
-                icon={<AlignLeft size={18} color={selState.alignLeft ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.alignCenter} onPress={() => editorRef.current?.exec('justifyCenter')}
-                icon={<AlignCenter size={18} color={selState.alignCenter ? c.primary : c.textSecondary} />} />
-              <ToolbarButton active={selState.alignRight} onPress={() => editorRef.current?.exec('justifyRight')}
-                icon={<AlignRight size={18} color={selState.alignRight ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.alignLeft} onPress={() => editorRef.current?.exec('justifyLeft')}
+                  icon={<AlignLeft size={18} color={selState.alignLeft ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.alignCenter} onPress={() => editorRef.current?.exec('justifyCenter')}
+                  icon={<AlignCenter size={18} color={selState.alignCenter ? c.primary : c.textSecondary} />} />
+                <ToolbarButton active={selState.alignRight} onPress={() => editorRef.current?.exec('justifyRight')}
+                  icon={<AlignRight size={18} color={selState.alignRight ? c.primary : c.textSecondary} />} />
 
-              <View style={styles.formatSep} />
+                <View style={styles.formatSep} />
 
-              <ToolbarButton active={selState.link} onPress={onLinkPress}
-                icon={selState.link
-                  ? <Link2Off size={18} color={c.primary} />
-                  : <Link2 size={18} color={c.textSecondary} />} />
-              <ToolbarButton onPress={() => { void insertInlineImage(); }}
-                icon={<ImageIcon size={18} color={c.textSecondary} />} />
-              <ToolbarButton onPress={() => editorRef.current?.exec('removeFormat')}
-                icon={<RemoveFormatting size={18} color={c.textSecondary} />} />
+                <ToolbarButton active={selState.link} onPress={onLinkPress}
+                  icon={selState.link
+                    ? <Link2Off size={18} color={c.primary} />
+                    : <Link2 size={18} color={c.textSecondary} />} />
+                <ToolbarButton onPress={() => { void insertInlineImage(); }}
+                  icon={<ImageIcon size={18} color={c.textSecondary} />} />
+                <ToolbarButton onPress={() => editorRef.current?.exec('removeFormat')}
+                  icon={<RemoveFormatting size={18} color={c.textSecondary} />} />
 
-              <View style={styles.formatSep} />
+                <View style={styles.formatSep} />
 
-              <ToolbarButton onPress={() => editorRef.current?.exec('undo')}
-                icon={<Undo2 size={18} color={c.textSecondary} />} />
-              <ToolbarButton onPress={() => editorRef.current?.exec('redo')}
-                icon={<Redo2 size={18} color={c.textSecondary} />} />
-            </>
-          )}
-        </ScrollView>
+                <ToolbarButton onPress={() => editorRef.current?.exec('undo')}
+                  icon={<Undo2 size={18} color={c.textSecondary} />} />
+                <ToolbarButton onPress={() => editorRef.current?.exec('redo')}
+                  icon={<Redo2 size={18} color={c.textSecondary} />} />
+              </>
+            )}
+          </ScrollView>
+        )}
       </View>
 
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={linkPromptVisible}
         transparent
         animationType="fade"
@@ -2567,7 +2554,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       </Modal>
 
       {/* Text / background colour palette */}
-      <Modal visible={!!colorTarget} transparent animationType="fade" onRequestClose={() => setColorTarget(null)}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!colorTarget} transparent animationType="fade" onRequestClose={() => setColorTarget(null)}>
         <Pressable style={styles.modalBackdrop} onPress={() => setColorTarget(null)}>
           <Pressable style={styles.scheduleCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>
@@ -2631,7 +2618,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       />
 
       {/* Schedule send sheet */}
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={scheduleSheetOpen}
         transparent
         animationType="fade"
@@ -2670,7 +2657,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       </Modal>
 
       {customStage !== null && Platform.OS === 'ios' && (
-        <Modal transparent animationType="fade" onRequestClose={() => setCustomStage(null)}>
+        <Modal supportedOrientations={MODAL_ORIENTATIONS} transparent animationType="fade" onRequestClose={() => setCustomStage(null)}>
           <Pressable style={styles.modalBackdrop} onPress={() => setCustomStage(null)}>
             <Pressable style={styles.scheduleCard} onPress={() => {}}>
               <DateTimePicker
@@ -2711,7 +2698,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       )}
 
       {/* Template placeholders */}
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={!!placeholderPrompt}
         transparent
         animationType="fade"
@@ -2766,7 +2753,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       </Modal>
 
       {/* From options: sub-address tag / From override */}
-      <Modal visible={fromOptionsOpen} transparent animationType="fade" onRequestClose={() => setFromOptionsOpen(false)}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={fromOptionsOpen} transparent animationType="fade" onRequestClose={() => setFromOptionsOpen(false)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>{t('email_composer.from', 'From')}</Text>
@@ -2882,6 +2869,7 @@ function makeStyles(c: ThemePalette) {
     borderBottomColor: c.border,
     gap: spacing.sm,
   },
+  headerCompact: { paddingVertical: 0 },
   headerBtn: {
     width: componentSizes.buttonLg,
     height: componentSizes.buttonLg,

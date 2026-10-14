@@ -31,7 +31,7 @@ module.exports = {
     // Android's manifest is maintained by hand and lists the same schemes.
     scheme: ['bulwarkmobile', 'bulwarkmail', 'mailto'],
     version: VERSION,
-    orientation: 'portrait',
+    orientation: 'default',
     icon: './assets/icon.png',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,

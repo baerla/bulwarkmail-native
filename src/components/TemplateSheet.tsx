@@ -10,6 +10,7 @@ import { useSheetDrag } from '../lib/use-sheet-drag';
 import { useLocaleStore } from '../stores/locale-store';
 import { useTemplatesStore, type EmailTemplate } from '../stores/templates-store';
 import { filterTemplates } from '../lib/template-utils';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface TemplateSheetProps {
   visible: boolean;
@@ -63,7 +64,7 @@ export function TemplateSheet({ visible, onClose, onPick }: TemplateSheetProps) 
   }, [templates, query]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.sheetOverlayPress} onPress={onClose} />
       </Animated.View>

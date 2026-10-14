@@ -14,6 +14,7 @@ import { useSheetDrag } from '../lib/use-sheet-drag';
 import { useLocaleStore } from '../stores/locale-store';
 import { localizeMailboxName } from '../lib/mailbox-label';
 import type { Mailbox } from '../api/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 function moveTargetIcon(role: string | null | undefined, name: string): LucideIcon {
   const lower = name.toLowerCase();
@@ -76,7 +77,7 @@ export function MoveSheet({
   }, [mailboxes]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.sheetOverlayPress} onPress={onClose} />
       </Animated.View>

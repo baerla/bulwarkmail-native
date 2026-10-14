@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   FlatList,
+  ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
@@ -49,7 +50,13 @@ export function MonthDropdown({
 }: MonthDropdownProps) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
-  const { width } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  // Pages are as wide as the panel (the window, or a pane on a tablet) and
+  // re-measure on rotation. In a short window the panel takes at most about
+  // half of it and its month scrolls inside.
+  const [measuredWidth, setMeasuredWidth] = React.useState(0);
+  const width = measuredWidth || windowWidth;
+  const panelHeight = Math.min(PANEL_HEIGHT, Math.round(windowHeight * 0.55));
   // The months are fixed while the panel is open; it remounts on each open.
   const [months] = React.useState(() => {
     const first = addMonths(startOfMonth(month), -MONTHS_EACH_SIDE);
@@ -69,7 +76,11 @@ export function MonthDropdown({
 
   const renderItem = React.useCallback(
     ({ item }: ListRenderItemInfo<Date>) => (
-      <View style={{ width, height: PANEL_HEIGHT }}>
+      <ScrollView
+        style={{ width, height: panelHeight }}
+        scrollEnabled={panelHeight < PANEL_HEIGHT}
+        showsVerticalScrollIndicator={false}
+      >
         <MonthView
           currentDate={item}
           selectedDate={selectedDate}
@@ -79,9 +90,9 @@ export function MonthDropdown({
           weekStartsOn={weekStartsOn}
           onSelectDate={onSelectDate}
         />
-      </View>
+      </ScrollView>
     ),
-    [width, selectedDate, eventsByDay, calendars, weekStartsOn, onSelectDate],
+    [width, panelHeight, selectedDate, eventsByDay, calendars, weekStartsOn, onSelectDate],
   );
 
   const getItemLayout = React.useCallback(
@@ -90,20 +101,28 @@ export function MonthDropdown({
   );
 
   return (
-    <View style={styles.panel}>
+    <View
+      style={styles.panel}
+      onLayout={(e) => {
+        const w = Math.round(e.nativeEvent.layout.width);
+        if (w > 0 && w !== measuredWidth) setMeasuredWidth(w);
+      }}
+    >
       <FlatList
+        // A new width remounts the pager on the month it was showing.
+        key={width}
         horizontal
         pagingEnabled
         data={months}
         keyExtractor={monthKey}
         renderItem={renderItem}
         getItemLayout={getItemLayout}
-        initialScrollIndex={MONTHS_EACH_SIDE}
+        initialScrollIndex={lastIndexRef.current}
         onMomentumScrollEnd={handleMomentumEnd}
         showsHorizontalScrollIndicator={false}
         initialNumToRender={1}
         windowSize={3}
-        style={{ height: PANEL_HEIGHT }}
+        style={{ height: panelHeight }}
       />
     </View>
   );

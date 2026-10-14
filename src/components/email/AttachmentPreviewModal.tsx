@@ -12,6 +12,7 @@ import { useLocaleStore } from '../../stores/locale-store';
 import EmailBodyView from '../EmailBodyView';
 import type { PreviewKind } from '../../lib/attachment-display';
 import type { EmlPreview } from './use-body-override';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 export interface PreviewItem {
   kind: PreviewKind;
@@ -160,7 +161,7 @@ export function AttachmentPreviewModal({
   };
 
   return (
-    <Modal visible={!!item || loading} animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!item || loading} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.header}>
           <Pressable

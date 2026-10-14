@@ -14,6 +14,7 @@ import { useColors } from '../../theme/colors';
 import ToggleSwitchComponent from '../ToggleSwitch';
 import { useLocaleStore } from '../../stores/locale-store';
 import { useSearchHighlight } from './search-highlight';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 /**
  * Mirrors webmail settings-section.tsx:
@@ -193,7 +194,7 @@ export function Select({ value, onChange, options, style }: SelectProps) {
         <Text style={styles.selectText}>{current?.label ?? ''}</Text>
         <ChevronDown size={14} color={c.mutedForeground} />
       </Pressable>
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={open}
         transparent
         animationType="fade"

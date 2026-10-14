@@ -7,6 +7,7 @@ import { spacing, radius, typography, type ThemePalette } from '../theme/tokens'
 import { useColors, useResolvedTheme } from '../theme/colors';
 import Button from './Button';
 import { useLocaleStore } from '../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface QrScanModalProps {
   visible: boolean;
@@ -42,7 +43,7 @@ export function QrScanModal({ visible, onClose, onScanned }: QrScanModalProps) {
   );
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <View style={styles.container}>
         {permission?.granted ? (
           <CameraView

@@ -217,6 +217,7 @@ function TimeGridScrollViewInner({
         listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
           const list = daysRef.current;
           offsetXRef.current = e.nativeEvent.contentOffset.x;
+          if (e.nativeEvent.contentOffset.x > 0) scrolledSinceMountRef.current = true;
           const col = Math.max(
             0,
             Math.min(list.length - 1, Math.round(e.nativeEvent.contentOffset.x / colWidthRef.current)),
@@ -239,7 +240,12 @@ function TimeGridScrollViewInner({
   const visibleHandlerRef = React.useRef(onVisibleDateChange);
   visibleHandlerRef.current = onVisibleDateChange;
   const lastVisibleKeyRef = React.useRef<string | null>(null);
+  // Right after a (re)mount the list reports its first days as visible
+  // before the initial scroll lands; that would set the title to the window's
+  // first month. Reports wait until the list has scrolled at all.
+  const scrolledSinceMountRef = React.useRef(false);
   const onViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    if (!scrolledSinceMountRef.current) return;
     let first: Date | null = null;
     for (const token of viewableItems) {
       const day = token.item as Date;
@@ -379,6 +385,21 @@ function TimeGridScrollViewInner({
       ),
     };
   }
+  // The remounted list starts at that day, but the header strip still holds
+  // the old pixel offset until the list scrolls: move it now, or the header
+  // shows other days (or none) after a rotation.
+  React.useLayoutEffect(() => {
+    const index = initialIndexRef.current?.index ?? 0;
+    scrolledSinceMountRef.current = false;
+    offsetXRef.current = index * colWidth;
+    scrollX.setValue(offsetXRef.current);
+    const day = days[index];
+    if (day) {
+      headerAnchorRef.current = day;
+      setHeaderAnchor(day);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listKey]);
   const listStyle = React.useMemo(() => ({ width: listWidth, height: GRID_HEIGHT }), [listWidth]);
 
   return (

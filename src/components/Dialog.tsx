@@ -5,6 +5,7 @@ import Button from './Button';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { useLocaleStore } from '../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface DialogInput {
   value: string;
@@ -55,7 +56,7 @@ export default function Dialog({
   const confirmLabel = confirmText ?? t('common.confirm', 'Confirm');
   const cancelLabel = cancelText ?? t('common.cancel', 'Cancel');
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <View style={styles.backdrop}>
         <View style={styles.dialog}>
           <View style={styles.content}>

@@ -24,6 +24,7 @@ import {
 import { otherAccountsSyncing, type SyncCollection } from '../../../device-sync/app/collections';
 import { CONTACTS_AUTHORITY, type Authority } from '../../../device-sync/types';
 import { useSyncCollections } from './use-sync-collections';
+import { MODAL_ORIENTATIONS } from '../../../lib/modal-orientations';
 
 interface Props {
   visible: boolean;
@@ -108,7 +109,7 @@ export function DeviceSyncCollectionsSheet({ visible, onClose, registryId, autho
           : t('settings.device_sync.list_error_server', 'The server could not list them.');
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={close} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={close} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={close} />
       </Animated.View>

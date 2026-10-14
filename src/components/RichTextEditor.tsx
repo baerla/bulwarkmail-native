@@ -65,6 +65,8 @@ export interface RichTextEditorHandle {
    */
   getHtml(timeoutMs?: number): Promise<string>;
   focus(): void;
+  /** Drop the caret, which closes the keyboard. */
+  blur(): void;
 }
 
 interface Props {
@@ -175,6 +177,9 @@ const RichTextEditor = React.forwardRef<RichTextEditorHandle, Props>(function Ri
       }),
     focus: () => {
       call(`window.__rne && window.__rne.focus()`);
+    },
+    blur: () => {
+      call(`document.activeElement && document.activeElement.blur()`);
     },
   }), [call]);
 

@@ -34,6 +34,22 @@ export function monthFocusRow(
   return Math.max(0, Math.min(rowCount - 1, row));
 }
 
+/**
+ * Row height and number of whole rows for a month grid of `height`. Six
+ * weeks fill the space when they fit at `minRow` or taller; a short window
+ * (a phone in landscape) shows fewer, taller-than-minimum rows instead of
+ * six rows that run off the bottom.
+ */
+export function monthRowGeometry(
+  height: number,
+  minRow: number,
+  maxRows = 6,
+): { rowHeight: number; visibleRows: number } {
+  if (height <= 0 || minRow <= 0) return { rowHeight: minRow, visibleRows: maxRows };
+  const visibleRows = Math.max(1, Math.min(maxRows, Math.floor(height / minRow)));
+  return { rowHeight: Math.floor(height / visibleRows), visibleRows };
+}
+
 /** Row under the sample line for a scroll offset. */
 export function sampledRow(
   offset: number,

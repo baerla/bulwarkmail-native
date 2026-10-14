@@ -16,6 +16,7 @@ import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 interface Props {
   visible: boolean;
@@ -94,7 +95,7 @@ export default function ContactPickerSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <Animated.View style={[styles.overlay, { opacity: overlay }]}>
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>

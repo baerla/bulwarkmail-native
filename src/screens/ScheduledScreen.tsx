@@ -25,6 +25,7 @@ import { draftContextFromEmail } from '../lib/draft-context';
 import { formatQuoteDate } from '../lib/quote-header';
 import { spacing, typography, componentSizes, radius, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Scheduled'>;
 
@@ -322,7 +323,7 @@ export default function ScheduledScreen({ navigation }: Props) {
       )}
 
       {/* Per-message actions */}
-      <Modal visible={!!actionsFor} transparent animationType="fade" onRequestClose={() => setActionsFor(null)}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!actionsFor} transparent animationType="fade" onRequestClose={() => setActionsFor(null)}>
         <Pressable style={styles.modalBackdrop} onPress={() => setActionsFor(null)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text style={styles.cardTitle} numberOfLines={2}>
@@ -345,7 +346,7 @@ export default function ScheduledScreen({ navigation }: Props) {
       </Modal>
 
       {/* Reschedule presets */}
-      <Modal visible={!!rescheduleFor && customStage === null} transparent animationType="fade" onRequestClose={() => setRescheduleFor(null)}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!rescheduleFor && customStage === null} transparent animationType="fade" onRequestClose={() => setRescheduleFor(null)}>
         <Pressable style={styles.modalBackdrop} onPress={() => setRescheduleFor(null)}>
           <Pressable style={styles.card} onPress={() => {}}>
             <Text style={styles.cardTitle}>{t('email_list.reschedule_send', 'Reschedule')}</Text>
@@ -375,7 +376,7 @@ export default function ScheduledScreen({ navigation }: Props) {
       </Modal>
 
       {customStage !== null && Platform.OS === 'ios' && (
-        <Modal transparent animationType="fade" onRequestClose={() => setCustomStage(null)}>
+        <Modal supportedOrientations={MODAL_ORIENTATIONS} transparent animationType="fade" onRequestClose={() => setCustomStage(null)}>
           <Pressable style={styles.modalBackdrop} onPress={() => setCustomStage(null)}>
             <Pressable style={styles.card} onPress={() => {}}>
               <DateTimePicker

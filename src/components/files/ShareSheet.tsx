@@ -18,6 +18,7 @@ import type { FileNode, FileNodeRights, Principal } from '../../api/types';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type RolePreset = 'read' | 'readWrite' | 'manager';
 
@@ -155,7 +156,7 @@ export default function ShareSheet({ node, onClose, onChanged }: ShareSheetProps
   };
 
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>

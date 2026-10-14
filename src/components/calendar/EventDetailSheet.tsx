@@ -60,6 +60,7 @@ import { useCalendarLocale } from '../../lib/calendar-locale';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { recurrenceEndLabel, recurrenceIntervalLabel } from '../../lib/recurrence';
 import type { TranslateFn } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 type RsvpStatus = 'accepted' | 'declined' | 'tentative';
 
@@ -243,7 +244,7 @@ export function EventDetailSheet({
   };
 
   return (
-    <Modal
+    <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={visible}
       transparent
       animationType="none"
@@ -613,7 +614,9 @@ function makeStyles(c: ThemePalette) {
     borderTopWidth: 1,
     borderTopColor: c.border,
   },
-  sheetSafe: { paddingTop: spacing.sm },
+  // The body shrinks to what is left under the sheet's max height, so the
+  // action row stays on screen in a short (landscape) window.
+  sheetSafe: { paddingTop: spacing.sm, flexShrink: 1 },
   handleHit: {
     alignItems: 'center',
     paddingTop: spacing.xs,
@@ -640,7 +643,7 @@ function makeStyles(c: ThemePalette) {
   subtitle: { ...typography.caption, color: c.textMuted, marginTop: 2 },
   closeBtn: { padding: 4 },
 
-  body: { maxHeight: 400 },
+  body: { flexShrink: 1 },
   bodyContent: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,

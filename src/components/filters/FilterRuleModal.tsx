@@ -37,6 +37,7 @@ import type {
   FilterComparator,
   FilterActionType,
 } from '../../lib/sieve/types';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 const ALL_FIELDS: FilterConditionField[] = ['from', 'to', 'cc', 'subject', 'header', 'size', 'body', 'attachment'];
 const TEXT_COMPARATORS: FilterComparator[] = ['contains', 'not_contains', 'is', 'not_is', 'starts_with', 'ends_with', 'matches'];
@@ -226,7 +227,7 @@ export function FilterRuleModal({ visible, rule, mailboxes, onSave, onClose }: F
   }, [name, conditions, actions, matchType, stopProcessing, includeSpam, rule, onSave, t, mailboxTargets]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.header}>
           <Pressable

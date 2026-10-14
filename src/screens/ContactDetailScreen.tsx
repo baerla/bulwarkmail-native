@@ -32,6 +32,7 @@ import AddressBookPickerSheet from '../components/contacts/AddressBookPickerShee
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { useLocaleStore, type TranslateFn } from '../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ContactDetail'>;
 type Route = RouteProp<RootStackParamList, 'ContactDetail'>;
@@ -802,7 +803,7 @@ function MoreActionsSheet({
   }, [visible, slideY, overlayOpacity]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" statusBarTranslucent onRequestClose={onClose}>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>

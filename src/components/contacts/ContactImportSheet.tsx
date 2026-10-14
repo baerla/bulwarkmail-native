@@ -13,6 +13,7 @@ import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 // expo-document-picker is loaded lazily on first use; its native module is not
 // linked into every build (matches the FilesScreen upload flow).
@@ -160,7 +161,7 @@ export default function ContactImportSheet({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>

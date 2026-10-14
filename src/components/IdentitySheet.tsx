@@ -9,6 +9,7 @@ import { useColors } from '../theme/colors';
 import { useSheetDrag } from '../lib/use-sheet-drag';
 import type { Identity } from '../api/types';
 import { useLocaleStore } from '../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface IdentitySheetProps {
   visible: boolean;
@@ -44,7 +45,7 @@ export function IdentitySheet({
   }, [visible, slideY, overlayOpacity]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.sheetOverlayPress} onPress={onClose} />
       </Animated.View>

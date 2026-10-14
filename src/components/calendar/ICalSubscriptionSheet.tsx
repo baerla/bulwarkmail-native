@@ -17,6 +17,7 @@ import {
   type CalendarSubscription,
 } from '../../stores/calendar-subscriptions-store';
 import { jmapClient } from '../../api/jmap-client';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 // The webmail's refresh intervals and their labels.
 const INTERVAL_OPTIONS: { minutes: number; key: string; fallback: string }[] = [
@@ -131,7 +132,7 @@ export function ICalSubscriptionSheet({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>

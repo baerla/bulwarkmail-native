@@ -6,6 +6,7 @@ import { spacing, radius, typography, type ThemePalette } from '../../theme/toke
 import { useColors } from '../../theme/colors';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 export interface ActionSheetItem {
   key: string;
@@ -55,7 +56,7 @@ export function ActionSheet({ visible, title, subtitle, items, onClose, children
   }, [visible, slideY, overlayOpacity]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>

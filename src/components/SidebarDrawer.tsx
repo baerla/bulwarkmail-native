@@ -37,6 +37,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { Mailbox } from '../api/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 const CHEVRON_SLOT = 20;
 const INDENT_STEP = 12;
@@ -228,7 +229,7 @@ function ActionSheet({ title, actions, onClose }: { title: string; actions: Shee
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <Pressable style={styles.sheetOverlay} onPress={onClose} />
       <View style={styles.sheet}>
         <Text style={styles.sheetTitle} numberOfLines={1}>{title}</Text>
@@ -270,7 +271,7 @@ function NamePrompt({ title, message, initial, confirmLabel, onSubmit, onClose }
     onSubmit(name);
   };
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <Pressable style={styles.sheetOverlay} onPress={onClose} />
       <View style={styles.promptCard}>
         <Text style={styles.sheetTitle}>{title}</Text>
@@ -746,7 +747,7 @@ export default function SidebarDrawer({ visible, onClose }: SidebarDrawerProps) 
   const tagViewActive = !!filters.keyword;
 
   return (
-    <Modal
+    <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={visible}
       transparent
       animationType="none"

@@ -23,6 +23,7 @@ import { CALENDAR_COLOR_PALETTE, calendarColorName, getCalendarColor } from '../
 import { BIRTHDAY_CALENDAR_ID } from '../../lib/birthday-calendar';
 import { isWritableCalendar } from '../../lib/calendar-editability';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 /** A calendar view listed at the top of the drawer. */
 export interface DrawerViewOption {
@@ -151,7 +152,7 @@ export function CalendarSidebarDrawer({
   };
 
   return (
-    <Modal
+    <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={visible}
       transparent
       animationType="none"

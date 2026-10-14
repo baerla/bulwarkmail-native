@@ -65,6 +65,7 @@ import { useLocaleStore, type TranslateFn } from '../stores/locale-store';
 import Dialog from '../components/Dialog';
 import ShareSheet from '../components/files/ShareSheet';
 import { FilePreviewModal, canPreviewInApp } from '../components/files/FilePreviewModal';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 // A file row carries the display name alongside the rest of the node.
 interface FileRow extends FileNode {
@@ -1148,7 +1149,7 @@ function PromptModal(props: PromptModalProps) {
   const c = useColors();
   const styles = React.useMemo(() => makePromptStyles(c), [c]);
   return (
-    <Modal
+    <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={props.visible}
       transparent
       animationType="fade"
@@ -1217,7 +1218,7 @@ function ActionsSheet({
   const canShare = sharingEnabled && !target.isShared && (target.myRights?.mayShare ?? true);
   const modified = modifiedOf(target);
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>
@@ -1339,7 +1340,7 @@ function FolderPickerSheet({ target, allNodes, rootLabel, t, onClose, onPick }: 
   if (!target) return null;
   const currentParent = target.parentId ?? null;
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>
@@ -1394,7 +1395,7 @@ function SortSheet({ visible, sortKey, sortDir, t, onClose, onChangeKey, onChang
   if (!visible) return null;
   const keys: FilesSortKey[] = ['name', 'size', 'modified'];
   return (
-    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>

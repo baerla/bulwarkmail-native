@@ -17,6 +17,7 @@ import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
 import { CALENDAR_COLOR_PALETTE, calendarColorName, getCalendarColor } from '../../lib/calendar-utils';
 import Button from '../Button';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 export interface CalendarEditValues {
   name: string;
@@ -69,7 +70,7 @@ export function CalendarEditSheet({ visible, calendar, onSave, onClose }: Calend
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backdrop}>
           <TouchableWithoutFeedback>

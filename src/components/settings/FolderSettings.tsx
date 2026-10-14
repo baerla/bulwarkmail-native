@@ -25,6 +25,7 @@ import { useLocaleStore } from '../../stores/locale-store';
 import { createMailbox, updateMailbox, deleteMailbox } from '../../api/email';
 import { jmapClient } from '../../api/jmap-client';
 import type { Mailbox } from '../../api/types';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 const ROLE_ICON: Record<string, any> = {
   inbox: Inbox, drafts: FileText, sent: Send, trash: Trash,
@@ -297,7 +298,7 @@ export function FolderSettings() {
         )}
       </SettingsSection>
 
-      <Modal visible={!!editor} animationType="slide" transparent onRequestClose={closeEditor}>
+      <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!editor} animationType="slide" transparent onRequestClose={closeEditor}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>

@@ -18,6 +18,7 @@ import type { CalendarFocus, DayRange } from '../../lib/calendar-scroll-window';
 import {
   dayIndexIn,
   monthFocusRow,
+  monthRowGeometry,
   monthKeyOf,
   monthMask,
   sampledRow,
@@ -124,8 +125,9 @@ function MonthScrollViewInner({
     const height = e.nativeEvent.layout.height;
     if (height > 0) setListHeight(height);
   }, []);
-  const rowHeight = Math.max(MONTH_ROW_HEIGHT_FULL_MIN, Math.floor(listHeight / VISIBLE_ROWS));
-  const viewportHeight = rowHeight * VISIBLE_ROWS;
+  // A phone in landscape has room for three or four weeks, not six.
+  const { rowHeight, visibleRows } = monthRowGeometry(listHeight, MONTH_ROW_HEIGHT_FULL_MIN, VISIBLE_ROWS);
+  const viewportHeight = listHeight;
 
   // The month in focus: set by navigation, then by what scrolls under the
   // sample line.
@@ -134,16 +136,28 @@ function MonthScrollViewInner({
   const onVisibleRef = React.useRef(onVisibleDateChange);
   onVisibleRef.current = onVisibleDateChange;
   const offsetRef = React.useRef(0);
-  // Row at the top of the viewport; a change of row height (the "show time"
-  // setting) remounts the list there.
-  const topRowRef = React.useRef<number | null>(null);
+  // Week at the top of the viewport; a change of row height (the "show time"
+  // setting, a rotation) remounts the list there. Kept as the week, not its
+  // index, because weeks added above shift the indices.
+  const topWeekRef = React.useRef<string | null>(null);
 
+  // A (re)mounted list reports offset 0 before its initial scroll lands; that
+  // report would set the month to the window's first one (a rotation jumped
+  // back a month). Until the list reaches its start row, or the user drags,
+  // scroll reports don't move the month.
+  const settledRef = React.useRef(false);
   const handleScroll = React.useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offset = e.nativeEvent.contentOffset.y;
+      if (!settledRef.current) {
+        const expected = (initialRef.current?.row ?? 0) * rowHeight;
+        if (Math.abs(offset - expected) > rowHeight / 2) return;
+        settledRef.current = true;
+      }
       offsetRef.current = offset;
-      topRowRef.current = Math.round(offset / rowHeight);
       const list = weeksRef.current;
+      const top = list[Math.max(0, Math.min(list.length - 1, Math.round(offset / rowHeight)))];
+      if (top) topWeekRef.current = dayKey(top[0]);
       const row = sampledRow(offset, viewportHeight, rowHeight, list.length);
       const days = list[row];
       if (!days) return;
@@ -158,15 +172,18 @@ function MonthScrollViewInner({
     [viewportHeight, rowHeight],
   );
 
+  const markSettled = React.useCallback(() => { settledRef.current = true; }, []);
+
   // Navigation inside the window scrolls the focused month's first week to
   // the top. The list mounts there already, so its own nonce needs nothing.
   const listRef = React.useRef<FlatList<Date[]>>(null);
   const handledNonceRef = React.useRef(focus.nonce);
   const initialRef = React.useRef<{ rowHeight: number; row: number } | null>(null);
   if (initialRef.current === null || initialRef.current.rowHeight !== rowHeight) {
+    settledRef.current = false;
     initialRef.current = {
       rowHeight,
-      row: topRowRef.current ?? monthFocusRow(window, focus.date, weeks.length, opts),
+      row: rowOfWeek(weeks, topWeekRef.current) ?? monthFocusRow(window, focus.date, weeks.length, opts),
     };
   }
   React.useEffect(() => {
@@ -263,12 +280,13 @@ function MonthScrollViewInner({
         onEndReached={onExtendEnd}
         onEndReachedThreshold={0.5}
         onScroll={handleScroll}
+        onScrollBeginDrag={markSettled}
         scrollEventThrottle={32}
         snapToInterval={rowHeight}
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
-        initialNumToRender={VISIBLE_ROWS + 2}
-        maxToRenderPerBatch={VISIBLE_ROWS}
+        initialNumToRender={visibleRows + 2}
+        maxToRenderPerBatch={visibleRows}
         windowSize={5}
       />
       )}
@@ -281,4 +299,10 @@ export const MonthScrollView = React.memo(MonthScrollViewInner);
 
 function weekKey(days: Date[]): string {
   return dayKey(days[0]);
+}
+
+function rowOfWeek(weeks: Date[][], key: string | null): number | null {
+  if (!key) return null;
+  const i = weeks.findIndex((days) => dayKey(days[0]) === key);
+  return i >= 0 ? i : null;
 }

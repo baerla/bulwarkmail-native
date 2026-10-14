@@ -107,6 +107,9 @@ export function ParticipantInput({ attendees, onAdd, onRemove }: ParticipantInpu
       )}
 
       <TextInput
+        // No full-screen keyboard in landscape: it would hide the suggestions
+        // and the text around the field.
+        disableFullscreenUI
         value={draft}
         onChangeText={setDraft}
         placeholder={t('calendar.event_modal.participant_placeholder', 'Add participant by email')}

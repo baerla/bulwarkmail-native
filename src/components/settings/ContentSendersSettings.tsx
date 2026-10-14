@@ -12,6 +12,7 @@ import { useContactsStore } from '../../stores/contacts-store';
 import { useHasContacts } from '../../lib/capabilities';
 import { isTrustedSendersSyncOn } from '../../lib/trusted-senders';
 import { useLocaleStore } from '../../stores/locale-store';
+import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 interface TrustedRow {
   email: string;
@@ -189,7 +190,7 @@ export function ContentSendersSettings() {
         )}
       </SettingsSection>
 
-      <Modal
+      <Modal supportedOrientations={MODAL_ORIENTATIONS}
         visible={modalOpen}
         transparent
         animationType="fade"

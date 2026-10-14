@@ -11,6 +11,7 @@ import { keywordToken, type KeywordDef } from '../stores/keywords-store';
 import { useLocaleStore } from '../stores/locale-store';
 import { getEmailTagIds } from '../lib/thread-utils';
 import type { Email } from '../api/types';
+import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
 interface TagSheetProps {
   visible: boolean;
@@ -65,7 +66,7 @@ export function TagSheet({ visible, onClose, keywords, selectedEmails, onToggle 
   }, [keywords, selectedEmails]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>
