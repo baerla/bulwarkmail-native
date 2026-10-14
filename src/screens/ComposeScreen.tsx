@@ -41,7 +41,7 @@ import { toast } from '../stores/toast-store';
 import { type EmailTemplate } from '../stores/templates-store';
 import { getIdentities } from '../api/identity';
 import {
-  sendEmail, createDraft, destroyEmails, patchKeywordsForEmails, type OutgoingAttachment, type OutgoingEmail,
+  sendEmail, saveDraftVersion, destroyEmails, patchKeywordsForEmails, type OutgoingAttachment, type OutgoingEmail,
 } from '../api/email';
 import { jmapClient, RequestTimeoutError, ScheduleTooLateError } from '../api/jmap-client';
 import { uploadBlob, uploadBytes } from '../api/blob';
@@ -62,6 +62,9 @@ import {
   findComposeIdentityId, findDraftIdentityId, resolveComposeAccountEmail, resolveReplyIdentity,
 } from '../lib/reply-identity';
 import { shouldBlockEditorRemoteImages } from '../lib/editor-html';
+import {
+  initialDraftPartBlobState, liveBlobId, rebaseDraftPartBlobs, withSnapshotBody,
+} from '../lib/draft-part-blobs';
 import {
   signatureIdentityFor, buildEmbeddedSignatureHtml, containsEmbeddedSignature, spliceSignature,
   insertSignatureAboveQuote, getPlainTextSignature, appendPlainTextSignature,
@@ -684,6 +687,13 @@ export default function ComposeScreen({ route, navigation }: Props) {
   // Track inline-image placeholders that haven't yet been rewritten to cid:
   // until send time. Maps cid → blobId/type/name/size.
   const inlineRegistryRef = React.useRef<Map<string, AttachmentEntry>>(new Map());
+  // A re-opened draft's attachments and inline images are parts of that
+  // draft: their blobIds die with each version a save replaces (#849), and an
+  // upload expires once nothing references it. This maps the blobId each
+  // entry holds to the matching part of the latest saved version, which
+  // `buildOutgoing` sends. Kept out of the attachment state so the dirty
+  // snapshot does not change on every save.
+  const draftPartBlobsRef = React.useRef(initialDraftPartBlobState());
 
   const getAutocomplete = useContactsStore((s) => s.getAutocomplete);
   const getGroupRecipients = useContactsStore((s) => s.getGroupRecipients);
@@ -843,6 +853,10 @@ export default function ComposeScreen({ route, navigation }: Props) {
         }
       }
       if (cancelled || map.size === 0) return;
+      // No change message since the editor loaded = the user has not typed
+      // yet, so the editor still holds the seeded body (normalised by the
+      // WebView DOM, which is why it can differ from the raw server HTML).
+      const untouched = !plainTextMode && latestRef.current.bodyHtml === initialBodyHtml;
       let live = latestRef.current.bodyHtml;
       try {
         live = (await editorRef.current?.getHtml()) ?? live;
@@ -853,8 +867,16 @@ export default function ComposeScreen({ route, navigation }: Props) {
         editorRef.current?.setHtml(next);
       }
       // The hydrated images are part of the untouched baseline, not an edit.
-      baselineRef.current = replaceInlineImagePlaceholders(baselineRef.current, map);
-      if (lastSavedRef.current) lastSavedRef.current = replaceInlineImagePlaceholders(lastSavedRef.current, map);
+      if (untouched) {
+        // Rebase on the body the composer now holds: comparing it with the
+        // raw server HTML made every re-opened draft with inline images look
+        // edited, and the autosave replaced (and destroyed) it unasked.
+        baselineRef.current = withSnapshotBody(baselineRef.current, next);
+        if (lastSavedRef.current) lastSavedRef.current = withSnapshotBody(lastSavedRef.current, next);
+      } else {
+        baselineRef.current = replaceInlineImagePlaceholders(baselineRef.current, map);
+        if (lastSavedRef.current) lastSavedRef.current = replaceInlineImagePlaceholders(lastSavedRef.current, map);
+      }
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1224,7 +1246,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
       .map((cid) => inlineRegistryRef.current.get(cid))
       .filter((e): e is AttachmentEntry => !!e && !!e.blobId && !e.error)
       .map<OutgoingAttachment>((e) => ({
-        blobId: e.blobId!,
+        blobId: liveBlobId(draftPartBlobsRef.current, e.blobId!),
         type: e.type,
         name: e.name,
         size: e.size,
@@ -1235,7 +1257,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
     const fileAttachments = attachments
       .filter((a) => !a.inline && a.blobId && !a.error)
       .map<OutgoingAttachment>((a) => ({
-        blobId: a.blobId!,
+        blobId: liveBlobId(draftPartBlobsRef.current, a.blobId!),
         type: a.type,
         name: a.name,
         size: a.size,
@@ -1295,8 +1317,14 @@ export default function ComposeScreen({ route, navigation }: Props) {
     setDraftStatus('saving');
     try {
       const outgoing = buildOutgoing(identity, html, { forDraft: true });
-      const id = await createDraft(outgoing, draftsMailbox.id, draftIdRef.current ?? undefined);
+      const saved = await saveDraftVersion(outgoing, draftsMailbox.id, draftIdRef.current ?? undefined);
+      const id = saved.id;
       draftIdRef.current = id;
+      // The previous version and its part blobs are gone: point every
+      // attachment at the parts of the version just created.
+      draftPartBlobsRef.current = rebaseDraftPartBlobs(
+        draftPartBlobsRef.current, outgoing.attachments ?? [], saved.attachments,
+      );
       lastSavedRef.current = snapshot;
       lastSaveAtRef.current = Date.now();
       setDraftStatus('saved');
