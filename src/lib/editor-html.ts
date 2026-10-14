@@ -70,8 +70,14 @@ export function buildEditorHtml(opts: {
   c: ThemePalette;
   /** Block remote images and fonts (see `buildEditorCsp`). */
   blockRemoteImages?: boolean;
+  /**
+   * Keep the page's visual viewport at the top and report every pan to RN as
+   * a `viewportShift` (CSS px = dp) instead (see the page script). Android
+   * only: its WebView pans the visual viewport to reveal the caret.
+   */
+  pinVisualViewport?: boolean;
 }): string {
-  const { initialHtml, placeholder, c, blockRemoteImages = false } = opts;
+  const { initialHtml, placeholder, c, blockRemoteImages = false, pinVisualViewport = false } = opts;
   // Inject initial content as a JSON-encoded string so any HTML/quotes inside
   // are safely embedded (no template literal collision with the script body).
   const initialJson = JSON.stringify(initialHtml);
@@ -361,6 +367,27 @@ export function buildEditorHtml(opts: {
 
   reportHeight();
   reportChange();
+
+  // ── Visual viewport pinning (Android) ──────────────────────────────
+  // The WebView is as tall as its content and sits in RN's ScrollView, so
+  // the page itself never scrolls. But Android's WebView shrinks the visual
+  // viewport to the part of the view that is on screen (above the keyboard,
+  // below the header fields) and pans it to reveal the caret while typing.
+  // The pan outlives the moment: once the composer is scrolled back to the
+  // top the body is still drawn shifted up by that offset, so its first
+  // lines hide under To/Cc/Subject until a scroll to the very bottom clamps
+  // it away. Undo every pan at once (window.scrollTo only moves the layout
+  // viewport; scrolling the top of the page into view resets both) and hand
+  // the offset to RN, which scrolls the composer by as much so the caret
+  // stays where the pan had put it.
+  if (${pinVisualViewport ? 'true' : 'false'} && window.visualViewport) {
+    window.visualViewport.addEventListener('scroll', function () {
+      var shift = window.visualViewport.offsetTop;
+      if (Math.abs(shift) < 0.5) return;
+      try { editor.scrollIntoView({ block: 'start', inline: 'nearest' }); } catch (e) {}
+      post('viewportShift', shift);
+    });
+  }
 
   // Re-measure after async layout (image loads, font swap).
   window.addEventListener('load', function () {

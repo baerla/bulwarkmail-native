@@ -680,6 +680,17 @@ export default function ComposeScreen({ route, navigation }: Props) {
   });
 
   const editorRef = React.useRef<RichTextEditorHandle>(null);
+  // The composer's ScrollView and its live offset. On Android the editor page
+  // hands back the caret-reveal pans it undoes (see `pinVisualViewport` in
+  // editor-html); scrolling the composer by the same amount keeps the caret
+  // where the pan had put it, without leaving the body drawn shifted up.
+  const bodyScrollRef = React.useRef<ScrollView>(null);
+  const bodyScrollY = React.useRef(0);
+  const onEditorViewportShift = React.useCallback((dy: number) => {
+    const y = Math.max(0, bodyScrollY.current + dy);
+    bodyScrollY.current = y;
+    bodyScrollRef.current?.scrollTo({ y, animated: false });
+  }, []);
   const isPickingSuggestion = React.useRef(false);
   // Track inline-image placeholders that haven't yet been rewritten to cid:
   // until send time. Maps cid → blobId/type/name/size.
@@ -2349,9 +2360,12 @@ export default function ComposeScreen({ route, navigation }: Props) {
 
       <View style={[styles.flex, { paddingBottom: bottomPad }]}>
         <ScrollView
+          ref={bodyScrollRef}
           style={styles.flex}
           keyboardShouldPersistTaps="always"
           contentContainerStyle={styles.scrollContent}
+          onScroll={(e) => { bodyScrollY.current = e.nativeEvent.contentOffset.y; }}
+          scrollEventThrottle={16}
         >
           <View style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>{t('email_composer.from', 'From')}</Text>
@@ -2427,6 +2441,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
               placeholder={t('email_composer.body_placeholder', 'Write your message...')}
               onChange={setBodyHtml}
               onSelectionChange={setSelState}
+              onViewportShift={onEditorViewportShift}
             />
           )}
         </ScrollView>
