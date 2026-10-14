@@ -43,7 +43,7 @@ import ComposeScreen from './src/screens/ComposeScreen';
 import EmailThreadScreen from './src/screens/EmailThreadScreen';
 import EmailSourceScreen from './src/screens/EmailSourceScreen';
 import LoginScreen from './src/screens/LoginScreen';
-import EmailListScreen from './src/screens/EmailListScreen';
+import MailTab from './src/screens/MailTab';
 import FilesScreen from './src/screens/FilesScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import ContactsScreen from './src/screens/ContactsScreen';
@@ -57,12 +57,12 @@ import { useAccountStore } from './src/stores/account-store';
 import { useAuthStore } from './src/stores/auth-store';
 import { useCalendarStore } from './src/stores/calendar-store';
 import { useContactsStore } from './src/stores/contacts-store';
-import { useEmailStore, viewerParamsForRow } from './src/stores/email-store';
-import { mailboxAccountId } from './src/lib/mailbox-tree';
+import { useEmailStore } from './src/stores/email-store';
 import { loadDetail, prefetchMessage } from './src/lib/email-detail-cache';
 import { useHasCalendar, useHasContacts, useHasFiles } from './src/lib/capabilities';
 import { useSettingsStore } from './src/stores/settings-store';
 import { useLocaleStore } from './src/stores/locale-store';
+import { useLayout } from './src/lib/use-layout';
 import { toast } from './src/stores/toast-store';
 import { useNetworkStore } from './src/stores/network-store';
 import { useUpdatesStore } from './src/stores/updates-store';
@@ -243,6 +243,9 @@ function MainTabsNavigator({ navigation }: NativeStackScreenProps<RootStackParam
     settings: t('sidebar.settings', 'Settings'),
   };
   const unavailable = (name: string) => t('sidebar.tab_unavailable', '{name} (unavailable)', { name });
+  // Side by side layouts move the tabs into a rail on the left, like the
+  // webmail's navigation rail.
+  const { isSplit } = useLayout();
 
   return (
     <View style={{ flex: 1, backgroundColor: c.background }}>
@@ -255,9 +258,21 @@ function MainTabsNavigator({ navigation }: NativeStackScreenProps<RootStackParam
         headerShown: false,
         // Tabs out of view stop re-rendering until they are shown again.
         freezeOnBlur: true,
+        tabBarPosition: isSplit ? 'left' : 'bottom',
+        tabBarVariant: isSplit ? 'material' : 'uikit',
+        // A narrow rail (icon over label), not a wide sidebar with labels
+        // beside the icons.
+        ...(isSplit ? { tabBarLabelPosition: 'below-icon' as const } : null),
         tabBarActiveTintColor: c.text,
         tabBarInactiveTintColor: c.textSecondary,
-        tabBarStyle: {
+        tabBarStyle: isSplit ? {
+          backgroundColor: c.secondary,
+          borderRightColor: c.border,
+          borderRightWidth: 1,
+          elevation: 0,
+          shadowOpacity: 0,
+          shadowColor: 'transparent',
+        } : {
           backgroundColor: c.background,
           borderTopColor: c.border,
           borderTopWidth: 1,
@@ -291,30 +306,7 @@ function MainTabsNavigator({ navigation }: NativeStackScreenProps<RootStackParam
           },
         }}
       >
-        {() => (
-          <EmailListScreen
-            onComposePress={() => navigation.navigate('Compose')}
-            onEmailPress={(email) => {
-              // The list holds the open folder's mail: name its account so the
-              // viewer never has to guess it from whatever folder is open.
-              const { mailboxes: all, currentMailboxId } = useEmailStore.getState();
-              const target = {
-                jmapAccountId: mailboxAccountId(all, currentMailboxId),
-                // A row of an "All folders" list or a tag view names its own
-                // account instead, and pages over that account's rows.
-                ...viewerParamsForRow(email),
-              };
-              // Start on the body now: mounting the viewer takes a while.
-              prefetchMessage(email, target.jmapAccountId);
-              navigation.navigate('EmailThread', {
-                emailId: email.id,
-                threadId: email.threadId,
-                subject: email.subject,
-                ...target,
-              });
-            }}
-          />
-        )}
+        {() => <MailTab navigation={navigation} />}
       </Tab.Screen>
       <Tab.Screen
         name="Calendar"

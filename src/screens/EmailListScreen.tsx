@@ -99,6 +99,7 @@ const EmailRow = React.memo(function EmailRow({
   onPress,
   onLongPress,
   selected,
+  active = false,
   selectionMode,
   loadAttachments,
   onOpenAttachment,
@@ -116,6 +117,8 @@ const EmailRow = React.memo(function EmailRow({
   onPress: (id: string) => void;
   onLongPress: (id: string) => void;
   selected: boolean;
+  /** The row open in the detail pane of a split view. */
+  active?: boolean;
   selectionMode: boolean;
   loadAttachments?: LoadListAttachments;
   onOpenAttachment?: (email: Email, attachment: Attachment) => void;
@@ -161,6 +164,7 @@ const EmailRow = React.memo(function EmailRow({
         styles.emailRow,
         { paddingVertical: density.rowPaddingVertical },
         pressed && styles.emailRowPressed,
+        active && styles.emailRowActive,
         selected && styles.emailRowSelected,
       ]}
       onPress={handlePress}
@@ -319,9 +323,18 @@ const emailKeyExtractor = rowKeyOf;
 interface EmailListScreenProps {
   onEmailPress?: (email: Email) => void;
   onComposePress?: () => void;
+  /** Row key (`rowKeyOf`) of the message open in a split view's detail pane. */
+  activeRowKey?: string | null;
+  /** The folder list is a permanent sidebar: no menu button, no drawer. */
+  sidebarDocked?: boolean;
 }
 
-export default function EmailListScreen({ onEmailPress, onComposePress }: EmailListScreenProps) {
+export default function EmailListScreen({
+  onEmailPress,
+  onComposePress,
+  activeRowKey = null,
+  sidebarDocked = false,
+}: EmailListScreenProps) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   // The navigator's safe-area provider knows the insets on the first render;
@@ -692,6 +705,7 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
           answered={flags?.answered ?? false}
           forwarded={flags?.forwarded ?? false}
           selected={selectedIds.has(rowKeyOf(item))}
+          active={activeRowKey === rowKeyOf(item)}
           selectionMode={selectionMode}
           onPress={handleRowPress}
           onLongPress={toggleSelect}
@@ -701,7 +715,7 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
       );
     },
     [
-      selectedIds, selectionMode, handleRowPress, toggleSelect, swipeLeftAction, swipeRightAction,
+      selectedIds, activeRowKey, selectionMode, handleRowPress, toggleSelect, swipeLeftAction, swipeRightAction,
       swipeMode, handleRowSwipe, disableThreading, rowFlags, rowTagIds, threadCountFor,
       showPreview, showRecipient, keywordDefs, inJunk, showAvatarsInJunk,
       loadAttachments, openAttachment,
@@ -1076,14 +1090,16 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
         </View>
       ) : (
         <View style={styles.header}>
-          <Pressable
-            onPress={() => setDrawerOpen(true)}
-            style={styles.headerButton}
-            accessibilityRole="button"
-            accessibilityLabel={t('sidebar.mobile.toggle_menu', 'Toggle menu')}
-          >
-            <Menu size={20} color={c.textMuted} />
-          </Pressable>
+          {!sidebarDocked && (
+            <Pressable
+              onPress={() => setDrawerOpen(true)}
+              style={styles.headerButton}
+              accessibilityRole="button"
+              accessibilityLabel={t('sidebar.mobile.toggle_menu', 'Toggle menu')}
+            >
+              <Menu size={20} color={c.textMuted} />
+            </Pressable>
+          )}
           <Text style={styles.headerTitle} numberOfLines={1}>
             {headerTitle}
           </Text>
@@ -1467,7 +1483,7 @@ export default function EmailListScreen({ onEmailPress, onComposePress }: EmailL
         <SquarePen size={24} color={c.background} />
       </Pressable>
 
-      <SidebarDrawer visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      {!sidebarDocked && <SidebarDrawer visible={drawerOpen} onClose={() => setDrawerOpen(false)} />}
       <ListAttachmentOpener ref={attachmentOpenerRef} />
 
       <Modal supportedOrientations={MODAL_ORIENTATIONS}
@@ -2175,6 +2191,14 @@ function makeStyles(c: ThemePalette) {
   },
   emailRowPressed: { backgroundColor: c.surface },
   emailRowSelected: { backgroundColor: c.selection },
+  // The message open next to the list (webmail: bg-selection with a primary
+  // bar on the start edge).
+  emailRowActive: {
+    backgroundColor: c.selection,
+    borderLeftWidth: 2,
+    borderLeftColor: c.primary,
+    paddingLeft: spacing.lg - 2,
+  },
   // Mirrors the webmail's unread indicator: an 8px filled circle at the row's
   // start edge, vertically centered (email-list-item.tsx, fill-unread). The
   // weight/color change alone is too subtle on some device fonts (#27).

@@ -49,7 +49,12 @@ import type { Email, EmailAddress, Identity } from '../api/types';
 import type { RootStackParamList } from '../navigation/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'EmailThread'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'EmailThread'> & {
+  /** Shown in a split view's detail pane: no back button. */
+  embedded?: boolean;
+  /** The pager moved to another message (the list highlights it). */
+  onActiveChange?: (emailId: string) => void;
+};
 
 // How long the pages beside the one on screen wait for its body at most.
 const NEIGHBOUR_FALLBACK_MS = 1500;
@@ -74,7 +79,7 @@ export default function EmailThreadScreen(props: Props) {
   return <EmailViewer key={instance.current.key} {...props} />;
 }
 
-function EmailViewer({ route, navigation }: Props) {
+function EmailViewer({ route, navigation, embedded = false, onActiveChange }: Props) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const { t } = useLocaleStore();
@@ -87,6 +92,9 @@ function EmailViewer({ route, navigation }: Props) {
   // swiping / Prev-Next can switch messages in place without remounting the
   // screen — which is what produced the loading flash on every change.
   const [activeEmailId, setActiveEmailId] = React.useState(route.params.emailId);
+  const onActiveChangeRef = React.useRef(onActiveChange);
+  onActiveChangeRef.current = onActiveChange;
+  React.useEffect(() => { onActiveChangeRef.current?.(activeEmailId); }, [activeEmailId]);
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   // Pages are as wide as the pager itself, which is the window on a phone
@@ -675,16 +683,18 @@ function EmailViewer({ route, navigation }: Props) {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Toolbar */}
-      <View style={styles.toolbar}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={styles.toolbarBack}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.back', 'Back')}
-        >
-          <ArrowLeft size={22} color={c.text} />
-        </Pressable>
+      <View style={[styles.toolbar, embedded && styles.toolbarEmbedded]}>
+        {!embedded && (
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={styles.toolbarBack}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back', 'Back')}
+          >
+            <ArrowLeft size={22} color={c.text} />
+          </Pressable>
+        )}
         <View style={styles.toolbarActions}>
           {relocatedActions.map((id) => {
             const def = quickActionRegistry[id];
@@ -1560,6 +1570,7 @@ function makeStyles(c: ThemePalette) {
     justifyContent: 'center',
     borderRadius: radius.full,
   },
+  toolbarEmbedded: { justifyContent: 'flex-end' },
   toolbarActions: {
     flexDirection: 'row',
     alignItems: 'center',

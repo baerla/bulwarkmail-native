@@ -302,9 +302,11 @@ function NamePrompt({ title, message, initial, confirmLabel, onSubmit, onClose }
 interface SidebarDrawerProps {
   visible: boolean;
   onClose: () => void;
+  /** Render as a permanent sidebar (wide screens) instead of a modal drawer. */
+  docked?: boolean;
 }
 
-export default function SidebarDrawer({ visible, onClose }: SidebarDrawerProps) {
+export default function SidebarDrawer({ visible, onClose, docked = false }: SidebarDrawerProps) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
@@ -746,6 +748,409 @@ export default function SidebarDrawer({ visible, onClose }: SidebarDrawerProps) 
 
   const tagViewActive = !!filters.keyword;
 
+  const panel = (
+      <SafeAreaView style={styles.drawerSafe} edges={['top', 'bottom', 'left']}>
+        {/* Header: close + account switcher */}
+        <View style={styles.header}>
+          {!docked && (
+            <Pressable
+              onPress={onClose}
+              style={styles.headerClose}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close', 'Close')}
+            >
+              <X size={20} color={c.text} />
+            </Pressable>
+          )}
+          <Pressable
+            onPress={() => setAccountMenuOpen((v) => !v)}
+            style={({ pressed }) => [styles.account, pressed && styles.accountPressed]}
+          >
+            <View style={[styles.accountAvatar, { backgroundColor: avatarBg }]}>
+              <Text style={styles.accountAvatarText}>{initials}</Text>
+            </View>
+            <View style={styles.accountInfo}>
+              <Text style={styles.accountName} numberOfLines={1}>{username || t('settings.account.title', 'Account')}</Text>
+              {hostname ? (
+                <Text style={styles.accountEmail} numberOfLines={1}>{hostname}</Text>
+              ) : null}
+            </View>
+            {busy ? (
+              <ActivityIndicator size="small" color={c.textMuted} />
+            ) : (
+              <ChevronDown
+                size={16}
+                color={c.textMuted}
+                style={accountMenuOpen ? styles.accountChevronOpen : undefined}
+              />
+            )}
+          </Pressable>
+        </View>
+
+        {accountMenuOpen && (
+          <View style={styles.accountMenu}>
+            <ScrollView style={styles.accountMenuList}>
+              {accounts.map((acc) => {
+                const isActive = acc.id === activeAccountId;
+                let accHost = '';
+                try { accHost = new URL(acc.serverUrl).hostname; } catch { accHost = acc.serverUrl; }
+                const accEmail = acc.email || (acc.username.includes('@')
+                  ? acc.username
+                  : accHost ? `${acc.username}@${accHost}` : acc.username);
+                return (
+                  <Pressable
+                    key={acc.id}
+                    onPress={() => {
+                      if (isActive) return;
+                      setAccountMenuOpen(false);
+                      onClose();
+                      void switchAccount(acc.id);
+                    }}
+                    onLongPress={isActive ? undefined : () => confirmRemoveAccount(acc)}
+                    delayLongPress={350}
+                    accessibilityHint={isActive ? undefined : t('sidebar.remove_account_hint', 'Long-press to remove this account')}
+                    style={({ pressed }) => [
+                      styles.accountMenuRow,
+                      isActive && styles.accountMenuRowActive,
+                      pressed && !isActive && styles.accountMenuActionPressed,
+                    ]}
+                  >
+                    <View style={styles.accountMenuAvatarWrap}>
+                      <View style={[styles.accountMenuAvatar, { backgroundColor: acc.avatarColor }]}>
+                        <Text style={styles.accountMenuAvatarText}>
+                          {getAccountInitials(acc.displayName, acc.email || acc.username)}
+                        </Text>
+                      </View>
+                      {isActive && (
+                        <View style={styles.accountMenuCheckBadge}>
+                          <Check size={10} color={c.primaryForeground} strokeWidth={3} />
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.accountMenuInfo}>
+                      <View style={styles.accountMenuNameRow}>
+                        <Text style={styles.accountMenuName} numberOfLines={1}>
+                          {acc.displayName || acc.username}
+                        </Text>
+                        {acc.isDefault && (
+                          <Star size={12} color="#f59e0b" fill="#f59e0b" />
+                        )}
+                      </View>
+                      <Text style={styles.accountMenuHost} numberOfLines={1}>{accEmail}</Text>
+                      <View style={styles.accountMenuStatusRow}>
+                        {acc.hasError ? (
+                          <>
+                            <AlertTriangle size={10} color={c.error} />
+                            <Text style={[styles.accountMenuStatusText, { color: c.error }]} numberOfLines={1}>
+                              {acc.errorMessage || t('sidebar.account_error', 'Needs attention')}
+                            </Text>
+                          </>
+                        ) : (
+                          <>
+                            {/* The connection dot only means something for the
+                                account the live session serves. */}
+                            {isActive && (
+                              <View style={[
+                                styles.accountMenuStatusDot,
+                                !acc.isConnected && styles.accountMenuStatusDotOffline,
+                              ]} />
+                            )}
+                            <Text style={styles.accountMenuStatusText} numberOfLines={1}>{accHost}</Text>
+                          </>
+                        )}
+                      </View>
+                    </View>
+                    {!isActive && (
+                      <Pressable
+                        onPress={() => confirmRemoveAccount(acc)}
+                        hitSlop={8}
+                        style={styles.accountMenuRemove}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('sidebar.remove_account', 'Remove account')}
+                      >
+                        <UserMinus size={14} color={c.textMuted} />
+                      </Pressable>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+
+            {accounts.length < MAX_ACCOUNTS && (
+              <>
+                <View style={styles.accountMenuDivider} />
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.accountMenuAction,
+                    pressed && styles.accountMenuActionPressed,
+                  ]}
+                  onPress={() => {
+                    setAccountMenuOpen(false);
+                    onClose();
+                    navigation.navigate('AddAccount');
+                  }}
+                >
+                  <Plus size={16} color={c.textSecondary} />
+                  <Text style={styles.accountMenuActionText}>{t('sidebar.add_account', 'Add account')}</Text>
+                </Pressable>
+              </>
+            )}
+
+            <View style={styles.accountMenuDivider} />
+            {accounts.length > 1 && activeAccountId && (() => {
+              const active = accounts.find((a) => a.id === activeAccountId);
+              if (!active || active.isDefault) return null;
+              return (
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.accountMenuAction,
+                    pressed && styles.accountMenuActionPressed,
+                  ]}
+                  onPress={() => setDefaultAccount(active.id)}
+                >
+                  <Star size={16} color={c.textSecondary} />
+                  <Text style={styles.accountMenuActionText}>{t('sidebar.set_as_default', 'Set as default')}</Text>
+                </Pressable>
+              );
+            })()}
+            <Pressable
+              style={({ pressed }) => [
+                styles.accountMenuAction,
+                pressed && styles.accountMenuActionPressed,
+              ]}
+              onPress={() => { setAccountMenuOpen(false); onClose(); void logout(); }}
+            >
+              <LogOut size={16} color={c.textSecondary} />
+              <Text style={styles.accountMenuActionText} numberOfLines={1}>
+                {t('sidebar.sign_out_of', `Sign out of ${accountEmailFull || 'account'}`, { account: accountEmailFull || 'account' })}
+              </Text>
+            </Pressable>
+            {accounts.length > 1 && (
+              <Pressable
+                style={({ pressed }) => [
+                  styles.accountMenuAction,
+                  pressed && styles.accountMenuActionPressed,
+                ]}
+                onPress={() => { setAccountMenuOpen(false); onClose(); void logoutAll(); }}
+              >
+                <LogOut size={16} color={c.error} />
+                <Text style={[styles.accountMenuActionText, { color: c.error }]}>
+                  {t('sidebar.sign_out_all', 'Sign out of all accounts')}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        )}
+
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          {/* Quick views */}
+          {showUnified && (
+            <Pressable
+              style={({ pressed }) => [styles.quickRow, pressed && styles.rowPressed]}
+              onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { role: 'inbox' }); }}
+            >
+              <Layers size={16} color={c.textSecondary} />
+              <Text style={styles.quickRowLabel}>
+                {unifiedCrossAccount && accounts.length > 1
+                  ? t('sidebar.all_accounts', 'All accounts')
+                  : t('sidebar.unified_inbox', 'All inboxes')}
+              </Text>
+              <View style={{ flex: 1 }} />
+              <RowCounts unread={unifiedCounts.inbox.unread} total={unifiedCounts.inbox.total} showTotal={showFolderTotalCount} />
+            </Pressable>
+          )}
+          <Pressable
+            style={({ pressed }) => [styles.quickRow, pressed && styles.rowPressed]}
+            onPress={() => { onClose(); navigation.navigate('Scheduled'); }}
+          >
+            <Clock size={16} color={c.textSecondary} />
+            <Text style={styles.quickRowLabel}>{t('sidebar.scheduled', 'Scheduled')}</Text>
+          </Pressable>
+
+          {/* Unified per-role and cross views */}
+          {showUnified && (
+            <>
+              <Pressable style={styles.sectionHeader} onPress={() => toggleSection('unifiedExpanded', setUnifiedExpanded)}>
+                {unifiedExpanded ? (
+                  <ChevronDown size={14} color={c.textMuted} />
+                ) : (
+                  <ChevronRight size={14} color={c.textMuted} />
+                )}
+                <Text style={styles.sectionHeaderText}>{t('sidebar.unified_mailbox', 'Unified mailbox')}</Text>
+              </Pressable>
+              {unifiedExpanded && (
+                <>
+                  {([
+                    { view: 'unread' as const, Icon: MailOpen, label: t('sidebar.unified_all_unread', 'All unread'), unread: unifiedCounts.crossUnread },
+                    { view: 'starred' as const, Icon: Star, label: t('sidebar.unified_all_starred', 'All starred'), unread: 0 },
+                    { view: 'all' as const, Icon: Mails, label: t('sidebar.unified_all_mail', 'All mail'), unread: unifiedCounts.crossUnread },
+                  ]).map((row) => (
+                    <SidebarRow
+                      key={row.view}
+                      icon={<row.Icon size={16} color={c.textSecondary} />}
+                      label={row.label}
+                      depth={0}
+                      isSelected={false}
+                      unread={row.unread}
+                      total={0}
+                      showTotal={false}
+                      hasChildren={false}
+                      isExpanded={false}
+                      onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { view: row.view }); }}
+                      onToggleExpand={() => {}}
+                    />
+                  ))}
+                  {unifiedCounts.roles.map((r) => {
+                    const Icon = unifiedIcon(r.role);
+                    return (
+                      <SidebarRow
+                        key={r.role}
+                        icon={<Icon size={16} color={iconColor(c, r.role, false)} />}
+                        label={t(`sidebar.unified_${r.role}`, `All ${r.role}`)}
+                        depth={0}
+                        isSelected={false}
+                        unread={r.unread}
+                        total={r.total}
+                        showTotal={showFolderTotalCount}
+                        hasChildren={false}
+                        isExpanded={false}
+                        onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { role: r.role }); }}
+                        onToggleExpand={() => {}}
+                      />
+                    );
+                  })}
+                </>
+              )}
+            </>
+          )}
+
+          {/* Folders section */}
+          <Pressable style={styles.sectionHeader} onPress={() => toggleSection('foldersExpanded', setFoldersExpanded)}>
+            {foldersExpanded ? (
+              <ChevronDown size={14} color={c.textMuted} />
+            ) : (
+              <ChevronRight size={14} color={c.textMuted} />
+            )}
+            <Text style={styles.sectionHeaderText}>{t('sidebar.folders', 'Folders')}</Text>
+            <View style={{ flex: 1 }} />
+            <Pressable
+              style={styles.sectionSettings}
+              hitSlop={8}
+              onPress={() => { onClose(); navigation.navigate('MainTabs'); }}
+              accessibilityLabel={t('sidebar.settings', 'Settings')}
+            >
+              <Settings size={14} color={c.textMuted} />
+            </Pressable>
+          </Pressable>
+
+          {foldersExpanded && (
+            mailboxes.length === 0 ? (
+              <Text style={styles.empty}>{t('sidebar.loading_mailboxes', 'Loading mailboxes...')}</Text>
+            ) : (
+              visibleNodes.map((node) => {
+                const hasChildren = node.children.length > 0;
+                const isExpanded = expandedFolders.has(node.id);
+                // A shared/group account's header has no mailbox behind it —
+                // tapping it only opens or closes that account's folders.
+                const Icon = node.isAccountNode
+                  ? Users
+                  : iconFor(node.role, node.name, hasChildren, isExpanded);
+                const isSelected = !node.isAccountNode && !tagViewActive && node.id === currentMailboxId;
+                return (
+                  <SidebarRow
+                    key={node.id}
+                    icon={
+                      <Icon
+                        size={16}
+                        color={node.isAccountNode ? c.textMuted : iconColor(c, node.role, isSelected)}
+                      />
+                    }
+                    label={node.isAccountNode ? node.name : localizeMailboxName(node.role, node.name, t)}
+                    depth={node.depth}
+                    isSelected={isSelected}
+                    isAccountHeader={node.isAccountNode}
+                    unread={node.unreadEmails}
+                    total={node.totalEmails}
+                    showTotal={showFolderTotalCount && !node.isAccountNode}
+                    hasChildren={hasChildren}
+                    isExpanded={isExpanded}
+                    onPress={
+                      node.isAccountNode
+                        ? () => toggleExpand(node.id)
+                        : () => handleSelect(node.id)
+                    }
+                    onLongPress={
+                      node.isAccountNode
+                        ? () => openSharedAccountSheet(node)
+                        : () => openFolderSheet(node)
+                    }
+                    onToggleExpand={() => toggleExpand(node.id)}
+                    onPressUnread={node.isAccountNode ? undefined : () => handleSelectUnread(node.id)}
+                  />
+                );
+              })
+            )
+          )}
+
+          {/* Tags section (#175) */}
+          {keywordDefs.length > 0 && (
+            <>
+              <Pressable style={styles.sectionHeader} onPress={() => toggleSection('tagsExpanded', setTagsExpanded)}>
+                {tagsExpanded ? (
+                  <ChevronDown size={14} color={c.textMuted} />
+                ) : (
+                  <ChevronRight size={14} color={c.textMuted} />
+                )}
+                <Text style={styles.sectionHeaderText}>{t('sidebar.tags', 'Tags')}</Text>
+              </Pressable>
+              {tagsExpanded && keywordDefs.map((kw) => {
+                const counts = tagCounts[kw.id];
+                const isSelected = filters.keyword === keywordToken(kw.id);
+                const dot = c.tags[kw.color]?.dot ?? c.textMuted;
+                return (
+                  <SidebarRow
+                    key={kw.id}
+                    icon={<Tag size={16} color={dot} fill={dot} />}
+                    label={kw.label}
+                    depth={0}
+                    isSelected={isSelected}
+                    unread={counts?.unread ?? 0}
+                    total={counts?.total ?? 0}
+                    showTotal={showFolderTotalCount}
+                    hasChildren={false}
+                    isExpanded={false}
+                    onPress={() => selectTag(kw.id)}
+                    onToggleExpand={() => {}}
+                  />
+                );
+              })}
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+  );
+
+  // On a wide screen the drawer is a permanent sidebar next to the list.
+  if (docked) {
+    return (
+      <View style={styles.docked}>
+        {panel}
+        {sheet && <ActionSheet title={sheet.title} actions={sheet.actions} onClose={() => setSheet(null)} />}
+        {prompt && (
+          <NamePrompt
+            title={prompt.title}
+            message={prompt.message}
+            initial={prompt.initial}
+            confirmLabel={prompt.confirmLabel}
+            onSubmit={prompt.onSubmit}
+            onClose={() => setPrompt(null)}
+          />
+        )}
+      </View>
+    );
+  }
+
   return (
     <Modal supportedOrientations={MODAL_ORIENTATIONS}
       visible={visible}
@@ -760,384 +1165,7 @@ export default function SidebarDrawer({ visible, onClose }: SidebarDrawerProps) 
       </Animated.View>
 
       <Animated.View style={[styles.drawer, { transform: [{ translateX: slideX }] }]}>
-        <SafeAreaView style={styles.drawerSafe} edges={['top', 'bottom', 'left']}>
-          {/* Header: close + account switcher */}
-          <View style={styles.header}>
-            <Pressable
-              onPress={onClose}
-              style={styles.headerClose}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.close', 'Close')}
-            >
-              <X size={20} color={c.text} />
-            </Pressable>
-            <Pressable
-              onPress={() => setAccountMenuOpen((v) => !v)}
-              style={({ pressed }) => [styles.account, pressed && styles.accountPressed]}
-            >
-              <View style={[styles.accountAvatar, { backgroundColor: avatarBg }]}>
-                <Text style={styles.accountAvatarText}>{initials}</Text>
-              </View>
-              <View style={styles.accountInfo}>
-                <Text style={styles.accountName} numberOfLines={1}>{username || t('settings.account.title', 'Account')}</Text>
-                {hostname ? (
-                  <Text style={styles.accountEmail} numberOfLines={1}>{hostname}</Text>
-                ) : null}
-              </View>
-              {busy ? (
-                <ActivityIndicator size="small" color={c.textMuted} />
-              ) : (
-                <ChevronDown
-                  size={16}
-                  color={c.textMuted}
-                  style={accountMenuOpen ? styles.accountChevronOpen : undefined}
-                />
-              )}
-            </Pressable>
-          </View>
-
-          {accountMenuOpen && (
-            <View style={styles.accountMenu}>
-              <ScrollView style={styles.accountMenuList}>
-                {accounts.map((acc) => {
-                  const isActive = acc.id === activeAccountId;
-                  let accHost = '';
-                  try { accHost = new URL(acc.serverUrl).hostname; } catch { accHost = acc.serverUrl; }
-                  const accEmail = acc.email || (acc.username.includes('@')
-                    ? acc.username
-                    : accHost ? `${acc.username}@${accHost}` : acc.username);
-                  return (
-                    <Pressable
-                      key={acc.id}
-                      onPress={() => {
-                        if (isActive) return;
-                        setAccountMenuOpen(false);
-                        onClose();
-                        void switchAccount(acc.id);
-                      }}
-                      onLongPress={isActive ? undefined : () => confirmRemoveAccount(acc)}
-                      delayLongPress={350}
-                      accessibilityHint={isActive ? undefined : t('sidebar.remove_account_hint', 'Long-press to remove this account')}
-                      style={({ pressed }) => [
-                        styles.accountMenuRow,
-                        isActive && styles.accountMenuRowActive,
-                        pressed && !isActive && styles.accountMenuActionPressed,
-                      ]}
-                    >
-                      <View style={styles.accountMenuAvatarWrap}>
-                        <View style={[styles.accountMenuAvatar, { backgroundColor: acc.avatarColor }]}>
-                          <Text style={styles.accountMenuAvatarText}>
-                            {getAccountInitials(acc.displayName, acc.email || acc.username)}
-                          </Text>
-                        </View>
-                        {isActive && (
-                          <View style={styles.accountMenuCheckBadge}>
-                            <Check size={10} color={c.primaryForeground} strokeWidth={3} />
-                          </View>
-                        )}
-                      </View>
-                      <View style={styles.accountMenuInfo}>
-                        <View style={styles.accountMenuNameRow}>
-                          <Text style={styles.accountMenuName} numberOfLines={1}>
-                            {acc.displayName || acc.username}
-                          </Text>
-                          {acc.isDefault && (
-                            <Star size={12} color="#f59e0b" fill="#f59e0b" />
-                          )}
-                        </View>
-                        <Text style={styles.accountMenuHost} numberOfLines={1}>{accEmail}</Text>
-                        <View style={styles.accountMenuStatusRow}>
-                          {acc.hasError ? (
-                            <>
-                              <AlertTriangle size={10} color={c.error} />
-                              <Text style={[styles.accountMenuStatusText, { color: c.error }]} numberOfLines={1}>
-                                {acc.errorMessage || t('sidebar.account_error', 'Needs attention')}
-                              </Text>
-                            </>
-                          ) : (
-                            <>
-                              {/* The connection dot only means something for the
-                                  account the live session serves. */}
-                              {isActive && (
-                                <View style={[
-                                  styles.accountMenuStatusDot,
-                                  !acc.isConnected && styles.accountMenuStatusDotOffline,
-                                ]} />
-                              )}
-                              <Text style={styles.accountMenuStatusText} numberOfLines={1}>{accHost}</Text>
-                            </>
-                          )}
-                        </View>
-                      </View>
-                      {!isActive && (
-                        <Pressable
-                          onPress={() => confirmRemoveAccount(acc)}
-                          hitSlop={8}
-                          style={styles.accountMenuRemove}
-                          accessibilityRole="button"
-                          accessibilityLabel={t('sidebar.remove_account', 'Remove account')}
-                        >
-                          <UserMinus size={14} color={c.textMuted} />
-                        </Pressable>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-
-              {accounts.length < MAX_ACCOUNTS && (
-                <>
-                  <View style={styles.accountMenuDivider} />
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.accountMenuAction,
-                      pressed && styles.accountMenuActionPressed,
-                    ]}
-                    onPress={() => {
-                      setAccountMenuOpen(false);
-                      onClose();
-                      navigation.navigate('AddAccount');
-                    }}
-                  >
-                    <Plus size={16} color={c.textSecondary} />
-                    <Text style={styles.accountMenuActionText}>{t('sidebar.add_account', 'Add account')}</Text>
-                  </Pressable>
-                </>
-              )}
-
-              <View style={styles.accountMenuDivider} />
-              {accounts.length > 1 && activeAccountId && (() => {
-                const active = accounts.find((a) => a.id === activeAccountId);
-                if (!active || active.isDefault) return null;
-                return (
-                  <Pressable
-                    style={({ pressed }) => [
-                      styles.accountMenuAction,
-                      pressed && styles.accountMenuActionPressed,
-                    ]}
-                    onPress={() => setDefaultAccount(active.id)}
-                  >
-                    <Star size={16} color={c.textSecondary} />
-                    <Text style={styles.accountMenuActionText}>{t('sidebar.set_as_default', 'Set as default')}</Text>
-                  </Pressable>
-                );
-              })()}
-              <Pressable
-                style={({ pressed }) => [
-                  styles.accountMenuAction,
-                  pressed && styles.accountMenuActionPressed,
-                ]}
-                onPress={() => { setAccountMenuOpen(false); onClose(); void logout(); }}
-              >
-                <LogOut size={16} color={c.textSecondary} />
-                <Text style={styles.accountMenuActionText} numberOfLines={1}>
-                  {t('sidebar.sign_out_of', `Sign out of ${accountEmailFull || 'account'}`, { account: accountEmailFull || 'account' })}
-                </Text>
-              </Pressable>
-              {accounts.length > 1 && (
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.accountMenuAction,
-                    pressed && styles.accountMenuActionPressed,
-                  ]}
-                  onPress={() => { setAccountMenuOpen(false); onClose(); void logoutAll(); }}
-                >
-                  <LogOut size={16} color={c.error} />
-                  <Text style={[styles.accountMenuActionText, { color: c.error }]}>
-                    {t('sidebar.sign_out_all', 'Sign out of all accounts')}
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          )}
-
-          <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-            {/* Quick views */}
-            {showUnified && (
-              <Pressable
-                style={({ pressed }) => [styles.quickRow, pressed && styles.rowPressed]}
-                onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { role: 'inbox' }); }}
-              >
-                <Layers size={16} color={c.textSecondary} />
-                <Text style={styles.quickRowLabel}>
-                  {unifiedCrossAccount && accounts.length > 1
-                    ? t('sidebar.all_accounts', 'All accounts')
-                    : t('sidebar.unified_inbox', 'All inboxes')}
-                </Text>
-                <View style={{ flex: 1 }} />
-                <RowCounts unread={unifiedCounts.inbox.unread} total={unifiedCounts.inbox.total} showTotal={showFolderTotalCount} />
-              </Pressable>
-            )}
-            <Pressable
-              style={({ pressed }) => [styles.quickRow, pressed && styles.rowPressed]}
-              onPress={() => { onClose(); navigation.navigate('Scheduled'); }}
-            >
-              <Clock size={16} color={c.textSecondary} />
-              <Text style={styles.quickRowLabel}>{t('sidebar.scheduled', 'Scheduled')}</Text>
-            </Pressable>
-
-            {/* Unified per-role and cross views */}
-            {showUnified && (
-              <>
-                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('unifiedExpanded', setUnifiedExpanded)}>
-                  {unifiedExpanded ? (
-                    <ChevronDown size={14} color={c.textMuted} />
-                  ) : (
-                    <ChevronRight size={14} color={c.textMuted} />
-                  )}
-                  <Text style={styles.sectionHeaderText}>{t('sidebar.unified_mailbox', 'Unified mailbox')}</Text>
-                </Pressable>
-                {unifiedExpanded && (
-                  <>
-                    {([
-                      { view: 'unread' as const, Icon: MailOpen, label: t('sidebar.unified_all_unread', 'All unread'), unread: unifiedCounts.crossUnread },
-                      { view: 'starred' as const, Icon: Star, label: t('sidebar.unified_all_starred', 'All starred'), unread: 0 },
-                      { view: 'all' as const, Icon: Mails, label: t('sidebar.unified_all_mail', 'All mail'), unread: unifiedCounts.crossUnread },
-                    ]).map((row) => (
-                      <SidebarRow
-                        key={row.view}
-                        icon={<row.Icon size={16} color={c.textSecondary} />}
-                        label={row.label}
-                        depth={0}
-                        isSelected={false}
-                        unread={row.unread}
-                        total={0}
-                        showTotal={false}
-                        hasChildren={false}
-                        isExpanded={false}
-                        onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { view: row.view }); }}
-                        onToggleExpand={() => {}}
-                      />
-                    ))}
-                    {unifiedCounts.roles.map((r) => {
-                      const Icon = unifiedIcon(r.role);
-                      return (
-                        <SidebarRow
-                          key={r.role}
-                          icon={<Icon size={16} color={iconColor(c, r.role, false)} />}
-                          label={t(`sidebar.unified_${r.role}`, `All ${r.role}`)}
-                          depth={0}
-                          isSelected={false}
-                          unread={r.unread}
-                          total={r.total}
-                          showTotal={showFolderTotalCount}
-                          hasChildren={false}
-                          isExpanded={false}
-                          onPress={() => { onClose(); navigation.navigate('UnifiedInbox', { role: r.role }); }}
-                          onToggleExpand={() => {}}
-                        />
-                      );
-                    })}
-                  </>
-                )}
-              </>
-            )}
-
-            {/* Folders section */}
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('foldersExpanded', setFoldersExpanded)}>
-              {foldersExpanded ? (
-                <ChevronDown size={14} color={c.textMuted} />
-              ) : (
-                <ChevronRight size={14} color={c.textMuted} />
-              )}
-              <Text style={styles.sectionHeaderText}>{t('sidebar.folders', 'Folders')}</Text>
-              <View style={{ flex: 1 }} />
-              <Pressable
-                style={styles.sectionSettings}
-                hitSlop={8}
-                onPress={() => { onClose(); navigation.navigate('MainTabs'); }}
-                accessibilityLabel={t('sidebar.settings', 'Settings')}
-              >
-                <Settings size={14} color={c.textMuted} />
-              </Pressable>
-            </Pressable>
-
-            {foldersExpanded && (
-              mailboxes.length === 0 ? (
-                <Text style={styles.empty}>{t('sidebar.loading_mailboxes', 'Loading mailboxes...')}</Text>
-              ) : (
-                visibleNodes.map((node) => {
-                  const hasChildren = node.children.length > 0;
-                  const isExpanded = expandedFolders.has(node.id);
-                  // A shared/group account's header has no mailbox behind it —
-                  // tapping it only opens or closes that account's folders.
-                  const Icon = node.isAccountNode
-                    ? Users
-                    : iconFor(node.role, node.name, hasChildren, isExpanded);
-                  const isSelected = !node.isAccountNode && !tagViewActive && node.id === currentMailboxId;
-                  return (
-                    <SidebarRow
-                      key={node.id}
-                      icon={
-                        <Icon
-                          size={16}
-                          color={node.isAccountNode ? c.textMuted : iconColor(c, node.role, isSelected)}
-                        />
-                      }
-                      label={node.isAccountNode ? node.name : localizeMailboxName(node.role, node.name, t)}
-                      depth={node.depth}
-                      isSelected={isSelected}
-                      isAccountHeader={node.isAccountNode}
-                      unread={node.unreadEmails}
-                      total={node.totalEmails}
-                      showTotal={showFolderTotalCount && !node.isAccountNode}
-                      hasChildren={hasChildren}
-                      isExpanded={isExpanded}
-                      onPress={
-                        node.isAccountNode
-                          ? () => toggleExpand(node.id)
-                          : () => handleSelect(node.id)
-                      }
-                      onLongPress={
-                        node.isAccountNode
-                          ? () => openSharedAccountSheet(node)
-                          : () => openFolderSheet(node)
-                      }
-                      onToggleExpand={() => toggleExpand(node.id)}
-                      onPressUnread={node.isAccountNode ? undefined : () => handleSelectUnread(node.id)}
-                    />
-                  );
-                })
-              )
-            )}
-
-            {/* Tags section (#175) */}
-            {keywordDefs.length > 0 && (
-              <>
-                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('tagsExpanded', setTagsExpanded)}>
-                  {tagsExpanded ? (
-                    <ChevronDown size={14} color={c.textMuted} />
-                  ) : (
-                    <ChevronRight size={14} color={c.textMuted} />
-                  )}
-                  <Text style={styles.sectionHeaderText}>{t('sidebar.tags', 'Tags')}</Text>
-                </Pressable>
-                {tagsExpanded && keywordDefs.map((kw) => {
-                  const counts = tagCounts[kw.id];
-                  const isSelected = filters.keyword === keywordToken(kw.id);
-                  const dot = c.tags[kw.color]?.dot ?? c.textMuted;
-                  return (
-                    <SidebarRow
-                      key={kw.id}
-                      icon={<Tag size={16} color={dot} fill={dot} />}
-                      label={kw.label}
-                      depth={0}
-                      isSelected={isSelected}
-                      unread={counts?.unread ?? 0}
-                      total={counts?.total ?? 0}
-                      showTotal={showFolderTotalCount}
-                      hasChildren={false}
-                      isExpanded={false}
-                      onPress={() => selectTag(kw.id)}
-                      onToggleExpand={() => {}}
-                    />
-                  );
-                })}
-              </>
-            )}
-          </ScrollView>
-        </SafeAreaView>
+        {panel}
       </Animated.View>
 
       {sheet && <ActionSheet title={sheet.title} actions={sheet.actions} onClose={() => setSheet(null)} />}
@@ -1154,6 +1182,9 @@ export default function SidebarDrawer({ visible, onClose }: SidebarDrawerProps) 
     </Modal>
   );
 }
+
+/** Width of the permanent sidebar (the webmail's default sidebar is 256 px). */
+export const DOCKED_WIDTH = 272;
 
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
@@ -1174,6 +1205,12 @@ function makeStyles(c: ThemePalette) {
     borderRightColor: c.border,
   },
   drawerSafe: { flex: 1 },
+  docked: {
+    width: DOCKED_WIDTH,
+    backgroundColor: c.secondary,
+    borderRightWidth: 1,
+    borderRightColor: c.border,
+  },
 
   // Header
   header: {
