@@ -1982,7 +1982,7 @@ function makeStyles(c: ThemePalette) {
     sectionBody: { gap: spacing.sm, paddingLeft: spacing.lg + spacing.xs },
 
     field: { gap: 4 },
-    fieldLabel: { ...typography.caption, color: c.textMuted },
+    fieldLabel: { ...typography.caption, color: c.mutedForeground },
     row2: { flexDirection: 'row', gap: spacing.sm },
 
     input: {
@@ -1990,7 +1990,8 @@ function makeStyles(c: ThemePalette) {
       borderWidth: 1,
       borderColor: c.border,
       borderRadius: radius.sm,
-      backgroundColor: c.surface,
+      // The shared Input: transparent, bordered (webmail contact form).
+      backgroundColor: 'transparent',
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
       ...typography.body,

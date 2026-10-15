@@ -758,7 +758,7 @@ function makeStyles(c: ThemePalette) {
     borderBottomWidth: 1,
     borderBottomColor: c.borderLight,
   },
-  sectionHeaderText: { ...typography.small, color: c.primary },
+  sectionHeaderText: { ...typography.captionMedium, color: c.mutedForeground },
 
   separator: { height: 1, backgroundColor: c.borderLight, marginLeft: 68 },
 

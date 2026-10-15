@@ -136,6 +136,6 @@ function makeStyles(c: ThemePalette) {
   info: { flex: 1, minWidth: 0 },
   name: { ...typography.bodyMedium, color: c.text },
   subtitle: { ...typography.caption, color: c.textMuted, marginTop: 1 },
-  tertiary: { ...typography.small, color: c.textSecondary, marginTop: 1 },
+  tertiary: { ...typography.caption, color: c.mutedForeground, marginTop: 1 },
   });
 }
