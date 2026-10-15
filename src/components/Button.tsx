@@ -15,7 +15,12 @@ interface ButtonProps {
   loading?: boolean;
   icon?: React.ReactNode;
   style?: ViewStyle;
+  /** Needed for an icon-only button; a text button reads its text. */
+  accessibilityLabel?: string;
 }
+
+// Extra touch area so even the small sizes reach a 48 dp target.
+const HIT_SLOP: Record<ButtonSize, number> = { sm: 6, md: 4, lg: 2, icon: 4 };
 
 export default function Button({
   variant = 'default',
@@ -26,6 +31,7 @@ export default function Button({
   loading = false,
   icon,
   style,
+  accessibilityLabel,
 }: ButtonProps) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
@@ -43,6 +49,10 @@ export default function Button({
       ]}
       onPress={onPress}
       disabled={isDisabled}
+      hitSlop={HIT_SLOP[size]}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
         <ActivityIndicator
