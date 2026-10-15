@@ -388,7 +388,7 @@ export default function EmailListScreen({
   const resolvedTheme = useResolvedTheme();
   // The undo bar floats over the list's bottom right on a phone (on a split
   // layout it sits over the reading pane instead).
-  const { isSplit } = useLayout();
+  const { isSplit, shortHeight } = useLayout();
   const listUndo = useEmailStore((s) => s.pendingUndo != null);
   const sendUndo = useSendUndoStore((s) => s.pending != null);
   const undoBarUp = !isSplit && (listUndo || sendUndo);
@@ -1066,6 +1066,90 @@ export default function EmailListScreen({
     }
   }, [mailboxes, currentMailboxId, selectMailbox]);
 
+  const renderSearchBar = (inHeader: boolean) => (
+    <View style={[styles.searchBar, inHeader && styles.searchBarInHeader]}>
+      <Pressable
+        style={styles.checkboxButton}
+        onPress={toggleSelectAllVisible}
+        hitSlop={6}
+        accessibilityRole="checkbox"
+        accessibilityLabel={t('email_list.batch_actions.select_all', 'Select all')}
+        accessibilityState={{ checked: allSelected ? true : selectionMode ? 'mixed' : false }}
+      >
+        {allSelected ? (
+          <SquareCheck size={18} color={c.primary} />
+        ) : selectionMode ? (
+          <View style={styles.checkboxIndeterminate}>
+            <Minus size={14} color={c.background} />
+          </View>
+        ) : (
+          <Square size={18} color={c.textMuted} />
+        )}
+      </Pressable>
+      <View style={styles.searchInputArea}>
+        <Search size={16} color={c.textMuted} />
+        <TextInput
+          // No full-screen keyboard in landscape: it would hide the suggestions
+          // and the text around the field.
+          disableFullscreenUI
+          ref={searchInputRef}
+          style={styles.searchInput}
+          placeholder={t('email_list.search_placeholder', 'Search mail...')}
+          placeholderTextColor={c.textMuted}
+          value={searchInput}
+          onChangeText={setSearchInput}
+          onFocus={() => setSearchFocused(true)}
+          // Delay so a tap on a recent-search row lands before the list hides.
+          onBlur={() => { setTimeout(() => setSearchFocused(false), 150); }}
+          onSubmitEditing={() => submitSearch(searchInput)}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="search"
+        />
+        {searchInput.length > 0 && (
+          <Pressable
+            onPress={() => { setSearchInput(''); setSearchQuery(''); }}
+            hitSlop={8}
+            style={styles.searchClearButton}
+            accessibilityRole="button"
+            accessibilityLabel={t('contacts.clear_search', 'Clear search')}
+          >
+            <X size={14} color={c.textMuted} />
+          </Pressable>
+        )}
+      </View>
+      <Pressable
+        style={styles.filterButton}
+        onPress={() => setSortAscending(!sortAscending)}
+        accessibilityRole="button"
+        accessibilityLabel={sortAscending
+          ? t('settings.appearance.message_list_order.direction.oldest_first', 'Oldest first')
+          : t('settings.appearance.message_list_order.direction.newest_first', 'Newest first')}
+        accessibilityHint={t('email_list.sort_toggle_hint', 'Reverses the mail sort order')}
+      >
+        {sortAscending ? (
+          <ArrowUpNarrowWide size={18} color={c.primary} />
+        ) : (
+          <ArrowDownWideNarrow size={18} color={c.textMuted} />
+        )}
+      </Pressable>
+      <Pressable
+        style={[styles.filterButton, activeFilterCount > 0 && styles.filterButtonActive]}
+        onPress={() => setFilterMenuOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t('advanced_search.advanced_filters_tooltip', 'Advanced search filters')}
+        accessibilityValue={activeFilterCount > 0 ? { text: String(activeFilterCount) } : undefined}
+      >
+        <Filter size={18} color={activeFilterCount > 0 ? c.primary : c.textMuted} />
+        {activeFilterCount > 0 && (
+          <View style={styles.filterBadge}>
+            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+          </View>
+        )}
+      </Pressable>
+    </View>
+  );
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {/* Header */}
@@ -1176,10 +1260,12 @@ export default function EmailListScreen({
               <Menu size={20} color={c.textMuted} />
             </Pressable>
           )}
-          <Text style={styles.headerTitle} numberOfLines={1}>
+          <Text style={[styles.headerTitle, shortHeight && styles.headerTitleShort]} numberOfLines={1}>
             {headerTitle}
           </Text>
-          <View style={{ flex: 1 }} />
+          {/* A phone in landscape has room for a few rows only: the search
+              shares the header row instead of taking its own. */}
+          {shortHeight ? renderSearchBar(true) : <View style={{ flex: 1 }} />}
           <Pressable
             onPress={() => { void handleImport(); }}
             style={styles.headerButton}
@@ -1203,88 +1289,8 @@ export default function EmailListScreen({
         </View>
       )}
 
-      {/* Search bar (always visible) */}
-      <View style={styles.searchBar}>
-        <Pressable
-          style={styles.checkboxButton}
-          onPress={toggleSelectAllVisible}
-          hitSlop={6}
-          accessibilityRole="checkbox"
-          accessibilityLabel={t('email_list.batch_actions.select_all', 'Select all')}
-          accessibilityState={{ checked: allSelected ? true : selectionMode ? 'mixed' : false }}
-        >
-          {allSelected ? (
-            <SquareCheck size={18} color={c.primary} />
-          ) : selectionMode ? (
-            <View style={styles.checkboxIndeterminate}>
-              <Minus size={14} color={c.background} />
-            </View>
-          ) : (
-            <Square size={18} color={c.textMuted} />
-          )}
-        </Pressable>
-        <View style={styles.searchInputArea}>
-          <Search size={16} color={c.textMuted} />
-          <TextInput
-            // No full-screen keyboard in landscape: it would hide the suggestions
-            // and the text around the field.
-            disableFullscreenUI
-            ref={searchInputRef}
-            style={styles.searchInput}
-            placeholder={t('email_list.search_placeholder', 'Search mail...')}
-            placeholderTextColor={c.textMuted}
-            value={searchInput}
-            onChangeText={setSearchInput}
-            onFocus={() => setSearchFocused(true)}
-            // Delay so a tap on a recent-search row lands before the list hides.
-            onBlur={() => { setTimeout(() => setSearchFocused(false), 150); }}
-            onSubmitEditing={() => submitSearch(searchInput)}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-          />
-          {searchInput.length > 0 && (
-            <Pressable
-              onPress={() => { setSearchInput(''); setSearchQuery(''); }}
-              hitSlop={8}
-              style={styles.searchClearButton}
-              accessibilityRole="button"
-              accessibilityLabel={t('contacts.clear_search', 'Clear search')}
-            >
-              <X size={14} color={c.textMuted} />
-            </Pressable>
-          )}
-        </View>
-        <Pressable
-          style={styles.filterButton}
-          onPress={() => setSortAscending(!sortAscending)}
-          accessibilityRole="button"
-          accessibilityLabel={sortAscending
-            ? t('settings.appearance.message_list_order.direction.oldest_first', 'Oldest first')
-            : t('settings.appearance.message_list_order.direction.newest_first', 'Newest first')}
-          accessibilityHint={t('email_list.sort_toggle_hint', 'Reverses the mail sort order')}
-        >
-          {sortAscending ? (
-            <ArrowUpNarrowWide size={18} color={c.primary} />
-          ) : (
-            <ArrowDownWideNarrow size={18} color={c.textMuted} />
-          )}
-        </Pressable>
-        <Pressable
-          style={[styles.filterButton, activeFilterCount > 0 && styles.filterButtonActive]}
-          onPress={() => setFilterMenuOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t('advanced_search.advanced_filters_tooltip', 'Advanced search filters')}
-          accessibilityValue={activeFilterCount > 0 ? { text: String(activeFilterCount) } : undefined}
-        >
-          <Filter size={18} color={activeFilterCount > 0 ? c.primary : c.textMuted} />
-          {activeFilterCount > 0 && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-            </View>
-          )}
-        </Pressable>
-      </View>
+      {/* Search bar (always visible; inside the header in a short window) */}
+      {!shortHeight && renderSearchBar(false)}
 
       {searchFocused && ((!searchInput.trim() && recentSearches.length > 0) || contactSuggestions.length > 0) && (
         <View style={styles.recentSearches}>
@@ -1967,6 +1973,8 @@ function makeStyles(c: ThemePalette) {
     marginVertical: spacing.sm,
     gap: spacing.sm,
   },
+  searchBarInHeader: { flex: 1, marginHorizontal: 0, marginVertical: 0 },
+  headerTitleShort: { flexShrink: 1, maxWidth: 180 },
   checkboxButton: {
     width: componentSizes.buttonMd, height: componentSizes.buttonMd,
     alignItems: 'center', justifyContent: 'center',
