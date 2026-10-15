@@ -33,6 +33,7 @@ import { spacing, radius, typography, type ThemePalette } from '../theme/tokens'
 import { useColors } from '../theme/colors';
 import { useLocaleStore, type TranslateFn } from '../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import { useSheetInsets } from '../lib/use-layout';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ContactDetail'>;
 type Route = RouteProp<RootStackParamList, 'ContactDetail'>;
@@ -789,6 +790,8 @@ function MoreActionsSheet({
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const slideY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -810,7 +813,7 @@ function MoreActionsSheet({
       <Animated.View style={[styles.sheetOverlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']}>
           <View style={styles.handleHit}>
             <View style={styles.handle} />

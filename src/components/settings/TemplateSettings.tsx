@@ -18,8 +18,11 @@ import { useColors } from '../../theme/colors';
 import { useTemplatesStore, type EmailTemplate } from '../../stores/templates-store';
 import { useLocaleStore } from '../../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 export function TemplateSettings() {
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const tr = useLocaleStore((s) => s.t);
@@ -198,7 +201,7 @@ export function TemplateSettings() {
 
       {/* Edit/Create modal */}
       <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!editing} animationType="slide" transparent onRequestClose={closeEditor}>
-        <View style={styles.modalOverlay}>
+        <View style={[styles.modalOverlay, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
@@ -272,7 +275,7 @@ export function TemplateSettings() {
 
       {/* Import modal */}
       <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={importVisible} animationType="slide" transparent onRequestClose={() => setImportVisible(false)}>
-        <View style={styles.modalOverlay}>
+        <View style={[styles.modalOverlay, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <View style={styles.modalSheet}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{tr('settings.templates.import', 'Import')}</Text>

@@ -25,6 +25,7 @@ import { otherAccountsSyncing, type SyncCollection } from '../../../device-sync/
 import { CONTACTS_AUTHORITY, type Authority } from '../../../device-sync/types';
 import { useSyncCollections } from './use-sync-collections';
 import { MODAL_ORIENTATIONS } from '../../../lib/modal-orientations';
+import { useSheetInsets } from '../../../lib/use-layout';
 
 interface Props {
   visible: boolean;
@@ -49,6 +50,8 @@ export function DeviceSyncCollectionsSheet({ visible, onClose, registryId, autho
   const changed = React.useRef(false);
 
   const slideY = React.useRef(new Animated.Value(600)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const close = React.useCallback(() => {
     const wasChanged = changed.current;
@@ -116,7 +119,7 @@ export function DeviceSyncCollectionsSheet({ visible, onClose, registryId, autho
       <Animated.View
         style={[
           styles.sheet,
-          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }] },
+          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }], ...sheetInsets },
         ]}
       >
         <View {...dragHandlers}>

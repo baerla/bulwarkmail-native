@@ -43,6 +43,7 @@ import { isWritableCalendar } from '../../lib/calendar-editability';
 import { useCalendarLocale } from '../../lib/calendar-locale';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 type TaskFilter = 'all' | 'pending' | 'completed' | 'overdue';
 
@@ -108,6 +109,8 @@ export function TasksSheet({
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const { locale, t } = useCalendarLocale();
   const slideY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const dragHandlers = useSheetDrag({
     slideY,
@@ -236,7 +239,7 @@ export function TasksSheet({
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>
 
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']} style={styles.sheetSafe}>
           <View {...dragHandlers}>
             <View style={styles.handleHit}>

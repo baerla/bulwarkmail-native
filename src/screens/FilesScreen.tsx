@@ -66,6 +66,7 @@ import Dialog from '../components/Dialog';
 import ShareSheet from '../components/files/ShareSheet';
 import { FilePreviewModal, canPreviewInApp } from '../components/files/FilePreviewModal';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import { useSheetInsets } from '../lib/use-layout';
 
 // A file row carries the display name alongside the rest of the node.
 interface FileRow extends FileNode {
@@ -1208,6 +1209,8 @@ interface ActionsSheetProps {
 function ActionsSheet({
   target, sharingEnabled, t, onClose, onPreview, onOpenWith, onDownload, onShare, onMove, onDuplicate, onRename, onDelete,
 }: ActionsSheetProps) {
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const c = useColors();
   const styles = React.useMemo(() => makeSheetStyles(c), [c]);
   if (!target) return null;
@@ -1220,7 +1223,7 @@ function ActionsSheet({
   return (
     <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
+        <View style={[styles.backdrop, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
               <Text style={styles.sheetTitle} numberOfLines={1}>
@@ -1302,6 +1305,8 @@ interface FolderPickerSheetProps {
 // its descendants (a folder can't be moved into itself), flattened with
 // indentation, plus the drive root.
 function FolderPickerSheet({ target, allNodes, rootLabel, t, onClose, onPick }: FolderPickerSheetProps) {
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const c = useColors();
   const styles = React.useMemo(() => makeSheetStyles(c), [c]);
   const options = useMemo(() => {
@@ -1342,7 +1347,7 @@ function FolderPickerSheet({ target, allNodes, rootLabel, t, onClose, onPick }: 
   return (
     <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
+        <View style={[styles.backdrop, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
               <Text style={styles.sheetTitle} numberOfLines={1}>
@@ -1390,6 +1395,8 @@ interface SortSheetProps {
 }
 
 function SortSheet({ visible, sortKey, sortDir, t, onClose, onChangeKey, onChangeDir }: SortSheetProps) {
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const c = useColors();
   const styles = React.useMemo(() => makeSheetStyles(c), [c]);
   if (!visible) return null;
@@ -1397,7 +1404,7 @@ function SortSheet({ visible, sortKey, sortDir, t, onClose, onChangeKey, onChang
   return (
     <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
+        <View style={[styles.backdrop, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
               <Text style={styles.sheetTitle}>{t('files.settings_default_sort', 'Sort')}</Text>

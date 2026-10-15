@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('react-native', () => ({ useWindowDimensions: () => ({ width: 411, height: 914 }) }));
+vi.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 
-import { layoutFor, listPaneWidth } from '../use-layout';
+import { floatingCardFrame, layoutFor, listPaneWidth, sheetSideInsets } from '../use-layout';
 
 describe('layoutFor', () => {
   it('keeps a phone in portrait on the single-pane layout', () => {
@@ -48,5 +49,33 @@ describe('listPaneWidth', () => {
     expect(listPaneWidth(600)).toBe(320);
     expect(listPaneWidth(1000)).toBe(340);
     expect(listPaneWidth(2000)).toBe(420);
+  });
+});
+
+describe('sheetSideInsets', () => {
+  it('keeps a phone sheet full width inside the side insets', () => {
+    expect(sheetSideInsets(411, 0, 0)).toEqual({ left: 0, right: 0 });
+  });
+
+  it('centres the sheet at 560 dp on a wide window', () => {
+    expect(sheetSideInsets(1280, 0, 0)).toEqual({ left: 360, right: 360 });
+    expect(sheetSideInsets(914, 0, 48)).toEqual({ left: 177, right: 177 });
+  });
+
+  it('never puts a centred sheet under a side inset', () => {
+    expect(sheetSideInsets(640, 0, 48)).toEqual({ left: 48, right: 48 });
+  });
+});
+
+describe('floatingCardFrame', () => {
+  it('spans a phone with 12 dp margins above the tab bar', () => {
+    expect(floatingCardFrame(411, false, { left: 0, right: 0 })).toEqual({ left: 12, right: 12, bottom: 64 });
+  });
+
+  it('sits bottom right at 360 dp on a split layout', () => {
+    const f = floatingCardFrame(1280, true, { left: 0, right: 0 });
+    expect(1280 - f.left - f.right).toBe(360);
+    expect(f.right).toBe(20);
+    expect(f.bottom).toBe(20);
   });
 });

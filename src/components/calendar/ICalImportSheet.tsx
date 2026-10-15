@@ -18,6 +18,7 @@ import { useLocaleStore } from '../../stores/locale-store';
 import { useCalendarLocale } from '../../lib/calendar-locale';
 import type { Locale } from 'date-fns';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 // expo-document-picker is loaded lazily on first use; its native module is not
 // linked into every build (matches the FilesScreen / ContactImportSheet flow).
@@ -75,6 +76,8 @@ export function ICalImportSheet({ visible, onClose, calendars, onImport, onImpor
   const [result, setResult] = React.useState<ImportResult | null>(null);
 
   const slideY = React.useRef(new Animated.Value(900)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
 
   const resetState = React.useCallback(() => {
@@ -189,7 +192,7 @@ export function ICalImportSheet({ visible, onClose, calendars, onImport, onImpor
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <View style={styles.header}>
             <Text style={styles.title}>{t('calendar.import.title', 'Import Calendar')}</Text>

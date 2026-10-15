@@ -18,6 +18,7 @@ import {
 } from '../../stores/calendar-subscriptions-store';
 import { jmapClient } from '../../api/jmap-client';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 // The webmail's refresh intervals and their labels.
 const INTERVAL_OPTIONS: { minutes: number; key: string; fallback: string }[] = [
@@ -76,6 +77,8 @@ export function ICalSubscriptionSheet({ visible, onClose }: Props) {
   };
 
   const slideY = React.useRef(new Animated.Value(900)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -136,7 +139,7 @@ export function ICalSubscriptionSheet({ visible, onClose }: Props) {
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <View style={styles.header}>
             <Rss size={20} color={c.text} />

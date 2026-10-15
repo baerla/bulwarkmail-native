@@ -14,6 +14,7 @@ import { spacing, radius, typography, type ThemePalette } from '../../theme/toke
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 // expo-document-picker is loaded lazily on first use; its native module is not
 // linked into every build (matches the FilesScreen upload flow).
@@ -57,6 +58,8 @@ export default function ContactImportSheet({
   const [result, setResult] = React.useState<{ imported: number; failed: number } | null>(null);
 
   const slideY = React.useRef(new Animated.Value(900)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
 
   const resetState = React.useCallback(() => {
@@ -165,7 +168,7 @@ export default function ContactImportSheet({
       <Animated.View style={[styles.overlay, { opacity: overlayOpacity }]}>
         <Pressable style={{ flex: 1 }} onPress={onClose} />
       </Animated.View>
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <View style={styles.header}>
             <Text style={styles.title}>{t('contacts.import.title', 'Import Contacts')}</Text>

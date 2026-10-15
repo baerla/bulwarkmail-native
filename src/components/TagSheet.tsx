@@ -12,6 +12,7 @@ import { useLocaleStore } from '../stores/locale-store';
 import { getEmailTagIds } from '../lib/thread-utils';
 import type { Email } from '../api/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import { useSheetInsets } from '../lib/use-layout';
 
 interface TagSheetProps {
   visible: boolean;
@@ -29,6 +30,8 @@ export function TagSheet({ visible, onClose, keywords, selectedEmails, onToggle 
   const t = useLocaleStore((s) => s.t);
   const insets = useSafeAreaInsets();
   const slideY = React.useRef(new Animated.Value(500)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const dragHandlers = useSheetDrag({ slideY, closedY: 500, onClose });
 
@@ -73,7 +76,7 @@ export function TagSheet({ visible, onClose, keywords, selectedEmails, onToggle 
       <Animated.View
         style={[
           styles.sheet,
-          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }] },
+          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }], ...sheetInsets },
         ]}
       >
         <View {...dragHandlers}>

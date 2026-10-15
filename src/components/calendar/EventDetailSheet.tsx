@@ -61,6 +61,7 @@ import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { recurrenceEndLabel, recurrenceIntervalLabel } from '../../lib/recurrence';
 import type { TranslateFn } from '../../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 type RsvpStatus = 'accepted' | 'declined' | 'tentative';
 
@@ -141,6 +142,8 @@ export function EventDetailSheet({
   // name) render with the contact card's name instead of the raw email.
   const resolveContactName = useContactNameResolver();
   const slideY = React.useRef(new Animated.Value(Dimensions.get('window').height)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const visible = !!event;
   const dragHandlers = useSheetDrag({
@@ -255,7 +258,7 @@ export function EventDetailSheet({
         <Pressable style={styles.overlayPress} onPress={onClose} />
       </Animated.View>
 
-      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }] }]}>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY: slideY }], ...sheetInsets }]}>
         <SafeAreaView edges={['bottom']} style={styles.sheetSafe}>
           <View {...dragHandlers}>
             <View style={styles.handleHit}>

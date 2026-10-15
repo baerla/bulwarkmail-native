@@ -4,6 +4,7 @@ import {
   type AccessibilityActionEvent, type LayoutChangeEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFloatingCardFrame } from '../lib/use-layout';
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react-native';
 import { spacing, radius, type ThemePalette } from '../theme/tokens';
 import { useColors, useResolvedTheme } from '../theme/colors';
@@ -21,9 +22,14 @@ import { shouldClaimToastSwipe, toastSwipeRelease } from './toast-swipe';
 export function ToastHost(): React.ReactElement | null {
   const toasts = useToastStore((s) => s.toasts);
   const insets = useSafeAreaInsets();
+  // Full width above the tab bar on a phone; bottom right on a tablet.
+  const frame = useFloatingCardFrame();
   if (toasts.length === 0) return null;
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + 64 }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.wrap, { left: frame.left, right: frame.right, bottom: insets.bottom + frame.bottom }]}
+    >
       {toasts.map((t) => <ToastCard key={t.id} toast={t} />)}
     </View>
   );
@@ -226,8 +232,6 @@ function ToastCard({ toast }: { toast: Toast }) {
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
-    left: spacing.md,
-    right: spacing.md,
     gap: spacing.sm,
     zIndex: 60,
   },

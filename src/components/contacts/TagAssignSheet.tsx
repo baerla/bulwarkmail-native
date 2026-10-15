@@ -10,6 +10,7 @@ import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { useContactsStore, selectKeywordsUsed } from '../../stores/contacts-store';
 import { useLocaleStore } from '../../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 interface Props {
   visible: boolean;
@@ -36,6 +37,8 @@ export default function TagAssignSheet({
   const [input, setInput] = React.useState('');
 
   const slideY = React.useRef(new Animated.Value(600)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const dragHandlers = useSheetDrag({ slideY, closedY: 600, onClose });
 
@@ -68,7 +71,7 @@ export default function TagAssignSheet({
       <Animated.View
         style={[
           styles.sheet,
-          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }] },
+          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }], ...sheetInsets },
         ]}
       >
         <View {...dragHandlers}>

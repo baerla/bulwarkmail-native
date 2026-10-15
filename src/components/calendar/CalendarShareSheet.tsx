@@ -18,6 +18,7 @@ import { spacing, radius, typography, type ThemePalette } from '../../theme/toke
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import { useSheetInsets } from '../../lib/use-layout';
 
 type RolePreset = 'freeBusy' | 'read' | 'readWrite' | 'manager';
 
@@ -70,6 +71,8 @@ interface CalendarShareSheetProps {
 // principal list comes from the same Principal/query the Files share sheet
 // uses.
 export function CalendarShareSheet({ calendar, onShare, onClose }: CalendarShareSheetProps) {
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
@@ -158,7 +161,7 @@ export function CalendarShareSheet({ calendar, onShare, onClose }: CalendarShare
   return (
     <Modal supportedOrientations={MODAL_ORIENTATIONS} visible transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop}>
+        <View style={[styles.backdrop, { paddingLeft: sheetInsets.left, paddingRight: sheetInsets.right }]}>
           <TouchableWithoutFeedback>
             <View style={styles.sheet}>
               <View style={styles.titleRow}>

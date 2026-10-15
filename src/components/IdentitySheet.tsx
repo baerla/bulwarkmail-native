@@ -10,6 +10,7 @@ import { useSheetDrag } from '../lib/use-sheet-drag';
 import type { Identity } from '../api/types';
 import { useLocaleStore } from '../stores/locale-store';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import { useSheetInsets } from '../lib/use-layout';
 
 interface IdentitySheetProps {
   visible: boolean;
@@ -26,6 +27,8 @@ export function IdentitySheet({
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const insets = useSafeAreaInsets();
   const slideY = React.useRef(new Animated.Value(500)).current;
+  // Centred on a wide window, clear of side insets in landscape.
+  const sheetInsets = useSheetInsets();
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;
   const dragHandlers = useSheetDrag({ slideY, closedY: 500, onClose });
   const { t } = useLocaleStore();
@@ -52,7 +55,7 @@ export function IdentitySheet({
       <Animated.View
         style={[
           styles.sheet,
-          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }] },
+          { paddingBottom: Math.max(insets.bottom, spacing.md), transform: [{ translateY: slideY }], ...sheetInsets },
         ]}
       >
         <View {...dragHandlers}>
