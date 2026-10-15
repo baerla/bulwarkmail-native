@@ -33,6 +33,8 @@ import { useSettingsStore, type SwipeAction, type SwipeMode } from '../stores/se
 import { useKeywordsStore, type KeywordDef } from '../stores/keywords-store';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
 import { listBackStep } from '../lib/list-back';
+import { useLayout } from '../lib/use-layout';
+import { useSendUndoStore } from '../stores/send-undo-store';
 import { useLocaleStore } from '../stores/locale-store';
 import { useSearchHistoryStore } from '../stores/search-history-store';
 import { useContactsStore } from '../stores/contacts-store';
@@ -322,6 +324,9 @@ function EmailRowSeparator() {
 // Rows of a list spanning accounts can share an id (#1082).
 const emailKeyExtractor = rowKeyOf;
 
+/** Height of the undo bar plus a gap, for lifting the compose button. */
+const UNDO_BAR_CLEARANCE = 60;
+
 const LOGO_ON_LIGHT = require('../../assets/logos/Bulwark Logo Dark.png');
 const LOGO_ON_DARK = require('../../assets/logos/Bulwark Logo White.png');
 
@@ -348,6 +353,12 @@ export default function EmailListScreen({
   const insets = useSafeAreaInsets();
   const { t } = useLocaleStore();
   const resolvedTheme = useResolvedTheme();
+  // The undo bar floats over the list's bottom right on a phone (on a split
+  // layout it sits over the reading pane instead).
+  const { isSplit } = useLayout();
+  const listUndo = useEmailStore((s) => s.pendingUndo != null);
+  const sendUndo = useSendUndoStore((s) => s.pending != null);
+  const undoBarUp = !isSplit && (listUndo || sendUndo);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [filterMenuOpen, setFilterMenuOpen] = React.useState(false);
   const emails = useEmailStore((s) => s.emails);
@@ -1499,7 +1510,13 @@ export default function EmailListScreen({
       {/* Compose FAB - matches webmail mobile: PenSquare, h-14 w-14, rounded-full, shadow-lg */}
       <Pressable
         onPress={onComposePress}
-        style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+        style={({ pressed }) => [
+          styles.fab,
+          // Lifted over the phone's undo bar, which used to cover it.
+          undoBarUp && { bottom: spacing.lg + UNDO_BAR_CLEARANCE },
+          { right: spacing.lg + insets.right },
+          pressed && styles.fabPressed,
+        ]}
         accessibilityRole="button"
         accessibilityLabel={t('sidebar.mobile.compose', 'Compose')}
       >
