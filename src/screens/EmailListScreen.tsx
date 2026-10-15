@@ -12,7 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
-import { useColors } from '../theme/colors';
+import { useColors, useResolvedTheme } from '../theme/colors';
 import { useTypography, useDensity } from '../theme/dynamic';
 import SidebarDrawer from '../components/SidebarDrawer';
 import SenderAvatar from '../components/SenderAvatar';
@@ -322,6 +322,9 @@ function EmailRowSeparator() {
 // Rows of a list spanning accounts can share an id (#1082).
 const emailKeyExtractor = rowKeyOf;
 
+const LOGO_ON_LIGHT = require('../../assets/logos/Bulwark Logo Dark.png');
+const LOGO_ON_DARK = require('../../assets/logos/Bulwark Logo White.png');
+
 interface EmailListScreenProps {
   onEmailPress?: (email: Email) => void;
   onComposePress?: () => void;
@@ -344,6 +347,7 @@ export default function EmailListScreen({
   // so the header first drew under the status bar and then jumped down.
   const insets = useSafeAreaInsets();
   const { t } = useLocaleStore();
+  const resolvedTheme = useResolvedTheme();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [filterMenuOpen, setFilterMenuOpen] = React.useState(false);
   const emails = useEmailStore((s) => s.emails);
@@ -1137,7 +1141,8 @@ export default function EmailListScreen({
             )}
           </Pressable>
           <Image
-            source={require('../../assets/logos/Bulwark Logo White.png')}
+            // The white logo vanished on the light header.
+            source={resolvedTheme === 'light' ? LOGO_ON_LIGHT : LOGO_ON_DARK}
             style={styles.headerLogo}
             resizeMode="contain"
           />
