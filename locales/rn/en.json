@@ -137,6 +137,7 @@
       "update_error": "Failed to update task"
     },
     "views": {
+      "n_days": "{count} days",
       "schedule": "Schedule",
       "three_days": "3 days"
     }

@@ -8,8 +8,10 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { multiDayCount } from '../lib/calendar-time-grid';
 import {
   Calendar as CalendarIcon,
   ChevronDown,
@@ -110,10 +112,10 @@ function windowMode(mode: ViewMode): ScrollViewMode {
   return mode === '3day' ? 'day' : mode;
 }
 
-// A window without free scrolling: one period, three days for the three-day grid.
-function fixedWindowFor(mode: ViewMode, anchor: Date): ScrollWindowState {
+// A window without free scrolling: one period, the multi-day grid's days.
+function fixedWindowFor(mode: ViewMode, anchor: Date, multiDays: number): ScrollWindowState {
   const state = fixedScrollWindowState(windowMode(mode), anchor);
-  return mode === '3day' ? { ...state, after: 2 } : state;
+  return mode === '3day' ? { ...state, after: multiDays - 1 } : state;
 }
 type PendingAction =
   | {
@@ -189,6 +191,9 @@ export default function CalendarScreen() {
   );
   // The sideways-scrolling week and day grids assume a left-to-right strip;
   // right-to-left layouts keep them paged.
+  // Wider windows show more days in the multi-day view.
+  const { width: windowWidth } = useWindowDimensions();
+  const multiDays = multiDayCount(windowWidth);
   const freeScroll =
     calendarFreeScroll
     && ((viewMode !== 'week' && viewMode !== '3day' && viewMode !== 'day') || !I18nManager.isRTL);
@@ -197,8 +202,8 @@ export default function CalendarScreen() {
     () =>
       freeScroll
         ? normalizeScrollWindowState(windowState, windowMode(viewMode), parseDayKey(focusKey))
-        : fixedWindowFor(viewMode, parseDayKey(focusKey)),
-    [freeScroll, windowState, viewMode, focusKey],
+        : fixedWindowFor(viewMode, parseDayKey(focusKey), multiDays),
+    [freeScroll, windowState, viewMode, focusKey, multiDays],
   );
   React.useEffect(() => {
     if (freeScroll && activeWindowState !== windowState) setWindowState(activeWindowState);
@@ -482,21 +487,21 @@ export default function CalendarScreen() {
     const base = visibleDate ?? focus.date;
     jumpTo(
       viewMode === 'week' ? subWeeks(base, 1)
-      : viewMode === '3day' ? subDays(base, 3)
+      : viewMode === '3day' ? subDays(base, multiDays)
       : viewMode === 'day' ? subDays(base, 1)
       : subMonths(base, 1),
     );
-  }, [viewMode, visibleDate, focus.date, jumpTo]);
+  }, [viewMode, visibleDate, focus.date, jumpTo, multiDays]);
 
   const goNext = React.useCallback(() => {
     const base = visibleDate ?? focus.date;
     jumpTo(
       viewMode === 'week' ? addWeeks(base, 1)
-      : viewMode === '3day' ? addDays(base, 3)
+      : viewMode === '3day' ? addDays(base, multiDays)
       : viewMode === 'day' ? addDays(base, 1)
       : addMonths(base, 1),
     );
-  }, [viewMode, visibleDate, focus.date, jumpTo]);
+  }, [viewMode, visibleDate, focus.date, jumpTo, multiDays]);
 
   const goToday = React.useCallback(() => {
     jumpTo(displayNow());
@@ -520,11 +525,17 @@ export default function CalendarScreen() {
     () => [
       { key: 'agenda', label: t('calendar.views.schedule', 'Schedule'), Icon: Rows2 },
       { key: 'day', label: t('calendar.views.day', 'Day'), Icon: Square },
-      { key: '3day', label: t('calendar.views.three_days', '3 days'), Icon: Columns3 },
+      {
+        key: '3day',
+        label: multiDays === 3
+          ? t('calendar.views.three_days', '3 days')
+          : t('calendar.views.n_days', '{count} days', { count: multiDays }),
+        Icon: Columns3,
+      },
       { key: 'week', label: t('calendar.views.week', 'Week'), Icon: Columns4 },
       { key: 'month', label: t('calendar.views.month', 'Month'), Icon: Grid3x3 },
     ],
-    [t],
+    [t, multiDays],
   );
 
   // The month that drops down under the title; the title follows the month
@@ -1094,6 +1105,7 @@ export default function CalendarScreen() {
           <TimeGridScrollView
             key={windowKey}
             mode={viewMode}
+            multiDays={multiDays}
             focus={focus}
             window={scrollWindow}
             onExtendStart={freeScroll && scrollWindow.canExtendStart ? extendWindowStart : undefined}

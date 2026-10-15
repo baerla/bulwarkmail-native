@@ -61,6 +61,8 @@ type TimeFormat = '12h' | '24h';
 
 interface TimeGridScrollViewProps {
   mode: TimeGridMode;
+  /** Days of the multi-day mode (`multiDayCount`). */
+  multiDays?: number;
   /** The day the user navigated to; its week (week view) or itself (day view) is scrolled into view. */
   focus: CalendarFocus;
   /** The loaded window: one column per day. */
@@ -96,6 +98,7 @@ interface TimeGridScrollViewProps {
  */
 function TimeGridScrollViewInner({
   mode,
+  multiDays = 3,
   focus,
   window,
   selectedDate,
@@ -120,7 +123,7 @@ function TimeGridScrollViewInner({
     [eventsByDay, events],
   );
 
-  const perScreen = columnsPerScreen(mode);
+  const perScreen = columnsPerScreen(mode, multiDays);
   const { width: screenWidth } = useWindowDimensions();
   const [rootWidth, setRootWidth] = React.useState(screenWidth);
   const listWidth = Math.max(perScreen, rootWidth - GUTTER_WIDTH);

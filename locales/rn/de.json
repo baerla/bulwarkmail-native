@@ -134,6 +134,7 @@
       "update_error": "Aufgabe konnte nicht aktualisiert werden"
     },
     "views": {
+      "n_days": "{count} Tage",
       "schedule": "Terminübersicht",
       "three_days": "3 Tage"
     }
