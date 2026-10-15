@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, TextInput, Pressable, ScrollView,
-  Keyboard, Platform, ActivityIndicator, Alert, Modal, Switch,
+  Keyboard, Platform, ActivityIndicator, Alert, Modal, Switch, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePreventRemove } from '@react-navigation/native';
@@ -664,6 +664,10 @@ export default function ComposeScreen({ route, navigation }: Props) {
   });
 
   const editorRef = React.useRef<RichTextEditorHandle>(null);
+  // The label column grows with the system font size: at 1.3 "Betreff"
+  // wrapped into "Betref" / "f" in a fixed 56 dp column.
+  const { fontScale } = useWindowDimensions();
+  const fieldLabelWidth = React.useMemo(() => ({ width: Math.round(56 * Math.max(1, fontScale)) }), [fontScale]);
   const subjectRef = React.useRef<TextInput>(null);
   const plainBodyRef = React.useRef<TextInput>(null);
   const [subjectFocused, setSubjectFocused] = React.useState(false);
@@ -2213,7 +2217,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
     const invalidInput = typedRecipients[field].invalid.length > 0 && !typedRecipients[field].valid.length && input.trim().length > 0 && activeField !== field;
     return (
       <View style={[styles.fieldRow, { zIndex }]}>
-        <Text style={styles.fieldLabel}>{label}</Text>
+        <Text style={[styles.fieldLabel, fieldLabelWidth]} numberOfLines={1}>{label}</Text>
         <View style={styles.recipientField}>
           {list.map((r, i) => (
             <RecipientChip
@@ -2362,7 +2366,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.fieldRow}>
-            <Text style={styles.fieldLabel}>{t('email_composer.from', 'From')}</Text>
+            <Text style={[styles.fieldLabel, fieldLabelWidth]} numberOfLines={1}>{t('email_composer.from', 'From')}</Text>
             <Pressable
               onPress={openIdentityPicker}
               onLongPress={openFromOptions}
@@ -2392,7 +2396,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
           {bccVisible && renderRecipientField('bcc', t('email_composer.bcc', 'Bcc'), t('email_composer.bcc_placeholder', 'Bcc recipients'), 4)}
 
           <View style={styles.fieldRow}>
-            <Text style={styles.fieldLabel}>{t('email_composer.subject', 'Subject')}</Text>
+            <Text style={[styles.fieldLabel, fieldLabelWidth]} numberOfLines={1}>{t('email_composer.subject', 'Subject')}</Text>
             <TextInput
               ref={subjectRef}
               disableFullscreenUI
@@ -2984,7 +2988,6 @@ function makeStyles(c: ThemePalette) {
   fieldLabel: {
     ...typography.body,
     color: c.textMuted,
-    width: 56,
     paddingTop: 10,
   },
   fieldContent: {
