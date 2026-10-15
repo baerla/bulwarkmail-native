@@ -31,6 +31,8 @@ import {
 } from '../stores/email-store';
 import { useSettingsStore, type SwipeAction, type SwipeMode } from '../stores/settings-store';
 import { useKeywordsStore, type KeywordDef } from '../stores/keywords-store';
+import { useBackWhileFocused } from '../lib/use-back-while-focused';
+import { listBackStep } from '../lib/list-back';
 import { useLocaleStore } from '../stores/locale-store';
 import { useSearchHistoryStore } from '../stores/search-history-store';
 import { useContactsStore } from '../stores/contacts-store';
@@ -885,6 +887,22 @@ export default function EmailListScreen({
     (filters.keyword ? 1 : 0) +
     (filters.folder && filters.folder !== 'current' ? 1 : 0);
   const hasActiveSearchOrFilter = Boolean(storeSearchQuery) || activeFilterCount > 0;
+
+  // Back first leaves the selection, then the search and filters; only then
+  // does it leave the app (it used to exit with a search still open).
+  const backStep = listBackStep({
+    selecting: selectionMode,
+    searching: hasActiveSearchOrFilter || searchInput.length > 0,
+  });
+  const handleBack = React.useCallback(() => {
+    if (backStep === 'clear-selection') {
+      clearSelection();
+    } else if (backStep === 'clear-search') {
+      setSearchInput('');
+      clearSearchAndFilters();
+    }
+  }, [backStep, clearSelection, clearSearchAndFilters]);
+  useBackWhileFocused(backStep !== 'leave', handleBack);
   const folderScope = effectiveFolderScope(storeSearchQuery, filters);
   // Accounts an "All folders" list could not reach (#1082).
   const unreachedAccounts = spansAccounts({ searchQuery: storeSearchQuery, filters })
