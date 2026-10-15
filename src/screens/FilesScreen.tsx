@@ -60,7 +60,7 @@ import { useLayout, useSheetInsets } from '../lib/use-layout';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
 import { filesBackStep } from '../lib/files-back';
 import type { FileNode } from '../api/types';
-import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
+import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import {
   useSettingsStore, type FilesViewMode, type FilesSortKey, type FilesSortDir,
@@ -1492,7 +1492,10 @@ function makeStyles(c: ThemePalette) {
       gap: spacing.xs,
     },
     headerBtn: {
-      padding: spacing.xs,
+      minWidth: componentSizes.buttonLg,
+      minHeight: componentSizes.buttonLg,
+      alignItems: 'center',
+      justifyContent: 'center',
       borderRadius: radius.sm,
     },
     headerBtnActive: {
@@ -1627,7 +1630,10 @@ function makeStyles(c: ThemePalette) {
       color: c.textMuted,
     },
     rowMore: {
-      padding: spacing.xs,
+      width: componentSizes.buttonLg,
+      height: componentSizes.buttonLg,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     gridContent: {
       padding: spacing.sm,

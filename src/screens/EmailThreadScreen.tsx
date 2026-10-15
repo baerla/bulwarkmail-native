@@ -1627,8 +1627,8 @@ function makeStyles(c: ThemePalette) {
     borderBottomColor: c.border,
   },
   toolbarBack: {
-    width: componentSizes.avatarSm,
-    height: componentSizes.avatarSm,
+    width: componentSizes.buttonLg,
+    height: componentSizes.buttonLg,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,

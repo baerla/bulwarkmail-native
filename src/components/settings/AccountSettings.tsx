@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ArrowDown, ArrowUp, Check, ChevronRight, Plus, Star, Trash2, Users } from 'lucide-react-native';
 import { SettingsSection, SettingItem } from './settings-section';
 import Button from '../Button';
-import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
+import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useAuthStore } from '../../stores/auth-store';
 import { useAccountStore } from '../../stores/account-store';
@@ -341,7 +341,7 @@ function makeStyles(c: ThemePalette) {
   rowError: { ...typography.caption, color: c.error },
   defaultBadge: { ...typography.caption, color: c.primary, marginTop: 2 },
   rowActions: { flexDirection: 'row', gap: 2 },
-  iconBtn: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
+  iconBtn: { width: componentSizes.buttonLg, height: componentSizes.buttonLg, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
   addRow: { gap: spacing.sm, alignItems: 'flex-start' },
   hint: { ...typography.caption, color: c.mutedForeground },
   });

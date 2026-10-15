@@ -161,7 +161,7 @@ export function QuickReplyBox({ email, jmapAccountId, onMoreOptions, onSent, onF
         editable={!sending}
       />
       <View style={styles.actions}>
-        <Pressable style={styles.more} onPress={() => onMoreOptions(text)} hitSlop={6}>
+        <Pressable style={styles.more} onPress={() => onMoreOptions(text)} hitSlop={10} accessibilityRole="button">
           <Maximize2 size={14} color={c.textSecondary} />
           <Text style={styles.moreText}>{t('email_viewer.more_options', 'More options')}</Text>
         </Pressable>
@@ -169,6 +169,9 @@ export function QuickReplyBox({ email, jmapAccountId, onMoreOptions, onSent, onF
           style={[styles.send, (!text.trim() || sending) && styles.sendDisabled]}
           onPress={send}
           disabled={!text.trim() || sending}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !text.trim() || sending, busy: sending }}
         >
           {sending ? <ActivityIndicator size="small" color={c.primaryForeground} /> : <Send size={14} color={c.primaryForeground} />}
           <Text style={styles.sendText}>{sending ? t('email_viewer.sending', 'Sending...') : t('email_viewer.send', 'Send')}</Text>

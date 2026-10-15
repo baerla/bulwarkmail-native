@@ -213,7 +213,8 @@ function RecipientChip({
       </Text>
       <Pressable
         onPress={onRemove}
-        hitSlop={8}
+        // A 12 px icon: the touch area reaches about 40 dp around it.
+        hitSlop={14}
         accessibilityRole="button"
         accessibilityLabel={t('email_composer.recipient_remove', 'Remove')}
       >

@@ -29,6 +29,8 @@ export default function ToggleSwitch({ value, onValueChange, disabled = false, a
         disabled && styles.disabled,
       ]}
       onPress={() => !disabled && onValueChange(!value)}
+      // The track is 44 x 24; the touch area reaches 48 dp high.
+      hitSlop={{ top: 12, bottom: 12, left: 4, right: 4 }}
       accessibilityRole="switch"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ checked: value, disabled }}

@@ -2025,8 +2025,8 @@ function makeStyles(c: ThemePalette) {
     lineHeight: 14,
   },
   searchClearButton: {
-    width: 20,
-    height: 20,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.full,

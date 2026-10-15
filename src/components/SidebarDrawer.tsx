@@ -186,7 +186,9 @@ function SidebarRow({
         {hasChildren ? (
           <Pressable
             onPress={onToggleExpand}
-            hitSlop={6}
+            // The 20 dp slot keeps the tree indent; the touch area reaches
+            // 44 dp so a near miss doesn't open the folder instead.
+            hitSlop={12}
             style={styles.chevron}
             accessibilityRole="button"
             accessibilityLabel={isExpanded ? t('sidebar.collapse', 'Collapse') : t('sidebar.expand', 'Expand')}
@@ -1399,7 +1401,7 @@ function makeStyles(c: ThemePalette) {
     ...typography.bodySemibold,
     color: c.text,
   },
-  sectionSettings: { padding: 4 },
+  sectionSettings: { padding: 10 },
 
   quickRow: {
     flexDirection: 'row',
