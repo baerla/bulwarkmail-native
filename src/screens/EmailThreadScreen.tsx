@@ -557,10 +557,10 @@ function EmailViewer({ route, navigation, embedded = false, onActiveChange }: Pr
   };
 
   // Reply / forward the given message (a thread card's own, or the active one).
-  const navigateCompose = React.useCallback((mode: 'reply' | 'replyAll' | 'forward', target?: Email) => {
+  const navigateCompose = React.useCallback((mode: 'reply' | 'replyAll' | 'forward', target?: Email, typed?: string) => {
     const source = target ?? email;
     if (!source) return;
-    const params = replyComposeParams(mode, source, ownerAccountId);
+    const params = replyComposeParams(mode, source, ownerAccountId, typed);
     if (params) navigation.navigate('Compose', params);
   }, [email, navigation, ownerAccountId]);
 
@@ -961,7 +961,7 @@ interface EmailPaneProps {
   onToggleStar: (email: Email) => void;
   onAddressPress: (address: EmailAddress) => void;
   onEmailPatched: (email: Email) => void;
-  onReply: (mode: 'reply' | 'replyAll' | 'forward', email: Email) => void;
+  onReply: (mode: 'reply' | 'replyAll' | 'forward', email: Email, typed?: string) => void;
   onSwipe: (direction: 'prev' | 'next') => void;
   onZoomChange: (zoom: { pinching: boolean; zoomed: boolean }) => void;
 }
@@ -1182,7 +1182,8 @@ function EmailPane({
           <QuickReplyBox
             email={newest}
             jmapAccountId={jmapAccountId}
-            onMoreOptions={() => onReply('reply', newest)}
+            // The text typed so far moves into the full composer.
+            onMoreOptions={(draft) => onReply('reply', newest, draft)}
             onSent={onEmailPatched}
             onFocus={handleQuickReplyFocus}
             onBlur={handleQuickReplyBlur}

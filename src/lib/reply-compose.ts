@@ -5,12 +5,15 @@ import { pickEmailBody, plainTextBody } from './email-body';
 /**
  * Composer params for a reply / reply-all / forward of `source`. Shared by
  * the thread viewer and the `mail/message/<id>?action=reply` deep link (the
- * triage widget). Null when there is nobody to reply to.
+ * triage widget). Null when there is nobody to reply to. `typed` is text
+ * the user already wrote (quick reply's "More options"); it goes above the
+ * quote.
  */
 export function replyComposeParams(
   mode: 'reply' | 'replyAll' | 'forward',
   source: Email,
   ownerAccountId?: string,
+  typed?: string,
 ): NonNullable<RootStackParamList['Compose']> | null {
   const from = source.from?.[0];
   if (!from && mode !== 'forward') return null;
@@ -24,6 +27,7 @@ export function replyComposeParams(
   const body = !quoteHtml || picked.text ? plainTextBody(source) : undefined;
   return {
     mode,
+    ...(typed?.trim() ? { prefillBody: typed } : null),
     replyTo: {
       from: from ?? { email: '' },
       to: source.to,
