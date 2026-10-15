@@ -394,6 +394,7 @@ export default function App() {
   // cached mail list instead of the "Restoring session" spinner; the real
   // JMAP session comes up in the background.
   const hasPersistedAccount = useAccountStore((state) => state.activeAccountId != null);
+  const { isSplit } = useLayout();
 
   React.useEffect(() => {
     if (!hasRestoredSession) {
@@ -824,10 +825,11 @@ export default function App() {
         <Stack.Screen
           name="Compose"
           component={ComposeScreen}
-          options={{
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-          }}
+          // A tablet shows the composer as a panel over the screen it came
+          // from, so that screen stays drawn behind the dimmed backdrop.
+          options={isSplit
+            ? { presentation: 'transparentModal', animation: 'fade' }
+            : { presentation: 'modal', animation: 'slide_from_bottom' }}
         />
         <Stack.Screen name="ContactDetail" component={ContactDetailScreen} />
         <Stack.Screen

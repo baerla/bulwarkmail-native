@@ -399,11 +399,15 @@ export default function ComposeScreen({ route, navigation }: Props) {
   const insets = useSafeAreaInsets();
   // Track the visible keyboard obstruction so the format bar stays above it.
   const kbObstruction = useKeyboardObstruction(insets.bottom, () => editorRef.current?.blur());
-  const { shortHeight } = useLayout();
+  const { shortHeight, isSplit } = useLayout();
   const typingInShortWindow = shortHeight && kbObstruction > 0;
   // When the keyboard is up it covers the bottom safe area, so we don't
   // need to add it on top — pad by whichever is larger.
-  const bottomPad = Math.max(kbObstruction, insets.bottom);
+  // On a tablet the composer is a centred panel that stops PANEL_MARGIN
+  // short of the screen bottom; the keyboard covers that much less of it.
+  const bottomPad = isSplit
+    ? Math.max(0, kbObstruction - PANEL_MARGIN)
+    : Math.max(kbObstruction, insets.bottom);
   const replyTo = route.params?.replyTo;
   const draft = route.params?.draft;
   const mode = route.params?.mode ?? 'compose';
@@ -2263,8 +2267,8 @@ export default function ComposeScreen({ route, navigation }: Props) {
     );
   };
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+  const composer = (
+    <SafeAreaView style={styles.container} edges={isSplit ? [] : ['top', 'left', 'right']}>
       <View style={[styles.header, typingInShortWindow && styles.headerCompact]}>
         <Pressable
           onPress={onClose}
@@ -2851,12 +2855,38 @@ export default function ComposeScreen({ route, navigation }: Props) {
       />
     </SafeAreaView>
   );
+  if (!isSplit) return composer;
+  // Tablet: a centred panel over the dimmed screen it was opened from.
+  return (
+    <View style={[styles.panelBackdrop, { paddingTop: insets.top + PANEL_MARGIN, paddingBottom: insets.bottom + PANEL_MARGIN }]}>
+      <View style={styles.panel}>{composer}</View>
+    </View>
+  );
 }
+
+/** Gap between the tablet composer panel and the screen edges. */
+const PANEL_MARGIN = 24;
 
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
   flex: { flex: 1 },
+  panelBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    paddingHorizontal: PANEL_MARGIN,
+  },
+  panel: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 760,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: c.border,
+    overflow: 'hidden',
+    backgroundColor: c.background,
+  },
   scrollContent: { flexGrow: 1 },
 
   header: {
