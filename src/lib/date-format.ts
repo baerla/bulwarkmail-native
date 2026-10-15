@@ -1,4 +1,5 @@
 import type { DateFormat, TimeFormat } from '../stores/settings-store';
+import { intlLocale } from './intl-locale';
 
 /**
  * Formats a received-at date for the email list. Mirrors the webmail
@@ -87,9 +88,7 @@ export function formatListDate(
   const { dateFormat, timeFormat } = opts;
   const localeRaw = opts.locale;
   const locale = localeRaw && localeRaw.length > 0 ? localeRaw : 'en';
-  // `en` alone resolves to en-US in Intl; everything else uses the language
-  // subtag as-is and lets the runtime pick a sensible default region.
-  const intlLocale = locale === 'en' ? 'en-US' : locale;
+  const intlTag = intlLocale(locale);
   const hour12 = timeFormat === '12h';
 
   if (dateFormat === 'relative') {
@@ -101,15 +100,15 @@ export function formatListDate(
     if (minutes < 60) return relativeLabel(opts.t, 'minute', minutes);
     if (hours < 24) return relativeLabel(opts.t, 'hour', hours);
     if (days < 7) return relativeLabel(opts.t, 'day', days);
-    return formatWith(d, intlLocale, d.getFullYear() !== now.getFullYear() ? 'monthDayYear' : 'monthDay');
+    return formatWith(d, intlTag, d.getFullYear() !== now.getFullYear() ? 'monthDayYear' : 'monthDay');
   }
 
   if (dateFormat === 'full') {
-    return formatWith(d, intlLocale, hour12 ? 'full12' : 'full24');
+    return formatWith(d, intlTag, hour12 ? 'full12' : 'full24');
   }
 
   // 'smart' (default)
-  const timeStr = formatWith(d, intlLocale, hour12 ? 'time12' : 'time24');
+  const timeStr = formatWith(d, intlTag, hour12 ? 'time12' : 'time24');
 
   const isSameDay =
     d.getFullYear() === now.getFullYear() &&
@@ -121,11 +120,11 @@ export function formatListDate(
   if (daysAgo < 7) {
     // German Intl outputs "Fr." with a trailing dot for `weekday: 'short'`;
     // strip it so the result reads cleanly next to the time.
-    const weekday = formatWith(d, intlLocale, 'weekday').replace(/\.$/, '');
+    const weekday = formatWith(d, intlTag, 'weekday').replace(/\.$/, '');
     return `${weekday} ${timeStr}`;
   }
 
-  return formatWith(d, intlLocale, 'date');
+  return formatWith(d, intlTag, 'date');
 }
 
 export type CalendarDateStyle = 'weekdayMonthDay' | 'longWeekdayMonthDayYear' | 'monthDay' | 'monthDayYear';
@@ -138,6 +137,5 @@ export type CalendarDateStyle = 'weekdayMonthDay' | 'longWeekdayMonthDayYear' | 
  */
 export function formatCalendarDate(date: Date, locale: string | undefined, style: CalendarDateStyle): string {
   syncFormatterZone(new Date());
-  const tag = !locale || locale === 'en' ? 'en-US' : locale;
-  return formatWith(date, tag, style);
+  return formatWith(date, intlLocale(locale), style);
 }
