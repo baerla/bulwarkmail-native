@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, type TextInput } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
@@ -43,6 +43,9 @@ export default function PasswordStep({
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
   const [showPassword, setShowPassword] = React.useState(false);
+  // Return moves username → password → code, then signs in.
+  const passwordRef = React.useRef<TextInput>(null);
+  const totpRef = React.useRef<TextInput>(null);
 
   return (
     <View style={styles.root}>
@@ -63,6 +66,9 @@ export default function PasswordStep({
         autoComplete="email"
         textContentType="username"
         keyboardType="email-address"
+        returnKeyType="next"
+        blurOnSubmit={false}
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
 
       <Input
@@ -74,12 +80,14 @@ export default function PasswordStep({
         secureTextEntry={!showPassword}
         autoComplete="current-password"
         textContentType="password"
+        ref={passwordRef}
         returnKeyType={totpRequired ? 'next' : 'go'}
-        onSubmitEditing={totpRequired ? undefined : onSubmit}
+        blurOnSubmit={!totpRequired}
+        onSubmitEditing={totpRequired ? () => totpRef.current?.focus() : onSubmit}
         rightIcon={
           <Pressable
             onPress={() => setShowPassword((v) => !v)}
-            hitSlop={8}
+            hitSlop={14}
             accessibilityRole="button"
             accessibilityLabel={showPassword ? t('login.hide_password', 'Hide password') : t('login.show_password', 'Show password')}
           >
@@ -93,6 +101,7 @@ export default function PasswordStep({
           label={t('login.totp_label', 'Two-factor code')}
           placeholder="123456"
           value={totp}
+          ref={totpRef}
           onChangeText={(value) => onChangeTotp?.(value)}
           autoFocus
           keyboardType="number-pad"

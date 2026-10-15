@@ -9,6 +9,8 @@ interface InputProps extends TextInputProps {
   containerStyle?: ViewStyle;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  /** React 19 passes `ref` as a prop; it reaches the TextInput (focus chaining). */
+  ref?: React.Ref<RNTextInput>;
 }
 
 /**
@@ -27,6 +29,7 @@ export default function Input({
   leftIcon,
   rightIcon,
   style,
+  ref,
   ...props
 }: InputProps) {
   const c = useColors();
@@ -44,6 +47,7 @@ export default function Input({
       ]}>
         {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
         <RNTextInput
+          ref={ref}
           {...props}
           style={[styles.input, style]}
           placeholderTextColor={c.textMuted}
