@@ -2,7 +2,7 @@ import React from 'react';
 import {
   View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, Alert, Modal, Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Clock, MoreHorizontal } from 'lucide-react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -33,6 +33,7 @@ export default function ScheduledScreen({ navigation }: Props) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
+  const insets = useSafeAreaInsets();
   const locale = useLocaleStore((s) => s.locale);
   const timeFormat = useSettingsStore((s) => s.timeFormat);
   const mailboxes = useEmailStore((s) => s.mailboxes);
@@ -276,7 +277,7 @@ export default function ScheduledScreen({ navigation }: Props) {
   ] : [];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Pressable
           onPress={() => navigation.goBack()}
@@ -316,7 +317,8 @@ export default function ScheduledScreen({ navigation }: Props) {
           keyExtractor={(i) => i.emailSubmissionId}
           renderItem={renderItem}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
-          contentContainerStyle={styles.listContent}
+          // A stack screen has no tab bar: the list ends clear of the gesture bar.
+          contentContainerStyle={[styles.listContent, { paddingBottom: insets.bottom + spacing.sm }]}
           refreshing={loading}
           onRefresh={() => { void load(); }}
         />

@@ -2,7 +2,7 @@ import React from 'react';
 import {
   View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, TextInput, Alert, AppState,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ArrowLeft, Star, Paperclip, AlertTriangle, Search, X, Square, SquareCheck,
@@ -49,6 +49,7 @@ export default function UnifiedInboxScreen({ navigation, route }: Props) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
+  const insets = useSafeAreaInsets();
   const role: UnifiedRole = route.params?.role ?? 'inbox';
   const view: CrossView | undefined = route.params?.view;
   const accounts = useAccountStore((s) => s.accounts);
@@ -381,7 +382,7 @@ export default function UnifiedInboxScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {selectionMode ? (
         <View style={styles.header}>
           <Pressable
@@ -527,7 +528,8 @@ export default function UnifiedInboxScreen({ navigation, route }: Props) {
           onEndReached={() => { void loadMore(); }}
           onEndReachedThreshold={0.3}
           ListFooterComponent={loadingMore ? <ActivityIndicator style={{ padding: spacing.md }} color={c.primary} /> : null}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          // A stack screen has no tab bar: the list ends clear of the gesture bar.
+          contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         />
       )}
     </SafeAreaView>
