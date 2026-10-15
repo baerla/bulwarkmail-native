@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, AppState, Linking, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColorScheme } from 'react-native';
 import {
   DarkTheme, DefaultTheme, NavigationContainer, createNavigationContainerRef, useIsFocused,
@@ -246,9 +247,12 @@ function MainTabsNavigator({ navigation }: NativeStackScreenProps<RootStackParam
   // Side by side layouts move the tabs into a rail on the left, like the
   // webmail's navigation rail.
   const { isSplit } = useLayout();
+  // A bottom tab bar keeps the screens clear of the gesture bar or taskbar;
+  // with the tabs in a side rail the whole tab area has to.
+  const bottomInset = useSafeAreaInsets().bottom;
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.background }}>
+    <View style={{ flex: 1, backgroundColor: c.background, paddingBottom: isSplit ? bottomInset : 0 }}>
       <UpdateBanner />
       <OfflineCacheBanner />
       <PushOnboardingPrompt />
