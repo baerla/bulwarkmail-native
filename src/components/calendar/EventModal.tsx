@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Switch,
   Platform,
+  Alert as NativeAlert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -364,6 +365,12 @@ export function EventModal({
         sendSchedulingMessages: attendees.length > 0 && sendInvitations,
       });
       onClose();
+    } catch (err) {
+      // The editor stays open with everything typed, and says why.
+      NativeAlert.alert(
+        t('calendar.notifications.event_error', 'Failed to save event'),
+        err instanceof Error ? err.message : undefined,
+      );
     } finally {
       setSaving(false);
     }
