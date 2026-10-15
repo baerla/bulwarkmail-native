@@ -54,6 +54,7 @@ import { downloadAttachment, shareAttachment } from '../lib/email-export';
 import { secureFetch } from '../lib/client-cert';
 import { getUniqueName } from '../lib/filenode-name';
 import { filesGridLayout } from '../lib/files-grid';
+import { formatListDate } from '../lib/date-format';
 import { useLayout, useSheetInsets } from '../lib/use-layout';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
 import { filesBackStep } from '../lib/files-back';
@@ -118,22 +119,20 @@ export function formatFileSize(bytes?: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
-function formatModified(iso?: string): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  const now = new Date();
-  const sameDay =
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate();
-  if (sameDay) {
-    return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-  }
-  if (d.getFullYear() === now.getFullYear()) {
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  }
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+/**
+ * Formats a file's modified time like the mail list does: in the app's
+ * language and with the 12/24 h and date settings, instead of the device
+ * defaults ("10:47 PM" next to 24 h times everywhere else).
+ */
+function useFormatModified(): (iso?: string) => string {
+  const dateFormat = useSettingsStore((s) => s.dateFormat);
+  const timeFormat = useSettingsStore((s) => s.timeFormat);
+  const locale = useLocaleStore((s) => s.locale);
+  const t = useLocaleStore((s) => s.t);
+  return React.useCallback(
+    (iso?: string) => (iso ? formatListDate(iso, { dateFormat, timeFormat, locale, t }) : ''),
+    [dateFormat, timeFormat, locale, t],
+  );
 }
 
 // Last-modified with the creation time as fallback (webmail file-store
@@ -167,6 +166,7 @@ export default function FilesScreen() {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
+  const formatModified = useFormatModified();
 
   // Folder navigation stack. Hierarchy is real parentId nesting (#379) — each
   // entry is the folder's node id (namespaced "accountId:nodeId" inside a
@@ -1229,6 +1229,7 @@ function ActionsSheet({
 }: ActionsSheetProps) {
   // Centred on a wide window, clear of side insets in landscape.
   const sheetInsets = useSheetInsets();
+  const formatModified = useFormatModified();
   const c = useColors();
   const styles = React.useMemo(() => makeSheetStyles(c), [c]);
   if (!target) return null;
