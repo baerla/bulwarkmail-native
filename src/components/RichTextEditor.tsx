@@ -78,10 +78,16 @@ interface Props {
   onSelectionChange?: (state: RichTextSelectionState) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  /**
+   * Android: the page undid a caret-reveal pan of `dy` px (dp) inside the
+   * WebView. The host should scroll its ScrollView down by `dy` so the caret
+   * stays visible (see `pinVisualViewport` in editor-html).
+   */
+  onViewportShift?: (dy: number) => void;
 }
 
 const RichTextEditor = React.forwardRef<RichTextEditorHandle, Props>(function RichTextEditor(
-  { initialHtml = '', placeholder = '', blockRemoteImages = false, onChange, onSelectionChange, onFocus, onBlur },
+  { initialHtml = '', placeholder = '', blockRemoteImages = false, onChange, onSelectionChange, onFocus, onBlur, onViewportShift },
   ref,
 ) {
   const c = useColors();
@@ -92,6 +98,8 @@ const RichTextEditor = React.forwardRef<RichTextEditorHandle, Props>(function Ri
   const onSelectionRef = React.useRef(onSelectionChange);
   const onFocusRef = React.useRef(onFocus);
   const onBlurRef = React.useRef(onBlur);
+  const onViewportShiftRef = React.useRef(onViewportShift);
+  onViewportShiftRef.current = onViewportShift;
   onChangeRef.current = onChange;
   onSelectionRef.current = onSelectionChange;
   onFocusRef.current = onFocus;
@@ -100,7 +108,9 @@ const RichTextEditor = React.forwardRef<RichTextEditorHandle, Props>(function Ri
   // Build the source HTML once. Theming changes won't auto-rebuild the page,
   // which is fine: themes change rarely and the user can recompose if needed.
   const html = React.useMemo(
-    () => buildEditorHtml({ initialHtml, placeholder, c, blockRemoteImages }),
+    () => buildEditorHtml({
+      initialHtml, placeholder, c, blockRemoteImages, pinVisualViewport: Platform.OS === 'android',
+    }),
     // c reference changes per theme switch but we don't want to lose user
     // edits on a theme change. Bake in the initial colors only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -224,6 +234,11 @@ const RichTextEditor = React.forwardRef<RichTextEditorHandle, Props>(function Ri
       case 'blur':
         onBlurRef.current?.();
         break;
+      case 'viewportShift': {
+        const dy = typeof data.payload === 'number' ? data.payload : Number(data.payload);
+        if (Number.isFinite(dy) && dy !== 0) onViewportShiftRef.current?.(dy);
+        break;
+      }
     }
   };
 
