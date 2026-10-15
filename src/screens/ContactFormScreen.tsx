@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, Modal, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { usePreventRemove, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
@@ -762,9 +762,25 @@ export default function ContactFormScreen() {
     setForm((f) => ({ ...f, [key]: value }));
   };
 
+  // Every way out asks about unsaved changes: the header back, Android's
+  // back and the modal's swipe-down. Only the header back did before.
+  const allowLeaveRef = React.useRef(false);
+  const pendingLeaveRef = React.useRef<(() => void) | null>(null);
+  usePreventRemove(dirty, ({ data }) => {
+    if (allowLeaveRef.current) {
+      navigation.dispatch(data.action);
+      return;
+    }
+    pendingLeaveRef.current = () => navigation.dispatch(data.action);
+    setConfirmDiscard(true);
+  });
+  const leave = (go: () => void) => {
+    allowLeaveRef.current = true;
+    go();
+  };
+
   const handleBack = () => {
-    if (dirty) setConfirmDiscard(true);
-    else navigation.goBack();
+    navigation.goBack();
   };
 
   const handleSave = async () => {
@@ -834,11 +850,11 @@ export default function ContactFormScreen() {
       const patch = formToPatch(form, existing, !!asGroup || existing?.kind === 'group', allContacts);
       if (isEdit && existing) {
         await updateContact(existing.id, patch);
-        navigation.goBack();
+        leave(() => navigation.goBack());
       } else {
         const created = await createContact(patch, form.addressBookId);
-        if (asGroup) navigation.replace('GroupDetail', { groupId: created.id });
-        else navigation.replace('ContactDetail', { contactId: created.id });
+        if (asGroup) leave(() => navigation.replace('GroupDetail', { groupId: created.id }));
+        else leave(() => navigation.replace('ContactDetail', { contactId: created.id }));
       }
     } catch (err) {
       Alert.alert(
@@ -1040,9 +1056,14 @@ export default function ContactFormScreen() {
       confirmText={t('settings.discard', 'Discard')}
       onConfirm={() => {
         setConfirmDiscard(false);
-        navigation.goBack();
+        const go = pendingLeaveRef.current ?? (() => navigation.goBack());
+        pendingLeaveRef.current = null;
+        leave(go);
       }}
-      onCancel={() => setConfirmDiscard(false)}
+      onCancel={() => {
+        pendingLeaveRef.current = null;
+        setConfirmDiscard(false);
+      }}
     />
   );
 
