@@ -7,7 +7,6 @@ import {
   TextInput,
   Pressable,
   StyleSheet,
-  Switch,
   Platform,
   Alert as NativeAlert,
 } from 'react-native';
@@ -70,6 +69,7 @@ import { ParticipantInput } from './ParticipantInput';
 import { useContactNameResolver } from '../../lib/contact-name-resolver';
 import { RecurrenceEditor } from './RecurrenceEditor';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
+import ToggleSwitch from '../ToggleSwitch';
 
 type RecurrenceOption = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
 
@@ -459,7 +459,7 @@ export function EventModal({
             value={title}
             onChangeText={setTitle}
             placeholder={t('calendar.form.title', 'Title')}
-            placeholderTextColor={c.textMuted}
+            placeholderTextColor={c.mutedForeground}
             style={styles.titleInput}
           />
 
@@ -515,12 +515,10 @@ export function EventModal({
           <Section icon={<Clock size={16} color={c.textMuted} />} label={t('calendar.form.time', 'Time')}>
             <View style={styles.allDayRow}>
               <Text style={styles.fieldText}>{t('calendar.form.all_day_event', 'All-day event')}</Text>
-              <Switch
+              <ToggleSwitch
                 value={allDay}
                 onValueChange={setAllDay}
                 accessibilityLabel={t('calendar.form.all_day_event', 'All-day event')}
-                thumbColor={allDay ? c.primary : c.textMuted}
-                trackColor={{ false: c.surface, true: c.primaryBg }}
               />
             </View>
 
@@ -673,7 +671,7 @@ export function EventModal({
                   keyboardType="number-pad"
                   style={styles.customAmountInput}
                   placeholder="30"
-                  placeholderTextColor={c.textMuted}
+                  placeholderTextColor={c.mutedForeground}
                 />
                 <View style={styles.customUnits}>
                   {(['minutes', 'hours', 'days', 'weeks'] as ReminderUnit[]).map((unit) => (
@@ -708,7 +706,7 @@ export function EventModal({
               value={location}
               onChangeText={setLocation}
               placeholder={t('calendar.form.location_placeholder', 'Place or address')}
-              placeholderTextColor={c.textMuted}
+              placeholderTextColor={c.mutedForeground}
               style={styles.fieldButton}
             />
           </Section>
@@ -718,7 +716,7 @@ export function EventModal({
               value={videoUrl}
               onChangeText={setVideoUrl}
               placeholder="https://meet.example.com/…"
-              placeholderTextColor={c.textMuted}
+              placeholderTextColor={c.mutedForeground}
               autoCapitalize="none"
               autoCorrect={false}
               keyboardType="url"
@@ -734,7 +732,7 @@ export function EventModal({
               value={description}
               onChangeText={setDescription}
               placeholder={t('calendar.form.description_placeholder', 'Notes, agenda…')}
-              placeholderTextColor={c.textMuted}
+              placeholderTextColor={c.mutedForeground}
               multiline
               style={styles.descriptionInput}
             />
@@ -756,12 +754,10 @@ export function EventModal({
                 <Text style={[styles.fieldText, { flex: 1 }]}>
                   {t('calendar.participants.send_invitations', 'Send invitations to participants')}
                 </Text>
-                <Switch
+                <ToggleSwitch
                   value={sendInvitations}
                   onValueChange={setSendInvitations}
                   accessibilityLabel={t('calendar.participants.send_invitations', 'Send invitations to participants')}
-                  thumbColor={sendInvitations ? c.primary : c.textMuted}
-                  trackColor={{ false: c.surface, true: c.primaryBg }}
                 />
               </View>
             )}
@@ -913,7 +909,7 @@ function makeStyles(c: ThemePalette) {
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: c.border,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
     justifyContent: 'center',
   },
   fieldText: { ...typography.body, color: c.text },
@@ -930,7 +926,7 @@ function makeStyles(c: ThemePalette) {
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: c.border,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
   },
   reminderRemove: { padding: 2 },
   customReminderRow: {
@@ -939,7 +935,7 @@ function makeStyles(c: ThemePalette) {
     borderWidth: 1,
     borderColor: c.border,
     borderRadius: radius.sm,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
   },
   customAmountInput: {
     ...typography.body,
@@ -975,7 +971,7 @@ function makeStyles(c: ThemePalette) {
     borderWidth: 1,
     borderColor: c.border,
     borderRadius: radius.sm,
-    backgroundColor: c.surface,
+    backgroundColor: c.popover,
     overflow: 'hidden',
   },
   popoverRow: {
@@ -997,7 +993,7 @@ function makeStyles(c: ThemePalette) {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: radius.sm,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
     borderWidth: 1,
     borderColor: c.border,
   },
@@ -1009,7 +1005,7 @@ function makeStyles(c: ThemePalette) {
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: c.border,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
   },
   dateLabel: { ...typography.body, color: c.textSecondary, flex: 1 },
   datePickers: { flexDirection: 'row', gap: spacing.sm },
@@ -1030,7 +1026,7 @@ function makeStyles(c: ThemePalette) {
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: c.border,
-    backgroundColor: c.surface,
+    backgroundColor: c.background,
     color: c.text,
     ...typography.body,
     textAlignVertical: 'top',

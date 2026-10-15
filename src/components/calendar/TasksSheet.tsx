@@ -530,7 +530,7 @@ function makeStyles(c: ThemePalette) {
       borderRadius: radius.sm,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
     },
     addBtn: {
       width: 38,
@@ -552,7 +552,7 @@ function makeStyles(c: ThemePalette) {
       borderRadius: radius.sm,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       textAlignVertical: 'top',
     },
     editorRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
