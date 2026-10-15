@@ -54,6 +54,7 @@ import { downloadAttachment, shareAttachment } from '../lib/email-export';
 import { secureFetch } from '../lib/client-cert';
 import { getUniqueName } from '../lib/filenode-name';
 import { filesGridLayout } from '../lib/files-grid';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatListDate } from '../lib/date-format';
 import { useLayout, useSheetInsets } from '../lib/use-layout';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
@@ -167,6 +168,14 @@ export default function FilesScreen() {
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
   const formatModified = useFormatModified();
+  // Clear of the status bar and, in landscape, the side insets; the header
+  // used a fixed 60 px top padding instead.
+  const insets = useSafeAreaInsets();
+  const headerInsets = {
+    paddingTop: insets.top + spacing.sm,
+    paddingLeft: spacing.md + insets.left,
+    paddingRight: spacing.md + insets.right,
+  };
 
   // Folder navigation stack. Hierarchy is real parentId nesting (#379) — each
   // entry is the folder's node id (namespaced "accountId:nodeId" inside a
@@ -674,7 +683,7 @@ export default function FilesScreen() {
     if (selectionMode) {
       const selectedRows = visibleFiles.filter((r) => selection.has(r.id));
       return (
-        <View style={styles.header}>
+        <View style={[styles.header, headerInsets]}>
           <View style={styles.headerRow}>
             <Pressable
               onPress={clearSelection}
@@ -716,7 +725,7 @@ export default function FilesScreen() {
       );
     }
     return (
-      <View style={styles.header}>
+      <View style={[styles.header, headerInsets]}>
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
             {canBack ? (
@@ -1465,8 +1474,6 @@ function makeStyles(c: ThemePalette) {
     listColumn: { flex: 1 },
     previewPane: { width: '45%', borderLeftWidth: 1, borderLeftColor: c.border },
     header: {
-      paddingTop: 60,
-      paddingHorizontal: spacing.md,
       paddingBottom: spacing.sm,
       borderBottomWidth: 1,
       borderBottomColor: c.border,
