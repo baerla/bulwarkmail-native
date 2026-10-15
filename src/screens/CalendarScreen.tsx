@@ -86,6 +86,7 @@ import {
   getTaskDueDate,
   pickUnusedCalendarColor,
   sharedCalendarColorKey,
+  reopenedEdit,
 } from '../lib/calendar-utils';
 import { buildReplyTo } from '../lib/calendar-invitation';
 import {
@@ -825,6 +826,16 @@ export default function CalendarScreen() {
     [modalEvent, createEvent, updateEvent],
   );
 
+  // Cancelling "which occurrences?" after editing a recurring event goes back
+  // to the editor with the edits still in it; they used to be thrown away.
+  const cancelScope = React.useCallback(() => {
+    const pending = pendingAction;
+    setPendingAction(null);
+    if (pending?.kind !== 'edit') return;
+    setModalEvent(reopenedEdit(pending.event, pending.updates));
+    setModalVisible(true);
+  }, [pendingAction]);
+
   const handleDeleteFromModal = React.useCallback(
     async (event: CalendarEvent) => {
       setModalVisible(false);
@@ -1232,7 +1243,7 @@ export default function CalendarScreen() {
         visible={!!pendingAction}
         actionType={pendingAction?.kind ?? 'edit'}
         onSelect={handleScopeSelect}
-        onClose={() => setPendingAction(null)}
+        onClose={cancelScope}
       />
 
       <CalendarSidebarDrawer

@@ -604,3 +604,17 @@ export function getPrimaryCalendarId(
 ): string | undefined {
   return Object.keys(event.calendarIds || {})[0];
 }
+
+/**
+ * The event as the editor last had it: the stored event with the unsaved
+ * edits on top, a field cleared in the editor (sent as `null`) removed. Used
+ * to reopen the editor when the recurrence-scope question is cancelled.
+ */
+export function reopenedEdit(event: CalendarEvent, updates: Partial<CalendarEvent>): CalendarEvent {
+  const merged: Record<string, unknown> = { ...event };
+  for (const [key, value] of Object.entries(updates)) {
+    if (value === null) delete merged[key];
+    else if (value !== undefined) merged[key] = value;
+  }
+  return merged as unknown as CalendarEvent;
+}

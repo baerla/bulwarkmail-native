@@ -13,6 +13,7 @@ import {
   timePattern,
   layoutOverlappingEvents,
   CALENDAR_COLOR_PALETTE,
+  reopenedEdit,
 } from '../calendar-utils';
 import type { CalendarEvent } from '../../api/types';
 import { useSettingsStore } from '../../stores/settings-store';
@@ -276,5 +277,20 @@ describe('layoutOverlappingEvents', () => {
       ev({ id: 'all', showWithoutTime: true, duration: 'P1D' }),
     ];
     expect(layoutOverlappingEvents(events, day)).toHaveLength(0);
+  });
+});
+
+describe('reopenedEdit', () => {
+  it('puts the unsaved edits over the event and drops cleared fields', () => {
+    const event = {
+      id: 'e1', title: 'Team sync', start: '2026-10-19T10:00:00', duration: 'PT30M',
+      locations: { l: { '@type': 'Location', name: 'Room 2' } },
+    } as unknown as CalendarEvent;
+    const reopened = reopenedEdit(event, { title: 'Team sync (moved)', start: '2026-10-19T11:00:00', locations: null });
+    expect(reopened.id).toBe('e1');
+    expect(reopened.title).toBe('Team sync (moved)');
+    expect(reopened.start).toBe('2026-10-19T11:00:00');
+    expect(reopened.duration).toBe('PT30M');
+    expect('locations' in reopened).toBe(false);
   });
 });
