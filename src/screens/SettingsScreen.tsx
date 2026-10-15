@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLayout } from '../lib/use-layout';
 import {
   ArrowLeft, LogOut, Settings, ChevronRight, Search, X,
   Palette, User, Shield, UserPen, Palmtree, Calendar,
@@ -173,6 +174,7 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const [selectedTab, setSelectedTab] = useState<Tab | null>(null);
+  const { isSplit } = useLayout();
   const [searchQuery, setSearchQuery] = useState('');
   // A tapped search result: its pane scrolls to the setting and flashes it.
   const [pendingHighlight, setPendingHighlight] = useState<{ tab: Tab; label: string } | null>(null);
@@ -269,11 +271,11 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
   // Settings is a tab and stays mounted behind the other tabs, so hardware
   // back is only claimed while it is the focused one.
   const handleBack = React.useCallback(() => {
-    if (selectedTab) closePane();
+    if (selectedTab && !isSplit) closePane();
     else if (searchQuery) setSearchQuery('');
     else leaveScope();
-  }, [selectedTab, searchQuery, closePane, leaveScope]);
-  useBackWhileFocused(!!selectedTab || !!searchQuery || !!managedAccount, handleBack);
+  }, [selectedTab, isSplit, searchQuery, closePane, leaveScope]);
+  useBackWhileFocused((!!selectedTab && !isSplit) || !!searchQuery || !!managedAccount, handleBack);
 
   // The first row of the open pane whose label matches the tapped result
   // calls this once it is laid out.
@@ -321,23 +323,30 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
     setPendingHighlight({ tab: tab.id, label: sub.label });
   };
 
-  if (selectedTab) {
+  // On a wide window the section list and the open page sit side by side;
+  // the first page is open from the start, so the right side is never empty.
+  const firstTab = groupedTabs.flatMap((g) => g.items).find((tab) => tab.implemented && !unavailableTabs.has(tab.id))?.id ?? null;
+  const shownTab = selectedTab ?? (isSplit ? firstTab : null);
+
+  const renderPage = (selectedTab: Tab) => {
     const tabDef = TABS.find((tab) => tab.id === selectedTab)!;
     const Component = TAB_COMPONENTS[selectedTab];
     const TabIcon = tabDef.icon;
     const tabLabel = t(`settings.tabs.${tabDef.id}`, tabDef.label);
 
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={isSplit ? ['top', 'right'] : ['top', 'left', 'right']}>
         <View style={styles.header}>
-          <Pressable
-            onPress={closePane}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.back', 'Back')}
-            style={({ pressed }) => [styles.headerBackBtn, pressed && styles.headerBackBtnPressed]}
-          >
-            <ArrowLeft size={20} color={c.text} />
-          </Pressable>
+          {!isSplit && (
+            <Pressable
+              onPress={closePane}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.back', 'Back')}
+              style={({ pressed }) => [styles.headerBackBtn, pressed && styles.headerBackBtnPressed]}
+            >
+              <ArrowLeft size={20} color={c.text} />
+            </Pressable>
+          )}
           <TabIcon size={20} color={c.mutedForeground} />
           <Text style={styles.headerTitle}>{tabLabel}</Text>
         </View>
@@ -356,10 +365,10 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
         </ScrollView>
       </SafeAreaView>
     );
-  }
+  };
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+  const list = (
+    <SafeAreaView style={styles.container} edges={isSplit ? ['top', 'left'] : ['top', 'left', 'right']}>
       {/* Header - matches webmail mobile: h-14, border-b, back button + icon + title.
           Settings is a tab root, so the back button is only rendered when a
           parent passes onBack (it'd otherwise lead nowhere). */}
@@ -437,10 +446,13 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
                     key={tab.id}
                     onPress={() => handleTabPress(tab)}
                     disabled={disabled}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled, selected: isSplit && tab.id === shownTab }}
                     style={({ pressed }) => [
                       styles.tabItem,
                       disabled && styles.tabItemDisabled,
                       !disabled && pressed && styles.tabItemPressed,
+                      isSplit && tab.id === shownTab && styles.tabItemActive,
                     ]}
                   >
                     <View style={styles.tabItemLeft}>
@@ -504,11 +516,25 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
       </ScrollView>
     </SafeAreaView>
   );
+
+  if (!isSplit) return shownTab ? renderPage(shownTab) : list;
+  return (
+    <View style={styles.splitRow}>
+      <View style={[styles.splitList, { width: SETTINGS_LIST_WIDTH }]}>{list}</View>
+      <View style={styles.splitPage}>{shownTab ? renderPage(shownTab) : null}</View>
+    </View>
+  );
 }
+
+/** The section list beside an open page on a wide window. */
+const SETTINGS_LIST_WIDTH = 320;
 
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: c.background },
+    splitRow: { flex: 1, flexDirection: 'row', backgroundColor: c.background },
+    splitList: { borderRightWidth: 1, borderRightColor: c.border },
+    splitPage: { flex: 1 },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -529,7 +555,9 @@ function makeStyles(c: ThemePalette) {
 
     scrollArea: { flex: 1 },
     scrollContent: { paddingBottom: 40 },
-    detailContent: { padding: spacing.lg, paddingBottom: 40 },
+    // A page keeps form width on a wide pane: labels and their controls
+    // 700 dp apart are hard to read across.
+    detailContent: { padding: spacing.lg, paddingBottom: 40, width: '100%', maxWidth: 720, alignSelf: 'center' },
 
     tabList: { paddingVertical: spacing.sm },
 
@@ -594,6 +622,8 @@ function makeStyles(c: ThemePalette) {
       paddingHorizontal: 20, paddingVertical: 14,
     },
     tabItemPressed: { backgroundColor: c.muted },
+    // The page open beside the list (webmail sidebar: accent background).
+    tabItemActive: { backgroundColor: c.selection },
     tabItemLeft: {
       flexDirection: 'row', alignItems: 'center',
       gap: spacing.md, flex: 1,
