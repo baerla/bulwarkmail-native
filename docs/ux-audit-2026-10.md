@@ -226,7 +226,7 @@ carries the commit that fixed it.
   - Where: 56 modals in 40 files.
   - iOS presents these portrait-only and forces a rotation.
   - Fix: pass all orientations everywhere.
-- [ ] **U-003 · P2 · TL TP · Every screen is the phone layout stretched to 1280 dp.** *(partly fixed in 802474d, 64a62b6, 8ab82cd, 2470e99, 0087e4c; login still open)*
+- [x] **U-003 · P2 · TL TP · Every screen is the phone layout stretched to 1280 dp.** *(fixed in 802474d, 64a62b6, 8ab82cd, 2470e99, 0087e4c, 250c0a9)*
   - Affected: mail rows, thread body, compose, contacts, files, settings, login.
   - Screenshots: `q_mail_list`, `q_thread_receipt`, `q_contacts`, `q_settings`, `t_login_confirm`.
   - Fix: the adaptive layout plan below.
@@ -238,17 +238,18 @@ carries the commit that fixed it.
   - Most screens use `SafeAreaView edges={['top']}` and position sheets `left: 0, right: 0`.
   - A side navigation bar or a camera cutout covers the content.
   - Fix: add the side edges to screen roots, and inset sheets and the FABs.
-- [ ] **U-006 · P2 · all · The Files header pads a fixed 60 px instead of the status-bar inset.**
+- [x] **U-006 · P2 · all · The Files header pads a fixed 60 px instead of the status-bar inset.** *(fixed in cbc41c9)*
   - Where: `FilesScreen.tsx:1438`.
   - It is too tall in landscape and wrong on any other status bar height.
-- [ ] **U-007 · P2 · all · Uppercase section labels get clipped on Android.**
+- [x] **U-007 · P2 · all · Uppercase section labels get clipped on Android.** *(fixed in 9e463d3)*
   - Example: "WORK" shows as "WOR", "ADDRESS BOOK" as "ADDRESS" (contact detail, English).
-  - Cause: `textTransform: 'uppercase'` with `letterSpacing` is measured before the transform.
-    13 places.
-  - Where: `ContactDetailScreen.tsx:976`.
-  - Fix: upper-case the string with `toLocaleUpperCase` instead.
-- [ ] **U-008 · P2 · all · After a cold start in German, the tab labels and the folder title stay
-  English.** The search placeholder is German. Screenshot `t_layo`.
+  - Cause: Android measures a shrink-wrapped, letter-spaced label a few pixels short, so its
+    last word wraps onto a second line that the one-line height hides. (Upper-casing the string
+    instead of `textTransform` made no difference.)
+  - Where: `ContactDetailScreen.tsx:976`, `ContactActivity.tsx:283`.
+  - Fix: let the label fill its row (`flex: 1`).
+- [x] **U-008 · P2 · all · After a cold start in German, the tab labels and the folder title stay
+  English.** *(fixed in 512a28c)* The search placeholder is German. Screenshot `t_layo`.
   - Fix: re-render the tab labels and the title when the locale store hydrates.
 - [ ] **U-009 · P2 · TL TP (font 1.3) · Tab labels truncate with plenty of room.**
   - Example: "E-…", "Kalen…", "Einstellu…" in 256 dp-wide tabs (`q_de_mail`).
@@ -263,11 +264,11 @@ carries the commit that fixed it.
     surface.
   - Where: `src/theme/tokens.ts` `DARK_COLORS`. APP.md lists this as open.
   - Fix: port the webmail dark tokens.
-- [ ] **U-012 · P2 · light · The mail header logo is invisible on the light theme.**
+- [x] **U-012 · P2 · light · The mail header logo is invisible on the light theme.** *(fixed in 99de74d)*
   - It always loads `Bulwark Logo White.png` (`EmailListScreen.tsx:1105`). Screenshot `q_mail_list`
     TL.
   - Fix: pick the logo by the resolved theme.
-- [ ] **U-013 · P2 · light · TagSheet reads the static dark palette.**
+- [x] **U-013 · P2 · light · TagSheet reads the static dark palette.** *(fixed in 29c172f)*
   - Where: `TagSheet.tsx:7,101,124`. Tag colours are wrong on light.
   - Fix: use `c.tags`.
 - [ ] **U-014 · P2 · all · `Button` has no `accessibilityRole` and no disabled or busy state.**
@@ -293,8 +294,8 @@ carries the commit that fixed it.
 
 ### Mail list, drawer, unified inbox, scheduled
 
-- [ ] **U-020 · P2 · all · Back with an active search exits the app instead of clearing the
-  search.**
+- [x] **U-020 · P2 · all · Back with an active search exits the app instead of clearing the
+  search.** *(fixed in 46d3016)*
   - Repro: search "Offsite", press Enter, then Back.
   - Where: `EmailListScreen.tsx` has no back handler for search or selection.
   - Fix: `useBackWhileFocused` that clears the selection, then the search.
@@ -306,8 +307,8 @@ carries the commit that fixed it.
   - Example: "Us…", "17:4" (`q_de_mail` PL).
   - Where: the row header in `EmailListScreen.tsx` around 158-250.
   - Fix: let the time keep its width (`flexShrink: 0`) and let the name shrink.
-- [ ] **U-023 · P2 · PP · The undo bar sits on top of the compose FAB for 5 s after every archive or
-  delete.**
+- [x] **U-023 · P2 · PP · The undo bar sits on top of the compose FAB for 5 s after every archive or
+  delete.** *(fixed in 50ab714)*
   - Where: `UndoSnackbar.tsx:161`, `EmailListScreen.tsx:2262`.
   - Fix: lift the FAB while the bar shows.
 - [ ] **U-024 · P2 · all · Swipe and bulk actions on the list fail silently.**
@@ -315,17 +316,17 @@ carries the commit that fixed it.
     rejection becomes an unhandled promise. The selection also stays.
   - Where: `EmailListScreen.tsx:604-651, 715-799`; `handleImport` `:492`.
   - Fix: report failures through `toast.error` as the viewer does.
-- [ ] **U-025 · P2 · all · Sign out and "Sign out of all accounts" run with no confirmation.**
+- [x] **U-025 · P2 · all · Sign out and "Sign out of all accounts" run with no confirmation.** *(fixed in 8403843)*
   - Where: drawer `SidebarDrawer.tsx:930,943`, settings `SettingsScreen.tsx:497`.
   - Fix: a destructive `Dialog`.
-- [ ] **U-026 · P2 · all · The drawer's folder-settings icon only closes the drawer.**
+- [x] **U-026 · P2 · all · The drawer's folder-settings icon only closes the drawer.** *(fixed in d97571c)*
   - Where: `SidebarDrawer.tsx:1048`, `navigate('MainTabs')`.
   - Fix: open Settings → Folders.
 - [ ] **U-027 · P2 · all · The filter modal runs a query per keystroke and has no keyboard
   handling.**
   - Where: `EmailListScreen.tsx:1507-1550`.
   - Fix: debounce like the main search; add next/search return keys.
-- [ ] **U-028 · P2 · PP PL · The unified inbox and Scheduled lists end under the gesture bar.**
+- [x] **U-028 · P2 · PP PL · The unified inbox and Scheduled lists end under the gesture bar.** *(fixed in 984c359)*
   - Where: `UnifiedInboxScreen.tsx:384`, `ScheduledScreen.tsx:278` (top edge only, fixed padding).
 - [ ] **U-029 · P2 · all · Unified inbox rows ignore the font-size, density and preview settings.**
   - Where: `UnifiedInboxScreen.tsx:576`.
@@ -353,7 +354,7 @@ carries the commit that fixed it.
 - [ ] **U-041 · P2 · all · A long thread opens at the oldest message.**
   - The newest (opened) message is expanded but off screen on a phone (`q_thread_long` PP).
   - Fix: scroll the opened message into view once the cards are laid out.
-- [ ] **U-042 · P1 · all · Quick reply "More options" throws away the typed text.**
+- [x] **U-042 · P1 · all · Quick reply "More options" throws away the typed text.** *(fixed in 053fde8)*
   - Where: `EmailThreadScreen.tsx:1185`.
   - Fix: pass the text as `prefillBody` to the reply composer.
 - [ ] **U-043 · P2 · PL · Phone landscape leaves almost no room for the body.**
@@ -402,7 +403,7 @@ carries the commit that fixed it.
   - Fix: `disableFullscreenUI` on recipients, subject, plain body and quick reply.
 - [x] **U-067 · P2 · TL TP · Compose fills the tablet screen.** *(fixed in 0087e4c)* Fix: a centred panel (phase 2).
 
-- [ ] **U-068 · P2 · all · The signature shows two "--" lines.** The seeded text signature starts
+- [x] **U-068 · P2 · all · The signature shows two "--" lines.** *(fixed in 90170ea)* The seeded text signature starts
   with the usual "-- " delimiter and the composer adds its own separator above it (screenshot
   `t_compose_panel`).
   - Fix: don't add a separator to a signature that already starts with one.
@@ -426,11 +427,11 @@ carries the commit that fixed it.
   screen.** *(fixed in bfa02f1)*
   - Screenshot `p_event_land`.
   - Where: `EventDetailSheet.tsx:609,643` (body `maxHeight: 400`, no `flexShrink`).
-- [ ] **U-083 · P1 · all · Saving an event fails silently.**
+- [x] **U-083 · P1 · all · Saving an event fails silently.** *(fixed in ab712f1)*
   - `handleSave` has `try/finally` without catch: the spinner stops, the editor stays, nothing is
     said.
   - Where: `EventModal.tsx:301-368`.
-- [ ] **U-084 · P2 · all · Several deletes have no confirmation or undo.**
+- [x] **U-084 · P2 · all · Several deletes have no confirmation or undo.** *(fixed in 0460da5)*
   - Deleting a single event (`CalendarScreen.tsx:632`, `EventModal.tsx:371`).
   - Deleting a task (`TasksSheet.tsx:427`).
   - Unsubscribing from a feed, which also deletes its calendar (`ICalSubscriptionSheet.tsx:278`).
@@ -460,7 +461,7 @@ carries the commit that fixed it.
     contact removed by a sync does the same.
 - [ ] **U-101 · P2 · PL · The address-book chip row is clipped at the bottom.** Screenshot
   `q_contacts` PL.
-- [ ] **U-102 · P2 · all · Back doesn't leave selection or search; it leaves the tab.**
+- [x] **U-102 · P2 · all · Back doesn't leave selection or search; it leaves the tab.** *(fixed in 756ceaa)*
   - Where: `ContactsScreen.tsx`. Files and Settings already handle this.
 - [ ] **U-103 · P2 · all · The contact form's discard check only covers the on-screen back.**
   - Hardware back drops edits silently.
@@ -475,22 +476,22 @@ carries the commit that fixed it.
   - The last row stretches its cells, so the columns don't line up. Tablet cells are huge
     (`q_files_grid`).
   - Where: `FilesScreen.tsx:989,1606`.
-- [ ] **U-111 · P2 · all · Dates and times ignore the app's language and the 12/24 h setting.**
+- [x] **U-111 · P2 · all · Dates and times ignore the app's language and the 12/24 h setting.** *(fixed in 63eefd7)*
   - Example: "10:47 PM" next to 24 h times everywhere else.
   - Where: `FilesScreen.tsx:127-132`.
-- [ ] **U-112 · P2 · all · Removing someone's share access has no confirmation.** Where:
+- [x] **U-112 · P2 · all · Removing someone's share access has no confirmation.** *(fixed in d4982f6)* Where:
   `ShareSheet.tsx:213`.
 - [x] **U-113 · P2 · TL TP · There is no side-by-side preview.** *(fixed in 2470e99)* Fix: phase 2.
 
 ### Settings
 
-- [ ] **U-120 · P2 · all · Deleting a tag has no confirmation, while the reset next to it does.**
+- [x] **U-120 · P2 · all · Deleting a tag has no confirmation, while the reset next to it does.** *(fixed in 275d674)*
   Where: `KeywordSettings.tsx:48,122`.
-- [ ] **U-121 · P2 · PP · The vacation subject input is a fixed 240 dp.**
+- [x] **U-121 · P2 · PP · The vacation subject input is a fixed 240 dp.** *(fixed in f22e851)*
   - It squeezes its label into five lines.
   - Where: `VacationSettings.tsx:434`; the same pattern in `AccountSecuritySettings.tsx:234`.
-- [ ] **U-122 · P2 · light · The amber banner in filters and the sieve editor is unreadable on
-  light.**
+- [x] **U-122 · P2 · light · The amber banner in filters and the sieve editor is unreadable on
+  light.** *(fixed in 8f68d24)*
   - Light yellow text on a faint brown fill.
   - Where: `FilterSettings.tsx:515-519`, `SieveEditorSheet.tsx:208-212`.
 - [x] **U-123 · P2 · TL TP · The section list and the page replace each other.** *(fixed in 8ab82cd)* Fix: phase 2.
@@ -499,7 +500,7 @@ carries the commit that fixed it.
 
 ### Login
 
-- [ ] **U-130 · P2 · TL TP · Login steps stretch to the full width.**
+- [x] **U-130 · P2 · TL TP · Login steps stretch to the full width.** *(fixed in 250c0a9)*
   - Fields and buttons are 1248 dp wide (`t_login_confirm`).
   - Fix: a centred column of about 480 dp.
 - [ ] **U-131 · P2 · all · Small targets: show-password 20 dp, header back 32 dp, email suggestion
