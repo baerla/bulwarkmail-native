@@ -217,24 +217,24 @@ carries the commit that fixed it.
 
 ### Cross-cutting
 
-- [ ] **U-001 · P1 · PL TL TP · The app is locked to portrait and has no large-screen layout.**
+- [x] **U-001 · P1 · PL TL TP · The app is locked to portrait and has no large-screen layout.** *(fixed in bfa02f1)*
   - Where: `app.config.js:34`, `AndroidManifest.xml:28`.
   - Android 16 ignores the lock on screens 600 dp and wider, so tablets and foldables rotate anyway.
   - Fix: remove the lock in both places. Keep `configChanges` (and add `smallestScreenSize` for
     split-screen and foldables). Then do phase 2.
-- [ ] **U-002 · P2 · iPad, landscape · No RN `<Modal>` sets `supportedOrientations`.**
+- [x] **U-002 · P2 · iPad, landscape · No RN `<Modal>` sets `supportedOrientations`.** *(fixed in bfa02f1)*
   - Where: 56 modals in 40 files.
   - iOS presents these portrait-only and forces a rotation.
   - Fix: pass all orientations everywhere.
-- [ ] **U-003 · P2 · TL TP · Every screen is the phone layout stretched to 1280 dp.**
+- [ ] **U-003 · P2 · TL TP · Every screen is the phone layout stretched to 1280 dp.** *(partly fixed in 802474d, 64a62b6, 8ab82cd, 2470e99, 0087e4c; login still open)*
   - Affected: mail rows, thread body, compose, contacts, files, settings, login.
   - Screenshots: `q_mail_list`, `q_thread_receipt`, `q_contacts`, `q_settings`, `t_login_confirm`.
   - Fix: the adaptive layout plan below.
-- [ ] **U-004 · P2 · TL TP · Sheets and floating cards span the full width.**
+- [x] **U-004 · P2 · TL TP · Sheets and floating cards span the full width.** *(fixed in f4ff07d)*
   - Affected: bottom sheets, toasts, the undo bar and the push prompt.
   - Screenshots: `q_event_detail`, `q_mail_list` (push prompt).
   - Fix: on medium and expanded widths, cap them at about 560 dp and centre them.
-- [ ] **U-005 · P2 · PL · Left and right safe-area insets are ignored.**
+- [ ] **U-005 · P2 · PL · Left and right safe-area insets are ignored.** *(partly fixed in bfa02f1 (compose), f4ff07d (sheets))*
   - Most screens use `SafeAreaView edges={['top']}` and position sheets `left: 0, right: 0`.
   - A side navigation bar or a camera cutout covers the content.
   - Fix: add the side edges to screen roots, and inset sheets and the FABs.
@@ -338,9 +338,13 @@ carries the commit that fixed it.
   - Example: "Q4 contracts" without Clients / ACME / 2026 (`q_drawer` PP).
   - This happens with "hide empty folders" on. To check before changing anything.
 
+- [x] **U-033 · P2 · TL TP · With the tabs in the side rail, the compose FAB and list ends sit under
+  the tablet taskbar.** *(fixed in b9e6ba4)* Found after the mail split view landed (802474d): a bottom tab bar used to
+  keep the screens clear of the bottom inset, a side rail doesn't.
+  - Fix: pad the tab area by the bottom inset when the rail is shown.
 ### Thread view
 
-- [ ] **U-040 · P1 · PL TL TP · After a rotation the pager is misaligned.**
+- [x] **U-040 · P1 · PL TL TP · After a rotation the pager is misaligned.** *(fixed in bfa02f1)*
   - Half of the neighbouring page shows and the open message is cut off at the right edge.
   - It happens when rotating on the thread, and when rotating on Compose opened from it
     (`q_thread_long` PL, `q_compose_close` TL).
@@ -369,12 +373,12 @@ carries the commit that fixed it.
   - Fix: a readable max width for the body on wide panes.
 - [ ] **U-048 · P3 · all · The toolbar star always says "Star", even when the message is starred.**
   - Where: `EmailThreadScreen.tsx:746`.
-- [ ] **U-049 · P3 · PL TL · Attachment image preview is sized from the window width, so it is
-  taller than the screen in landscape.** Where: `AttachmentPreviewModal.tsx:112`.
+- [x] **U-049 · P3 · PL TL · Attachment image preview is sized from the window width, so it is
+  taller than the screen in landscape.** *(fixed in 2470e99)* Where: `AttachmentPreviewModal.tsx:112`.
 
 ### Compose
 
-- [ ] **U-060 · P1 · PL · With the keyboard open in landscape, the whole compose body is blank.**
+- [x] **U-060 · P1 · PL · With the keyboard open in landscape, the whole compose body is blank.** *(fixed in bfa02f1)*
   - Only the header stays, so you can't see what you type (`tri.png`).
   - Where: the keyboard padding is computed from `Dimensions.get('screen').height`
     (`ComposeScreen.tsx:400-425`), which doesn't follow the rotation.
@@ -393,26 +397,33 @@ carries the commit that fixed it.
   - Example: "…ning 2027: venue…". The cursor was put at the end on mount.
 - [ ] **U-065 · P2 · all · Format-bar buttons have no accessibility labels.**
   - Where: `ComposeScreen.tsx:2441-2513`; the toolbar button also has no role or state.
-- [ ] **U-066 · P2 · PL · Text inputs use Android's full-screen landscape keyboard.**
+- [x] **U-066 · P2 · PL · Text inputs use Android's full-screen landscape keyboard.** *(fixed in bfa02f1)*
   - The autocomplete and the composer are hidden behind it.
   - Fix: `disableFullscreenUI` on recipients, subject, plain body and quick reply.
-- [ ] **U-067 · P2 · TL TP · Compose fills the tablet screen.** Fix: a centred panel (phase 2).
+- [x] **U-067 · P2 · TL TP · Compose fills the tablet screen.** *(fixed in 0087e4c)* Fix: a centred panel (phase 2).
 
+- [ ] **U-068 · P2 · all · The signature shows two "--" lines.** The seeded text signature starts
+  with the usual "-- " delimiter and the composer adds its own separator above it (screenshot
+  `t_compose_panel`).
+  - Fix: don't add a separator to a signature that already starts with one.
+- [ ] **U-069 · P2 · PL · Recipient suggestions can't show in phone landscape.** With the keyboard
+  up, about 50 dp are left under the To field, so the suggestion list is hidden behind the
+  keyboard. Typing a full address still works.
 ### Calendar
 
-- [ ] **U-080 · P1 · PL · Month view shows two week rows and cuts off the rest.**
+- [x] **U-080 · P1 · PL · Month view shows two week rows and cuts off the rest.** *(fixed in bfa02f1)*
   - Rows keep a 72 dp minimum and the list is sized to six of them (`q_calendar_default` PL).
   - Where: `MonthScrollView.tsx:127-128,250`, `MonthView.tsx:427-438`.
   - Fix: size the list to the real height and let rows shrink.
-- [ ] **U-081 · P1 · TL TP · Rotating on month or week jumps back a month, and week view goes
-  blank.**
+- [x] **U-081 · P1 · TL TP · Rotating on month or week jumps back a month, and week view goes
+  blank.** *(fixed in bfa02f1)*
   - After a rotation, month view showed September instead of October. Week view showed no day
     headers and no events until Today was tapped (`q_calendar_default` TP, `q_cal_week` TL).
   - Where: `MonthScrollView` samples the visible month at a fixed 40% of a stale height;
     `TimeGridScrollView` keeps the old `scrollX` after its list remounts.
   - Fix: keep the focused date across the remount and reset the header offset.
-- [ ] **U-082 · P1 · PL · The event sheet's action row (Edit, Duplicate, .ics, Delete) is below the
-  screen.**
+- [x] **U-082 · P1 · PL · The event sheet's action row (Edit, Duplicate, .ics, Delete) is below the
+  screen.** *(fixed in bfa02f1)*
   - Screenshot `p_event_land`.
   - Where: `EventDetailSheet.tsx:609,643` (body `maxHeight: 400`, no `flexShrink`).
 - [ ] **U-083 · P1 · all · Saving an event fails silently.**
@@ -425,9 +436,9 @@ carries the commit that fixed it.
   - Unsubscribing from a feed, which also deletes its calendar (`ICalSubscriptionSheet.tsx:278`).
 - [ ] **U-085 · P2 · all · Cancelling the recurrence-scope dialog after editing a recurring event
   throws the edits away.** Where: `CalendarScreen.tsx:786-790`.
-- [ ] **U-086 · P2 · TL TP · Wide screens get wider columns, not more days.** 3 days stays 3 and
+- [x] **U-086 · P2 · TL TP · Wide screens get wider columns, not more days.** *(fixed in 2288d28)* 3 days stays 3 and
   day stays 1. Fix: phase 2.
-- [ ] **U-087 · P2 · PL · The month dropdown is a fixed 346 dp tall and sized from the window.**
+- [x] **U-087 · P2 · PL · The month dropdown is a fixed 346 dp tall and sized from the window.** *(fixed in bfa02f1)*
   - It overflows in landscape and lands on a half page after rotation.
   - Where: `MonthDropdown.tsx:23,52,72`.
 - [ ] **U-088 · P3 · all · Times and dates use English formats in other languages.**
@@ -442,7 +453,7 @@ carries the commit that fixed it.
 
 ### Contacts
 
-- [ ] **U-100 · P1 · all · Deleting a contact or group crashes the detail screen.**
+- [x] **U-100 · P1 · all · Deleting a contact or group crashes the detail screen.** *(fixed in 295e292)*
   - Hooks run after an early return: `ContactDetailScreen.tsx:149` before `:216`, and
     `GroupDetailScreen.tsx:58` before `:130`.
   - The delete empties the store, the screen re-renders with fewer hooks, and React throws. A
@@ -456,11 +467,11 @@ carries the commit that fixed it.
   - Where: `ContactFormScreen.tsx:764`. Fix: `usePreventRemove`.
 - [ ] **U-104 · P2 · all · Contact form fields have no next or submit chaining.** Where:
   `ContactFormScreen.tsx:1197-1283`.
-- [ ] **U-105 · P2 · TL TP · List and detail are separate full-screen pages.** Fix: phase 2.
+- [x] **U-105 · P2 · TL TP · List and detail are separate full-screen pages.** *(fixed in 64a62b6)* Fix: phase 2.
 
 ### Files
 
-- [ ] **U-110 · P2 · all · The grid has a fixed 3 columns.**
+- [x] **U-110 · P2 · all · The grid has a fixed 3 columns.** *(fixed in 2470e99)*
   - The last row stretches its cells, so the columns don't line up. Tablet cells are huge
     (`q_files_grid`).
   - Where: `FilesScreen.tsx:989,1606`.
@@ -469,7 +480,7 @@ carries the commit that fixed it.
   - Where: `FilesScreen.tsx:127-132`.
 - [ ] **U-112 · P2 · all · Removing someone's share access has no confirmation.** Where:
   `ShareSheet.tsx:213`.
-- [ ] **U-113 · P2 · TL TP · There is no side-by-side preview.** Fix: phase 2.
+- [x] **U-113 · P2 · TL TP · There is no side-by-side preview.** *(fixed in 2470e99)* Fix: phase 2.
 
 ### Settings
 
@@ -482,7 +493,7 @@ carries the commit that fixed it.
   light.**
   - Light yellow text on a faint brown fill.
   - Where: `FilterSettings.tsx:515-519`, `SieveEditorSheet.tsx:208-212`.
-- [ ] **U-123 · P2 · TL TP · The section list and the page replace each other.** Fix: phase 2.
+- [x] **U-123 · P2 · TL TP · The section list and the page replace each other.** *(fixed in 8ab82cd)* Fix: phase 2.
 - [ ] **U-124 · P3 · all · The language list is in neither name nor code order.** Example: Česky,
   Slovenčina, Dansk.
 
