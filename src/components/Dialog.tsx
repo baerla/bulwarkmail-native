@@ -72,7 +72,7 @@ export default function Dialog({
                 value={input.value}
                 onChangeText={input.onChangeText}
                 placeholder={input.placeholder}
-                placeholderTextColor={c.textMuted}
+                placeholderTextColor={c.mutedForeground}
                 autoFocus
                 onSubmitEditing={confirmDisabled ? undefined : onConfirm}
                 accessibilityLabel={input.placeholder ?? title}
@@ -143,15 +143,17 @@ function makeStyles(c: ThemePalette) {
     color: c.mutedForeground,  // text-muted-foreground
     marginTop: spacing.sm,
   },
+  // The shared Input look: 40 dp, transparent, radius 6.
   input: {
     ...typography.body,
     color: c.text,
-    backgroundColor: c.surface,
+    backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: c.border,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: 10,
+    paddingVertical: 0,
+    minHeight: 40,
     marginTop: spacing.md,
   },
   footer: {
