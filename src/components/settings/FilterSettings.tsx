@@ -512,11 +512,13 @@ function makeStyles(c: ThemePalette) {
       padding: spacing.md,
       borderRadius: radius.sm,
       borderWidth: 1,
-      borderColor: 'rgba(252, 211, 77, 0.4)',
-      backgroundColor: 'rgba(120, 53, 15, 0.25)',
+      // Theme warning tokens: the fixed dark-amber values left light-yellow
+      // text on a near-white fill in the light theme.
+      borderColor: c.warning,
+      backgroundColor: c.warningBg,
       alignItems: 'flex-start',
     },
-    opaqueText: { ...typography.caption, color: '#fde68a' },
+    opaqueText: { ...typography.caption, color: c.text },
     opaqueActions: { flexDirection: 'row', gap: spacing.lg, marginTop: spacing.sm, flexWrap: 'wrap', alignItems: 'center' },
     resetConfirmRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
     resetLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
