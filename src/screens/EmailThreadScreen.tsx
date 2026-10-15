@@ -1683,11 +1683,12 @@ function makeStyles(c: ThemePalette) {
   subjectStar: {
     paddingTop: 4,
   },
+  // Webmail viewer on a phone: text-lg font-bold tracking-tight.
   subjectText: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    lineHeight: 28,
+    lineHeight: 26,
     color: c.text,
     letterSpacing: -0.2,
   },

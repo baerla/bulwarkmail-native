@@ -11,7 +11,7 @@ import {
 } from '../components/icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
+import { spacing, radius, typography, componentSizes, mix, type ThemePalette } from '../theme/tokens';
 import { useColors, useResolvedTheme } from '../theme/colors';
 import { useTypography, useDensity } from '../theme/dynamic';
 import SidebarDrawer from '../components/SidebarDrawer';
@@ -168,6 +168,7 @@ const EmailRow = React.memo(function EmailRow({
       style={({ pressed }) => [
         styles.emailRow,
         { paddingVertical: density.rowPaddingVertical },
+        unread && styles.emailRowUnread,
         pressed && styles.emailRowPressed,
         active && styles.emailRowActive,
         selected && styles.emailRowSelected,
@@ -2002,10 +2003,9 @@ function makeStyles(c: ThemePalette) {
     // A minimum, not a fixed height: at a larger system font the text used
     // to be cut off at the top.
     minHeight: componentSizes.inputHeight, // h-10 = 40px
-    backgroundColor: c.surface,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: c.border,
+    // Webmail mobile header: a filled pill, no border.
+    backgroundColor: c.muted,
+    borderRadius: radius.full,
     gap: spacing.sm,
   },
   // No lineHeight and no Android default padding on a TextInput: both clip
@@ -2298,6 +2298,9 @@ function makeStyles(c: ThemePalette) {
     borderBottomWidth: 1,
     borderBottomColor: c.border,   // border-b border-border
   },
+  // Webmail: unread rows get bg-accent/30. Opaque, since the row covers
+  // its swipe actions.
+  emailRowUnread: { backgroundColor: mix(c.accent, c.background, 0.3) },
   emailRowPressed: { backgroundColor: c.surface },
   emailRowSelected: { backgroundColor: c.selection },
   // The message open next to the list (webmail: bg-selection with a primary

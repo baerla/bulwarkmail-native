@@ -1459,10 +1459,9 @@ function makeStyles(c: ThemePalette) {
     color: c.text,
   },
   rowLabelAccount: {
-    ...typography.caption,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '500',
     color: c.textSecondary,
   },
   counts: {

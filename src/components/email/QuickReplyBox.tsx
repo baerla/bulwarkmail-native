@@ -155,7 +155,7 @@ export function QuickReplyBox({ email, jmapAccountId, onMoreOptions, onSent, onF
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={t('email_viewer.quick_reply_placeholder', 'Write a quick reply...')}
-        placeholderTextColor={c.textMuted}
+        placeholderTextColor={c.mutedForeground}
         style={styles.input}
         multiline
         editable={!sending}
@@ -189,7 +189,7 @@ function makeStyles(c: ThemePalette) {
       borderWidth: 1,
       borderColor: c.border,
       borderRadius: radius.md,
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       padding: spacing.sm,
       gap: spacing.sm,
     },
@@ -211,10 +211,10 @@ function makeStyles(c: ThemePalette) {
       gap: spacing.xs,
       backgroundColor: c.primary,
       paddingHorizontal: spacing.md,
-      paddingVertical: 6,
-      borderRadius: radius.full,
+      minHeight: 36,
+      borderRadius: radius.sm,
     },
     sendDisabled: { opacity: 0.5 },
-    sendText: { ...typography.caption, color: c.primaryForeground, fontWeight: '600' },
+    sendText: { ...typography.bodyMedium, color: c.primaryForeground },
   });
 }

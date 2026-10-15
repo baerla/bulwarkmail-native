@@ -329,3 +329,22 @@ export const componentSizes = {
   toggleHeight: 24, toggleWidth: 44, toggleThumb: 20,
   fab: 56, badgeSize: 16,
 } as const;
+
+/**
+ * `top` over `bottom` at `amount` opacity, as an opaque #rrggbb: the
+ * webmail's `bg-accent/30` for a surface that must hide what is behind it
+ * (a list row over its swipe actions). Takes #rrggbb; anything else
+ * returns `bottom` unchanged.
+ */
+export function mix(top: string, bottom: string, amount: number): string {
+  const parse = (hex: string) => {
+    const m = /^#([0-9a-f]{6})$/i.exec(hex);
+    if (!m) return null;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const a = parse(top);
+  const b = parse(bottom);
+  if (!a || !b) return bottom;
+  return `#${a.map((v, i) => Math.round(v * amount + b[i] * (1 - amount)).toString(16).padStart(2, '0')).join('')}`;
+}
