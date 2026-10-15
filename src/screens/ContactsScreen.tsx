@@ -101,7 +101,14 @@ function categoryTitle(
   }
 }
 
-export default function ContactsScreen() {
+interface ContactsScreenProps {
+  /** Split view: open the contact in the detail pane instead of the stack. */
+  onOpenContact?: (contact: ContactCard) => void;
+  /** The contact open in the detail pane. */
+  activeContactId?: string | null;
+}
+
+export default function ContactsScreen({ onOpenContact, activeContactId = null }: ContactsScreenProps = {}) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const navigation = useNavigation<Nav>();
@@ -210,7 +217,9 @@ export default function ContactsScreen() {
       toggleSelect(c.id);
       return;
     }
-    if (isGroup(c)) {
+    if (onOpenContact) {
+      onOpenContact(c);
+    } else if (isGroup(c)) {
       navigation.navigate('GroupDetail', { groupId: c.id });
     } else {
       navigation.navigate('ContactDetail', { contactId: c.id });
@@ -541,6 +550,7 @@ export default function ContactsScreen() {
             onPress={() => handleRowPress(item)}
             onLongPress={() => handleLongPress(item)}
             selected={selection.has(item.id)}
+            active={item.id === activeContactId}
             selectionMode={selectionMode}
           />
         )}

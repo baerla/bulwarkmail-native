@@ -6,6 +6,7 @@ import {
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useInPane } from '../navigation/pane';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -132,6 +133,7 @@ export default function ContactDetailScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const t = useLocaleStore((s) => s.t);
+  const inPane = useInPane();
   const { contactId } = route.params;
 
   const contact = useContactsStore((s) => s.contacts.find((c) => c.id === contactId));
@@ -360,16 +362,19 @@ export default function ContactDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => navigation.goBack()}
-          style={styles.headerBtn}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.back', 'Back')}
-        >
-          <ArrowLeft size={22} color={c.text} />
-        </Pressable>
+      <View style={[styles.header, inPane && styles.headerInPane]}>
+        {/* In a split view's pane the list is right next to it: no back. */}
+        {!inPane && (
+          <Pressable
+            onPress={() => navigation.goBack()}
+            style={styles.headerBtn}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.back', 'Back')}
+          >
+            <ArrowLeft size={22} color={c.text} />
+          </Pressable>
+        )}
         <Text style={styles.headerTitle} numberOfLines={1}>
           {isGroup(contact) ? t('contacts.group', 'Group') : t('contacts.contact', 'Contact')}
         </Text>
@@ -911,7 +916,8 @@ function makeStyles(c: ThemePalette) {
     container: { flex: 1, backgroundColor: c.background },
     scrollContent: { paddingBottom: spacing.xxxl * 2 },
 
-    header: {
+    headerInPane: { paddingLeft: spacing.lg },
+  header: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: spacing.sm,

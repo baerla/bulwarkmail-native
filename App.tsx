@@ -46,7 +46,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import MailTab from './src/screens/MailTab';
 import FilesScreen from './src/screens/FilesScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
-import ContactsScreen from './src/screens/ContactsScreen';
+import ContactsTab from './src/screens/ContactsTab';
 import ContactDetailScreen from './src/screens/ContactDetailScreen';
 import ContactFormScreen from './src/screens/ContactFormScreen';
 import GroupDetailScreen from './src/screens/GroupDetailScreen';
@@ -325,7 +325,7 @@ function MainTabsNavigator({ navigation }: NativeStackScreenProps<RootStackParam
       />
       <Tab.Screen
         name="Contacts"
-        component={ContactsScreen}
+        component={ContactsTab}
         options={{
           title: tabLabels.contacts,
           tabBarIcon: ({ color, size }) => <BookUser size={size} color={color} />,
