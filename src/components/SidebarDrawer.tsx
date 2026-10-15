@@ -39,6 +39,7 @@ import type { RootStackParamList } from '../navigation/types';
 import type { Mailbox } from '../api/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 import { confirmSignOut } from '../lib/sign-out-confirm';
+import { setPendingSettingsTab } from '../navigation/pending-settings-tab';
 
 const CHEVRON_SLOT = 20;
 const INDENT_STEP = 12;
@@ -1044,8 +1045,15 @@ export default function SidebarDrawer({ visible, onClose, docked = false }: Side
             <Pressable
               style={styles.sectionSettings}
               hitSlop={8}
-              onPress={() => { onClose(); navigation.navigate('MainTabs'); }}
-              accessibilityLabel={t('sidebar.settings', 'Settings')}
+              // Opens the folder settings; it used to navigate to the screen
+              // already shown, which only closed the drawer.
+              onPress={() => {
+                onClose();
+                setPendingSettingsTab('folders');
+                navigation.navigate('MainTabs', { screen: 'Settings' } as never);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t('settings.tabs.folders', 'Folders')}
             >
               <Settings size={14} color={c.textMuted} />
             </Pressable>
