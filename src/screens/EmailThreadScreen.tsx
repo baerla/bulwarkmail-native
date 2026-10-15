@@ -748,7 +748,7 @@ function EmailViewer({ route, navigation, embedded = false, onActiveChange }: Pr
                 fill={starred ? c.starred : 'transparent'}
               />
             }
-            label={t('email_viewer.star', 'Star')}
+            label={starred ? t('email_viewer.unstar', 'Unstar') : t('email_viewer.star', 'Star')}
             onPress={onToggleStar}
           />
           <ToolbarButton
