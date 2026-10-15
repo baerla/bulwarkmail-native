@@ -110,7 +110,11 @@ function makeStyles(c: ThemePalette) {
       height: componentSizes.headerHeight,
     },
     headerButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+    // One readable column, centred on a tablet or a phone in landscape.
     content: {
+      width: '100%',
+      maxWidth: 480 + spacing.lg * 2,
+      alignSelf: 'center',
       paddingHorizontal: spacing.lg,
       paddingBottom: spacing.xxxl,
     },
