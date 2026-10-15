@@ -1985,14 +1985,18 @@ function makeStyles(c: ThemePalette) {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    height: componentSizes.inputHeight, // h-10 = 40px
+    // A minimum, not a fixed height: at a larger system font the text used
+    // to be cut off at the top.
+    minHeight: componentSizes.inputHeight, // h-10 = 40px
     backgroundColor: c.surface,
     borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: c.border,
     gap: spacing.sm,
   },
-  searchInput: { flex: 1, ...typography.body, color: c.text },
+  // No lineHeight and no Android default padding on a TextInput: both clip
+  // the text when the system font is scaled up.
+  searchInput: { flex: 1, fontSize: typography.body.fontSize, color: c.text, paddingVertical: 4 },
   filterButton: {
     width: componentSizes.buttonMd, height: componentSizes.buttonMd,
     alignItems: 'center', justifyContent: 'center',

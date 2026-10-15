@@ -71,7 +71,7 @@ function makeStyles(c: ThemePalette) {
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: componentSizes.inputHeight,    // h-10 = 40px
+    minHeight: componentSizes.inputHeight, // h-10 = 40px; grows with a larger system font
     borderWidth: 1,
     borderColor: c.border,            // border-input
     borderRadius: radius.sm,               // rounded-md = 6px
