@@ -1501,9 +1501,9 @@ function makeStyles(c: ThemePalette) {
     headerBtnActive: {
       backgroundColor: c.primaryBg,
     },
+    // Same header title as Mail and Contacts (text-lg font-semibold).
     title: {
-      fontSize: typography.h2.fontSize,
-      fontWeight: '700' as const,
+      ...typography.h3,
       color: c.text,
       flexShrink: 1,
     },
