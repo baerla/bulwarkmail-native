@@ -47,6 +47,7 @@ import { editorTimesFromEvent, eventTimeFieldsToSave } from '../../lib/event-edi
 import { useSettingsStore } from '../../stores/settings-store';
 import { canCreateEventsIn } from '../../lib/calendar-editability';
 import { useCalendarLocale } from '../../lib/calendar-locale';
+import { formatCalendarDate } from '../../lib/date-format';
 import {
   alertsToReminders,
   remindersToAlerts,
@@ -530,7 +531,7 @@ export function EventModal({
                   style={styles.dateBtn}
                   onPress={() => setShowStartDate(true)}
                 >
-                  <Text style={styles.dateText}>{format(start, 'EEE, MMM d', { locale })}</Text>
+                  <Text style={styles.dateText}>{formatCalendarDate(start, locale.code, 'weekdayMonthDay')}</Text>
                 </Pressable>
                 {!allDay && (
                   <Pressable
@@ -550,7 +551,7 @@ export function EventModal({
                   style={styles.dateBtn}
                   onPress={() => setShowEndDate(true)}
                 >
-                  <Text style={styles.dateText}>{format(end, 'EEE, MMM d', { locale })}</Text>
+                  <Text style={styles.dateText}>{formatCalendarDate(end, locale.code, 'weekdayMonthDay')}</Text>
                 </Pressable>
                 {!allDay && (
                   <Pressable

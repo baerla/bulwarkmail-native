@@ -17,7 +17,8 @@ import type { DateFormat, TimeFormat } from '../stores/settings-store';
 type Translate = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
 
 type FormatName =
-  | 'time12' | 'time24' | 'full12' | 'full24' | 'weekday' | 'date' | 'monthDay' | 'monthDayYear';
+  | 'time12' | 'time24' | 'full12' | 'full24' | 'weekday' | 'date' | 'monthDay' | 'monthDayYear'
+  | 'weekdayMonthDay' | 'longWeekdayMonthDayYear';
 
 const FORMATS: Record<FormatName, Intl.DateTimeFormatOptions> = {
   time12: { hour: '2-digit', minute: '2-digit', hour12: true },
@@ -28,6 +29,8 @@ const FORMATS: Record<FormatName, Intl.DateTimeFormatOptions> = {
   date: { year: 'numeric', month: '2-digit', day: '2-digit' },
   monthDay: { month: 'short', day: 'numeric' },
   monthDayYear: { month: 'short', day: 'numeric', year: 'numeric' },
+  weekdayMonthDay: { weekday: 'short', month: 'short', day: 'numeric' },
+  longWeekdayMonthDayYear: { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
 };
 
 // Building an Intl formatter is the expensive part of formatting a date (on
@@ -123,4 +126,18 @@ export function formatListDate(
   }
 
   return formatWith(d, intlLocale, 'date');
+}
+
+export type CalendarDateStyle = 'weekdayMonthDay' | 'longWeekdayMonthDayYear' | 'monthDay' | 'monthDayYear';
+
+/**
+ * A calendar date in the order and words of `locale` ("Thu, Oct 15",
+ * "Do., 15. Okt."). The calendar used fixed US patterns such as
+ * 'EEE, MMM d', which put German and most other languages in the wrong order.
+ * `locale` is a language tag such as a date-fns locale's `code`.
+ */
+export function formatCalendarDate(date: Date, locale: string | undefined, style: CalendarDateStyle): string {
+  syncFormatterZone(new Date());
+  const tag = !locale || locale === 'en' ? 'en-US' : locale;
+  return formatWith(date, tag, style);
 }
