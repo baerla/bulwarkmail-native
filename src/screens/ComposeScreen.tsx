@@ -1062,6 +1062,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
   const [draftStatus, setDraftStatus] = React.useState<'idle' | 'saving' | 'saved' | 'failed'>('idle');
   const [savingDraft, setSavingDraft] = React.useState(false);
 
+  const [, bumpBaseline] = React.useReducer((n: number) => n + 1, 0);
   const isDirty = currentSnapshot !== baselineRef.current;
   const needsSave = currentSnapshot !== (lastSavedRef.current ?? baselineRef.current);
 
@@ -1120,10 +1121,21 @@ export default function ComposeScreen({ route, navigation }: Props) {
           const next = placeSignatureHtml(live, sigHtml);
           setBodyHtml(next);
           editorRef.current?.setHtml(next);
+          // The untouched baseline is the editor's own read-back: the page
+          // normalises the markup, so the string built here never equalled
+          // what it reports, and an untouched reply counted as edited (it
+          // autosaved a draft and asked "Save or discard?" on close).
+          let settled = placeSignatureHtml(initialBodyHtml, sigHtml);
+          try {
+            settled = (await editorRef.current?.getHtml()) ?? settled;
+          } catch { /* keep the built string */ }
+          if (latestRef.current.bodyHtml === next) setBodyHtml(settled);
           baselineRef.current = snapshotOf({
             to: initialTo, cc: initialCc, bcc: initialBcc, subject: initialSubject,
-            body: placeSignatureHtml(initialBodyHtml, sigHtml), attachments: initialAttachments,
+            body: settled, attachments: initialAttachments,
           });
+          // The baseline is a ref: re-render so "edited" is worked out again.
+          bumpBaseline();
         })();
       }
       return;
