@@ -234,7 +234,7 @@ carries the commit that fixed it.
   - Affected: bottom sheets, toasts, the undo bar and the push prompt.
   - Screenshots: `q_event_detail`, `q_mail_list` (push prompt).
   - Fix: on medium and expanded widths, cap them at about 560 dp and centre them.
-- [ ] **U-005 · P2 · PL · Left and right safe-area insets are ignored.** *(partly fixed in bfa02f1 (compose), f4ff07d (sheets))*
+- [x] **U-005 · P2 · PL · Left and right safe-area insets are ignored.** *(fixed in bfa02f1, f4ff07d, e19229a)* *(partly fixed in bfa02f1 (compose), f4ff07d (sheets))*
   - Most screens use `SafeAreaView edges={['top']}` and position sheets `left: 0, right: 0`.
   - A side navigation bar or a camera cutout covers the content.
   - Fix: add the side edges to screen roots, and inset sheets and the FABs.
@@ -255,10 +255,10 @@ carries the commit that fixed it.
   - Example: "E-…", "Kalen…", "Einstellu…" in 256 dp-wide tabs (`q_de_mail`).
   - The label sits beside the icon with a fixed font size and no width.
   - Fix: let the label size itself; on wide screens use the side rail (phase 2).
-- [ ] **U-010 · P2 · all (font 1.3) · The mail search field clips the top of its text.**
+- [x] **U-010 · P2 · all (font 1.3) · The mail search field clips the top of its text.** *(fixed in 7b93265)*
   - Where: fixed height in `EmailListScreen.tsx:1885-1912`.
   - Fix: use `minHeight` and vertical padding.
-- [ ] **U-011 · P2 · dark · The dark palette doesn't match the webmail's standard theme.**
+- [x] **U-011 · P2 · dark · The dark palette doesn't match the webmail's standard theme.** *(fixed in b3290c3)*
   - The app uses a blue primary and zinc greys. The webmail uses a white `#fafafa` primary with
     `#171717` text, a `#0a0a0a` ground, neutral greys, `#1c1c1c` popover and a `#262626` muted
     surface.
@@ -271,9 +271,9 @@ carries the commit that fixed it.
 - [x] **U-013 · P2 · light · TagSheet reads the static dark palette.** *(fixed in 29c172f)*
   - Where: `TagSheet.tsx:7,101,124`. Tag colours are wrong on light.
   - Fix: use `c.tags`.
-- [ ] **U-014 · P2 · all · `Button` has no `accessibilityRole` and no disabled or busy state.**
+- [x] **U-014 · P2 · all · `Button` has no `accessibilityRole` and no disabled or busy state.** *(fixed in f891bf3)*
   - Where: `Button.tsx:35`. This affects every dialog and prompt button.
-- [ ] **U-015 · P2 · all · Many icon buttons are under 48 dp.**
+- [ ] **U-015 · P2 · all · Many icon buttons are under 48 dp.** *(partly fixed in c8434b0 (thread back, login header, Files header and row menu, account icons, switches, drawer chevron and folder icon, search clear, recipient chip, quick reply))*
   - Mail search clear 36, recent-search remove 28, filter chip remove 32, attachment chips about 22,
     drawer chevron 32.
   - Viewer: card pills about 36, collapse handle 18, quick-reply Send 28, subject star 34.
@@ -299,7 +299,7 @@ carries the commit that fixed it.
   - Repro: search "Offsite", press Enter, then Back.
   - Where: `EmailListScreen.tsx` has no back handler for search or selection.
   - Fix: `useBackWhileFocused` that clears the selection, then the search.
-- [ ] **U-021 · P2 · PL · Phone landscape shows about 1.5 rows.**
+- [x] **U-021 · P2 · PL · Phone landscape shows about 1.5 rows.** *(fixed in b5c4d62)*
   - The 56 dp header, the 56 dp search row and the 64 dp tab bar take most of the 411 dp.
   - The compose FAB covers the second row. Screenshot `q_mail_list` PL.
   - Fix: in compact height, merge the title and search into one row and drop the tab labels.
@@ -311,7 +311,7 @@ carries the commit that fixed it.
   delete.** *(fixed in 50ab714)*
   - Where: `UndoSnackbar.tsx:161`, `EmailListScreen.tsx:2262`.
   - Fix: lift the FAB while the bar shows.
-- [ ] **U-024 · P2 · all · Swipe and bulk actions on the list fail silently.**
+- [x] **U-024 · P2 · all · Swipe and bulk actions on the list fail silently.** *(fixed in 0db4bf0)*
   - Archive, spam, read, star, move and delete are called as `void ...` with no catch, so a server
     rejection becomes an unhandled promise. The selection also stays.
   - Where: `EmailListScreen.tsx:604-651, 715-799`; `handleImport` `:492`.
@@ -322,8 +322,8 @@ carries the commit that fixed it.
 - [x] **U-026 · P2 · all · The drawer's folder-settings icon only closes the drawer.** *(fixed in d97571c)*
   - Where: `SidebarDrawer.tsx:1048`, `navigate('MainTabs')`.
   - Fix: open Settings → Folders.
-- [ ] **U-027 · P2 · all · The filter modal runs a query per keystroke and has no keyboard
-  handling.**
+- [x] **U-027 · P2 · all · The filter modal runs a query per keystroke and has no keyboard
+  handling.** *(fixed in c6cb44d)*
   - Where: `EmailListScreen.tsx:1507-1550`.
   - Fix: debounce like the main search; add next/search return keys.
 - [x] **U-028 · P2 · PP PL · The unified inbox and Scheduled lists end under the gesture bar.** *(fixed in 984c359)*
@@ -351,28 +351,28 @@ carries the commit that fixed it.
     (`q_thread_long` PL, `q_compose_close` TL).
   - Where: `EmailThreadScreen.tsx:265-280`; the pager keeps its old pixel offset.
   - Fix: re-scroll to the active index after a width change, without animation.
-- [ ] **U-041 · P2 · all · A long thread opens at the oldest message.**
+- [x] **U-041 · P2 · all · A long thread opens at the oldest message.** *(fixed in 7617064)*
   - The newest (opened) message is expanded but off screen on a phone (`q_thread_long` PP).
   - Fix: scroll the opened message into view once the cards are laid out.
 - [x] **U-042 · P1 · all · Quick reply "More options" throws away the typed text.** *(fixed in 053fde8)*
   - Where: `EmailThreadScreen.tsx:1185`.
   - Fix: pass the text as `prefillBody` to the reply composer.
-- [ ] **U-043 · P2 · PL · Phone landscape leaves almost no room for the body.**
+- [x] **U-043 · P2 · PL · Phone landscape leaves almost no room for the body.** *(fixed in 975ed08)*
   - Toolbar with labels, subject, sender block, attachments, banner and the labelled bottom bar
     fill the 411 dp (`q_thread_receipt` PL).
   - Fix: icon-only toolbar and bottom bar in compact height.
-- [ ] **U-044 · P2 · PP (German, 1.3) · The toolbar overflows and pushes More off screen.**
+- [x] **U-044 · P2 · PP (German, 1.3) · The toolbar overflows and pushes More off screen.** *(fixed in 975ed08)*
   - "Stern hinzufügen" is long (`d_de_thread`).
   - Fix: drop the toolbar labels when they don't fit; keep the a11y labels.
 - [ ] **U-045 · P3 · German · Prev/Next read "Zurück"/"Weiter".**
   - "Zurück" reads as Back. "Allen antworten" wraps in the bottom bar.
   - Fix: "Vorherige"/"Nächste" (locale), and a single line with shrinking text.
-- [ ] **U-046 · P2 · all · The tag sheet doesn't scroll.**
+- [x] **U-046 · P2 · all · The tag sheet doesn't scroll.** *(fixed in b59d00f)*
   - With many tags, or in landscape, rows can't be reached.
   - Where: `EmailThreadScreen.tsx:1472-1486`.
-- [ ] **U-047 · P2 · TL TP · Plain-text and fluid HTML bodies run 150+ characters per line.**
+- [x] **U-047 · P2 · TL TP · Plain-text and fluid HTML bodies run 150+ characters per line.** *(fixed in e94b782)*
   - Fix: a readable max width for the body on wide panes.
-- [ ] **U-048 · P3 · all · The toolbar star always says "Star", even when the message is starred.**
+- [x] **U-048 · P3 · all · The toolbar star always says "Star", even when the message is starred.** *(fixed in d7cee7c)*
   - Where: `EmailThreadScreen.tsx:746`.
 - [x] **U-049 · P3 · PL TL · Attachment image preview is sized from the window width, so it is
   taller than the screen in landscape.** *(fixed in 2470e99)* Where: `AttachmentPreviewModal.tsx:112`.
@@ -384,19 +384,19 @@ carries the commit that fixed it.
   - Where: the keyboard padding is computed from `Dimensions.get('screen').height`
     (`ComposeScreen.tsx:400-425`), which doesn't follow the rotation.
   - Fix: compute the overlap from the window, against the keyboard frame.
-- [ ] **U-061 · P2 · all · An untouched reply autosaves a draft and asks "Save or discard?" on
-  close.**
+- [x] **U-061 · P2 · all · An untouched reply autosaves a draft and asks "Save or discard?" on
+  close.** *(fixed in e7857ef)*
   - The signature insertion counts as an edit (`d_de_compose`). Opening and closing a reply should
     leave nothing behind.
   - Where: `ComposeScreen.tsx:1116-1184`, `:1331-1444`.
-- [ ] **U-062 · P2 · all · Recipient and subject fields have no return-key flow.**
+- [x] **U-062 · P2 · all · Recipient and subject fields have no return-key flow.** *(fixed in 56e1593)*
   - Fix: To/Cc/Bcc use `next`; an empty submit moves on; Subject `next` focuses the body.
   - Where: `ComposeScreen.tsx:2228-2395`.
-- [ ] **U-063 · P2 · all (German, 1.3) · Field labels wrap.** "Betreff" shows as "Betref/f": the
+- [x] **U-063 · P2 · all (German, 1.3) · Field labels wrap.** *(fixed in 509583e)* "Betreff" shows as "Betref/f": the
   label column is a fixed width.
-- [ ] **U-064 · P3 · PP · The subject field shows the end of a long subject.**
+- [x] **U-064 · P3 · PP · The subject field shows the end of a long subject.** *(fixed in 56e1593)*
   - Example: "…ning 2027: venue…". The cursor was put at the end on mount.
-- [ ] **U-065 · P2 · all · Format-bar buttons have no accessibility labels.**
+- [x] **U-065 · P2 · all · Format-bar buttons have no accessibility labels.** *(fixed in af55e0a)*
   - Where: `ComposeScreen.tsx:2441-2513`; the toolbar button also has no role or state.
 - [x] **U-066 · P2 · PL · Text inputs use Android's full-screen landscape keyboard.** *(fixed in bfa02f1)*
   - The autocomplete and the composer are hidden behind it.
@@ -459,11 +459,11 @@ carries the commit that fixed it.
     `GroupDetailScreen.tsx:58` before `:130`.
   - The delete empties the store, the screen re-renders with fewer hooks, and React throws. A
     contact removed by a sync does the same.
-- [ ] **U-101 · P2 · PL · The address-book chip row is clipped at the bottom.** Screenshot
+- [x] **U-101 · P2 · PL · The address-book chip row is clipped at the bottom.** *(fixed in 0b37102)* Screenshot
   `q_contacts` PL.
 - [x] **U-102 · P2 · all · Back doesn't leave selection or search; it leaves the tab.** *(fixed in 756ceaa)*
   - Where: `ContactsScreen.tsx`. Files and Settings already handle this.
-- [ ] **U-103 · P2 · all · The contact form's discard check only covers the on-screen back.**
+- [x] **U-103 · P2 · all · The contact form's discard check only covers the on-screen back.** *(fixed in 1ebc5c6)*
   - Hardware back drops edits silently.
   - Where: `ContactFormScreen.tsx:764`. Fix: `usePreventRemove`.
 - [ ] **U-104 · P2 · all · Contact form fields have no next or submit chaining.** Where:
@@ -504,8 +504,8 @@ carries the commit that fixed it.
   - Fields and buttons are 1248 dp wide (`t_login_confirm`).
   - Fix: a centred column of about 480 dp.
 - [ ] **U-131 · P2 · all · Small targets: show-password 20 dp, header back 32 dp, email suggestion
-  chips about 26 dp.**
-- [ ] **U-132 · P2 · all · The password step's return keys don't move on.**
+  chips about 26 dp.** *(partly fixed in ae1ef5b (show password), c8434b0 (header); email suggestion chips still small)*
+- [x] **U-132 · P2 · all · The password step's return keys don't move on.** *(fixed in ae1ef5b)*
   - Username has no `next`. With TOTP on, the password field shows Next and does nothing.
   - Where: `PasswordStep.tsx:56,78`.
 - [ ] **U-133 · P2 · all · There is no way out while "Signing in" hangs.** Hardware back is
