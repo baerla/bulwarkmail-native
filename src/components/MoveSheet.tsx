@@ -5,8 +5,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Inbox, Send, File as FileIcon, Trash2, Ban, Archive, Folder,
-  X, Check, type LucideIcon,
-} from 'lucide-react-native';
+  X, Check, type AppIcon,
+} from './icons';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { buildMailboxTree, flattenVisible, type MailboxNode } from '../lib/mailbox-tree';
@@ -17,7 +17,7 @@ import type { Mailbox } from '../api/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 import { useSheetInsets } from '../lib/use-layout';
 
-function moveTargetIcon(role: string | null | undefined, name: string): LucideIcon {
+function moveTargetIcon(role: string | null | undefined, name: string): AppIcon {
   const lower = name.toLowerCase();
   if (role === 'inbox' || lower.includes('inbox')) return Inbox;
   if (role === 'sent' || lower.includes('sent')) return Send;

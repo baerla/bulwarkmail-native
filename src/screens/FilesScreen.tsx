@@ -21,7 +21,7 @@ import {
   FileAudio, FileArchive, FileSpreadsheet, FileCode2, LayoutGrid, List as ListIcon,
   MoreVertical, Pencil, Share2, Trash2, Upload, Users, X, Download, Search,
   ArrowUpDown, ArrowUp, ArrowDown, FolderInput, Copy, Check, Eye, ExternalLink,
-} from 'lucide-react-native';
+} from '../components/icons';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import JSZip from 'jszip';

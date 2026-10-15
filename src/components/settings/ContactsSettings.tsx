@@ -4,7 +4,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import {
   Download, Upload, Plus, Pencil, Trash2, Check, X, BookUser, Star,
-} from 'lucide-react-native';
+} from '../icons';
 import { SettingsSection, SettingItem, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import Dialog from '../Dialog';

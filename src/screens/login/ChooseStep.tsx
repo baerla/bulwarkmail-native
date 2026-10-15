@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
-import { ClipboardPaste, QrCode, Mail, Plus, Server } from 'lucide-react-native';
+import { ClipboardPaste, QrCode, Mail, Plus, Server } from '../../components/icons';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors, useResolvedTheme } from '../../theme/colors';
 import type { AccountEntry } from '../../stores/account-store';

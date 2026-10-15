@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, type TextInput } from 'react-native';
-import { Eye, EyeOff } from 'lucide-react-native';
+import { Eye, EyeOff } from '../../components/icons';
 import { spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { Button, Input } from '../../components';

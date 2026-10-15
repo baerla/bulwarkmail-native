@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { Folder, FileText, Trash2, UserPlus, Users } from 'lucide-react-native';
+import { Folder, FileText, Trash2, UserPlus, Users } from '../icons';
 
 import { getPrincipals, isFolder, ownPrincipalId, setFileNodeShare } from '../../api/files';
 import type { FileNode, FileNodeRights, Principal } from '../../api/types';

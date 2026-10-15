@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
-import { Repeat, Trash2 } from 'lucide-react-native';
+import { Repeat, Trash2 } from '../icons';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';

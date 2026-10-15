@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
-import { X, ExternalLink, Share2, Download } from 'lucide-react-native';
+import { X, ExternalLink, Share2, Download } from '../icons';
 import type { Email } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

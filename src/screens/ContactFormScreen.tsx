@@ -12,7 +12,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import {
   ArrowLeft, Mail, Phone, Building, MapPin, Cake, Tag, FileText, User, Check, Calendar,
   Camera, X as XIcon, Globe, Heart, UserCircle, Plus, ChevronDown, ChevronRight, Book, Users,
-} from 'lucide-react-native';
+} from '../components/icons';
 import type { RootStackParamList } from '../navigation/types';
 import type {
   ContactCard, ContactEmail, ContactPhone, ContactAddress, ContactOrganization,

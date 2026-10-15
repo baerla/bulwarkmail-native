@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { CheckCircle2, RefreshCw, XCircle } from 'lucide-react-native';
+import { CheckCircle2, RefreshCw, XCircle } from '../icons';
 import Button from '../Button';
 import Dialog from '../Dialog';
 import { SettingsSection, SettingItem, ToggleSwitch } from './settings-section';

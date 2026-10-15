@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { Trash2, UserPlus, Users } from 'lucide-react-native';
+import { Trash2, UserPlus, Users } from '../icons';
 import { getPrincipals, ownPrincipalId } from '../../api/files';
 import type { Calendar, CalendarRights, Principal } from '../../api/types';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

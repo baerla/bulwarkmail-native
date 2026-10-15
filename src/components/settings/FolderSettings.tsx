@@ -13,7 +13,7 @@ import {
 import {
   Folder, Inbox, Send, FileText, Trash, ShieldAlert, Archive, Flag, Star, Mails,
   StickyNote, Clock, AlarmClock, Users, Plus, Pencil, Trash2, X,
-} from 'lucide-react-native';
+} from '../icons';
 import { SettingsSection, Select } from './settings-section';
 import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput } from 'react-native';
 import {
   Plus, Pencil, Trash2, Globe, ExternalLink, PanelRight, GripVertical,
-} from 'lucide-react-native';
+} from '../icons';
 import { SettingsSection, SettingItem, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, Easing, TextInput, ActivityIndicator, Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X, Plus, RefreshCw, Trash2, Rss, AlertTriangle } from 'lucide-react-native';
+import { X, Plus, RefreshCw, Trash2, Rss, AlertTriangle } from '../icons';
 import { formatDistanceToNow } from 'date-fns';
 import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

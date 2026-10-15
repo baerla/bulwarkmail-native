@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import { File as FileIcon, FileArchive, FileImage, FileSpreadsheet, FileText } from 'lucide-react-native';
+import { File as FileIcon, FileArchive, FileImage, FileSpreadsheet, FileText } from '../icons';
 import type { Attachment, Email, Mailbox } from '../../api/types';
 import { getEmailAttachments } from '../../api/email';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';

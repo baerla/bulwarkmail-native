@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFloatingCardFrame } from '../lib/use-layout';
-import { AlertCircle, AlertTriangle, CheckCircle2, Info } from 'lucide-react-native';
+import { AlertCircle, AlertTriangle, CheckCircle2, Info } from './icons';
 import { spacing, radius, type ThemePalette } from '../theme/tokens';
 import { useColors, useResolvedTheme } from '../theme/colors';
 import { useShouldAnimate } from '../theme/dynamic';

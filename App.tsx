@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator, type NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Mail, Calendar, BookUser, HardDrive, Settings } from 'lucide-react-native';
+import { Mail, Calendar, BookUser, HardDrive, Settings } from './src/components/icons';
 
 import { startLiveUpdates, type LiveUpdatesHandle } from './src/api/push-stream';
 import { jmapClient } from './src/api/jmap-client';

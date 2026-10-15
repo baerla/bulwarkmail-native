@@ -4,7 +4,7 @@ import {
   Animated, Dimensions, Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, X, Check } from 'lucide-react-native';
+import { Search, X, Check } from '../icons';
 import type { ContactCard } from '../../api/types';
 import {
   useContactsStore,

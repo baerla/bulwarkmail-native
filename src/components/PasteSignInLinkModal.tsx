@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
-import { ClipboardPaste, X } from 'lucide-react-native';
+import { ClipboardPaste, X } from './icons';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import Button from './Button';

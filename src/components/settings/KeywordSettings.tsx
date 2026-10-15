@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { Plus, Pencil, Trash2, Check, X, RotateCcw, ScanSearch } from 'lucide-react-native';
+import { Plus, Pencil, Trash2, Check, X, RotateCcw, ScanSearch } from '../icons';
 import { SettingsSection } from './settings-section';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

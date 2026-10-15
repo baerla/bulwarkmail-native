@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Clock, MapPin, Users } from 'lucide-react-native';
+import { Clock, MapPin, Users } from '../icons';
 import { format } from 'date-fns';
 import type { Calendar, CalendarEvent } from '../../api/types';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';

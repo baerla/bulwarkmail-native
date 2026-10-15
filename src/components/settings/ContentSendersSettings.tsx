@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, Pressable, TextInput, FlatList, Modal, Alert,
 } from 'react-native';
-import { ChevronRight, X, Plus, Trash2, BookUser } from 'lucide-react-native';
+import { ChevronRight, X, Plus, Trash2, BookUser } from '../icons';
 import { SettingsSection, SettingItem, RadioGroup, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

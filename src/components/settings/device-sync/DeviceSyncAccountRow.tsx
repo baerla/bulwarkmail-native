@@ -7,7 +7,7 @@ import React from 'react';
 import { Alert, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AlertTriangle, RefreshCw, Settings as SettingsIcon, XCircle } from 'lucide-react-native';
+import { AlertTriangle, RefreshCw, Settings as SettingsIcon, XCircle } from '../../icons';
 import { SettingItem, Select, RadioGroup, ToggleSwitch } from '../settings-section';
 import Button from '../../Button';
 import Dialog from '../../Dialog';

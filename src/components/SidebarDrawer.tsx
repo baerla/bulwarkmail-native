@@ -10,8 +10,8 @@ import {
   Folder, FolderOpen, ChevronDown, ChevronRight, X, Settings, LogOut, Check, Plus,
   Clock, Layers, Users, Tag, Mails, MailOpen, StickyNote, AlarmClock, Flag,
   CheckCheck, Eraser, FolderPlus, Pencil, AlertTriangle, UserMinus,
-  type LucideIcon,
-} from 'lucide-react-native';
+  type AppIcon,
+} from './icons';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { useAnimDuration } from '../theme/dynamic';
@@ -65,7 +65,7 @@ function iconFor(
   name: string | undefined,
   hasChildren: boolean,
   isExpanded: boolean,
-): LucideIcon {
+): AppIcon {
   switch (role) {
     case 'inbox': return Inbox;
     case 'sent': return Send;
@@ -224,7 +224,7 @@ function SidebarRow({
 interface SheetAction {
   key: string;
   label: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   destructive?: boolean;
   onPress: () => void;
 }
@@ -685,7 +685,7 @@ export default function SidebarDrawer({ visible, onClose, docked = false }: Side
     };
   }, [mailboxes, accountSnapshots, activeAccountId, unifiedCrossAccount, includeGroupInUnified]);
 
-  const unifiedIcon = (role: UnifiedRole): LucideIcon => iconFor(role, undefined, false, false);
+  const unifiedIcon = (role: UnifiedRole): AppIcon => iconFor(role, undefined, false, false);
 
   const slideX = React.useRef(new Animated.Value(-Dimensions.get('window').width)).current;
   const overlayOpacity = React.useRef(new Animated.Value(0)).current;

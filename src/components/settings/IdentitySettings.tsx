@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Plus, Star, Trash2, X } from 'lucide-react-native';
+import { Plus, Star, Trash2, X } from '../icons';
 import { SettingsSection } from './settings-section';
 import Button from '../Button';
 import { typography, spacing, radius, type ThemePalette } from '../../theme/tokens';

@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { CloudDownload, ExternalLink } from 'lucide-react-native';
+import { CloudDownload, ExternalLink } from '../icons';
 import { SettingsSection, SettingItem, Select, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import Dialog from '../Dialog';

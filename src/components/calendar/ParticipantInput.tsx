@@ -7,7 +7,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import { X } from 'lucide-react-native';
+import { X } from '../icons';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useContactsStore } from '../../stores/contacts-store';

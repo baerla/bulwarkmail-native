@@ -8,7 +8,7 @@ import {
   ScrollView,
   ViewStyle,
 } from 'react-native';
-import { FlaskConical, Lock, ChevronDown, Check } from 'lucide-react-native';
+import { FlaskConical, Lock, ChevronDown, Check } from '../icons';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import ToggleSwitchComponent from '../ToggleSwitch';

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import {
   Star, ChevronDown, ChevronUp, Reply, Forward, ShieldCheck, ShieldAlert, ShieldQuestion, Lock,
-} from 'lucide-react-native';
+} from '../icons';
 import type { Email, EmailAddress, Identity } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

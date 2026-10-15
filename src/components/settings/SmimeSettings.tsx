@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { KeyRound } from 'lucide-react-native';
+import { KeyRound } from '../icons';
 import { SettingsSection } from './settings-section';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

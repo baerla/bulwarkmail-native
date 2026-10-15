@@ -8,7 +8,7 @@ import {
   Star, Paperclip, Mail as MailIcon, MailOpen, Trash2, RotateCcw, CalendarDays,
   Archive, FolderInput, Tag, Import, ArrowDownWideNarrow, ArrowUpNarrowWide,
   Pin, Reply, Forward, ShieldAlert, ShieldCheck, Folder,
-} from 'lucide-react-native';
+} from '../components/icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';

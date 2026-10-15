@@ -9,8 +9,8 @@ import {
   Filter, FileText, FolderOpen, Tags, HardDrive,
   BookUser, KeyRound, PanelLeftClose, Bell, Puzzle, RefreshCw,
   LayoutGrid, BookOpen, PenLine, EyeOff, Languages, Info, Download,
-  type LucideIcon,
-} from 'lucide-react-native';
+  type AppIcon,
+} from '../components/icons';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { ReadingSettings } from '../components/settings/ReadingSettings';
@@ -62,7 +62,7 @@ type TabGroup = 'general' | 'appearance' | 'mail' | 'privacy' | 'apps' | 'advanc
 interface TabDef {
   id: Tab;
   label: string;
-  icon: LucideIcon;
+  icon: AppIcon;
   group: TabGroup;
   experimental?: boolean;
   implemented: boolean;

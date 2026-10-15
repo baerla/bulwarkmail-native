@@ -25,7 +25,7 @@ import {
   Users,
   Trash2,
   AlignLeft,
-} from 'lucide-react-native';
+} from '../icons';
 import { addHours, addMinutes, format } from 'date-fns';
 import type {
   Alert,

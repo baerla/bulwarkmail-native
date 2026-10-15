@@ -8,7 +8,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ArrowLeft, Edit2, Trash2, Plus, Users, Mail, UserMinus,
-} from 'lucide-react-native';
+} from '../components/icons';
 import type { RootStackParamList } from '../navigation/types';
 import type { ContactCard } from '../api/types';
 import {

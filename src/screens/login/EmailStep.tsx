@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Mail } from 'lucide-react-native';
+import { Mail } from '../../components/icons';
 import { spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { Button, Input } from '../../components';

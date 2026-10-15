@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system/legacy';
-import { Upload, X, Check, FileText, AlertTriangle, BookUser } from 'lucide-react-native';
+import { Upload, X, Check, FileText, AlertTriangle, BookUser } from '../icons';
 import type { ContactCard } from '../../api/types';
 import { parseVCard, detectDuplicates } from '../../lib/vcard';
 import { getContactDisplayName, getContactPrimaryEmail } from '../../lib/contact-utils';

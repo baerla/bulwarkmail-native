@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, Alert, Modal, Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Clock, MoreHorizontal } from 'lucide-react-native';
+import { ArrowLeft, Clock, MoreHorizontal } from '../components/icons';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';

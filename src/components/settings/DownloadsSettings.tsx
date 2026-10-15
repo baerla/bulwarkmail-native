@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { RotateCcw } from 'lucide-react-native';
+import { RotateCcw } from '../icons';
 import { SettingsSection, SettingItem, RadioGroup, ToggleSwitch } from './settings-section';
 import Input from '../Input';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, AlertTriangle, CheckCircle } from 'lucide-react-native';
+import { X, AlertTriangle, CheckCircle } from '../icons';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import Button from '../Button';

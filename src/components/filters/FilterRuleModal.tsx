@@ -4,7 +4,7 @@ import {
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { X, Plus, Trash2 } from 'lucide-react-native';
+import { X, Plus, Trash2 } from '../icons';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { Select, ToggleSwitch } from '../settings/settings-section';

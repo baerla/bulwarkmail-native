@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, TextInput, type TextInputProps } from 'react-native';
-import { AlertTriangle } from 'lucide-react-native';
+import { AlertTriangle } from './icons';
 import Button from './Button';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';

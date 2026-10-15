@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, Easing,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X, Check, Tag } from 'lucide-react-native';
+import { X, Check, Tag } from './icons';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
 import { useSheetDrag } from '../lib/use-sheet-drag';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Paperclip, Reply, ReplyAll, Forward, Star } from 'lucide-react-native';
+import { Paperclip, Reply, ReplyAll, Forward, Star } from '../icons';
 import type { Email } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

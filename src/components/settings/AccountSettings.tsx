@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ArrowDown, ArrowUp, Check, ChevronRight, Plus, Star, Trash2, Users } from 'lucide-react-native';
+import { ArrowDown, ArrowUp, Check, ChevronRight, Plus, Star, Trash2, Users } from '../icons';
 import { SettingsSection, SettingItem } from './settings-section';
 import Button from '../Button';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';

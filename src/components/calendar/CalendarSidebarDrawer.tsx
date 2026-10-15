@@ -13,8 +13,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Check, X, Upload, Rss, Shuffle, Star, Plus, Pencil, Share2, Eraser, Trash2, RefreshCw,
-  type LucideIcon,
-} from 'lucide-react-native';
+  type AppIcon,
+} from '../icons';
 import type { Calendar } from '../../api/types';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
@@ -29,7 +29,7 @@ import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 export interface DrawerViewOption {
   key: string;
   label: string;
-  Icon: LucideIcon;
+  Icon: AppIcon;
 }
 
 interface CalendarSidebarDrawerProps {

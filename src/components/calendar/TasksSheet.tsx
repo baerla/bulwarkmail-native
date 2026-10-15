@@ -24,7 +24,7 @@ import {
   Plus,
   Trash2,
   X,
-} from 'lucide-react-native';
+} from '../icons';
 import { format, isBefore, startOfDay } from 'date-fns';
 import type { Calendar, CalendarEvent } from '../../api/types';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';

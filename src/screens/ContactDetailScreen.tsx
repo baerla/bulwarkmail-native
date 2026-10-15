@@ -14,7 +14,7 @@ import {
   Building, Cake, Heart, Globe, Tag, Users, FileText, BookUser,
   Copy, MoreHorizontal, Calendar as CalendarIcon, UserCircle, Languages,
   Clock, KeyRound, FolderInput, Plus,
-} from 'lucide-react-native';
+} from '../components/icons';
 import type { RootStackParamList } from '../navigation/types';
 import { openExternalUrl } from '../lib/open-url';
 import type { ContactCard } from '../api/types';

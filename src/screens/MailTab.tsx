@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Mail } from 'lucide-react-native';
+import { Mail } from '../components/icons';
 
 import EmailListScreen from './EmailListScreen';
 import EmailThreadScreen from './EmailThreadScreen';

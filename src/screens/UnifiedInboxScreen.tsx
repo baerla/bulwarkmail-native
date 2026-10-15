@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   ArrowLeft, Star, Paperclip, AlertTriangle, Search, X, Square, SquareCheck,
   Mail as MailIcon, MailOpen, Archive, Trash2, ShieldAlert, ShieldCheck, Folder,
-} from 'lucide-react-native';
+} from '../components/icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import SenderAvatar from '../components/SenderAvatar';

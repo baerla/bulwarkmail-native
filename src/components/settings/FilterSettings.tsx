@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert } from 'rea
 import {
   Plus, X, Code, AlertTriangle, Filter, RotateCcw, Lock,
   ChevronUp, ChevronDown, Palmtree, ChevronRight,
-} from 'lucide-react-native';
+} from '../icons';
 import { SettingsSection, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

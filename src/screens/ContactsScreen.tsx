@@ -21,7 +21,7 @@ import { listBackStep } from '../lib/list-back';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   Search, Plus, UserCircle, X, Menu, Trash2, Tag, FolderInput, Upload, CheckSquare, Share2,
-} from 'lucide-react-native';
+} from '../components/icons';
 import type { RootStackParamList } from '../navigation/types';
 import type { ContactCard } from '../api/types';
 import {

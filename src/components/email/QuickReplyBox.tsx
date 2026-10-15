@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator, Alert, Keyboard } from 'react-native';
-import { Send, Maximize2 } from 'lucide-react-native';
+import { Send, Maximize2 } from '../icons';
 import type { Email } from '../../api/types';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

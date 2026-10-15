@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator, Alert 
 import { WebView } from 'react-native-webview';
 import {
   AlertTriangle, Eye, EyeOff, Bold, Italic, Underline, List as ListIcon,
-} from 'lucide-react-native';
+} from '../icons';
 import { SettingsSection, SettingItem, ToggleSwitch } from './settings-section';
 import Button from '../Button';
 import RichTextEditor, { type RichTextEditorHandle } from '../RichTextEditor';

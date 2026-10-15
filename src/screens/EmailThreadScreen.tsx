@@ -12,7 +12,7 @@ import {
   ChevronLeft, ChevronRight, Archive, Mail, MailOpen,
   FolderInput, ShieldAlert, ShieldCheck, X, Check,
   Code, Download, Tag, Sun, Moon, FileInput, UserRoundPlus,
-} from 'lucide-react-native';
+} from '../components/icons';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
 import { useColors, useResolvedTheme } from '../theme/colors';
 import { MoveSheet } from '../components/MoveSheet';

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
-import { ArrowLeft, X } from 'lucide-react-native';
+import { ArrowLeft, X } from '../../components/icons';
 import { spacing, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';

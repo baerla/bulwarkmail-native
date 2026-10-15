@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { Check } from '../icons';
 import type { Calendar } from '../../api/types';
 import { radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';

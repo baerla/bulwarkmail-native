@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { Paperclip, Download, Eye, ExternalLink, Save, Share2, FolderArchive } from 'lucide-react-native';
+import { Paperclip, Download, Eye, ExternalLink, Save, Share2, FolderArchive } from '../icons';
 import type { File } from 'expo-file-system';
 import type { Attachment, Email } from '../../api/types';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';

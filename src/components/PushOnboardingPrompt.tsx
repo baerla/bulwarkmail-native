@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFloatingCardFrame } from '../lib/use-layout';
-import { BellRing, X } from 'lucide-react-native';
+import { BellRing, X } from './icons';
 import Button from './Button';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';

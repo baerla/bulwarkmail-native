@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, ActivityIndicator, Pressable, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Share2, Copy, Check } from 'lucide-react-native';
+import { ArrowLeft, Share2, Copy, Check } from '../components/icons';
 import * as Clipboard from 'expo-clipboard';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';

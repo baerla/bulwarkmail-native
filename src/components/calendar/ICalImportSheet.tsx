@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, Easing, Alert, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Upload, X, Check, CalendarPlus, AlertTriangle, Clock } from 'lucide-react-native';
+import { Upload, X, Check, CalendarPlus, AlertTriangle, Clock } from '../icons';
 import { format, parseISO } from 'date-fns';
 import type { Calendar, CalendarEvent } from '../../api/types';
 import { uploadBlob } from '../../api/blob';

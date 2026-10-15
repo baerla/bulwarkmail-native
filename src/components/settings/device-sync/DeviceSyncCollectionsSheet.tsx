@@ -8,7 +8,7 @@ import {
   ActivityIndicator, Animated, Easing, Modal, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AlertTriangle, Check, X } from 'lucide-react-native';
+import { AlertTriangle, Check, X } from '../../icons';
 import Button from '../../Button';
 import { spacing, radius, typography, type ThemePalette } from '../../../theme/tokens';
 import { useColors } from '../../../theme/colors';

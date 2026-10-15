@@ -12,7 +12,7 @@ import {
   Heading1, Heading2, AlignLeft, AlignCenter, AlignRight, RemoveFormatting,
   Undo2, Redo2, FileText, Clock, Check, Palette, Table, LayoutTemplate, MailCheck,
   Users, Tag, Type, Highlighter,
-} from 'lucide-react-native';
+} from '../components/icons';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';

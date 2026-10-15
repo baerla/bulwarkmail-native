@@ -3,7 +3,7 @@ import { View, StyleSheet, Linking, Platform, Text, Pressable, useWindowDimensio
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Image as ImageIcon, ShieldCheck } from 'lucide-react-native';
+import { Image as ImageIcon, ShieldCheck } from './icons';
 import type { Email } from '../api/types';
 import { extractCidRefs } from '../lib/email-html';
 import { hasTruncatedDisplayedBody, pickEmailBody, selectRenderableHtml } from '../lib/email-body';

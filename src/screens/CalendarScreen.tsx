@@ -24,7 +24,7 @@ import {
   Menu,
   Rows2,
   Square,
-} from 'lucide-react-native';
+} from '../components/icons';
 import {
   format,
   addDays,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
-import { Check, Users } from 'lucide-react-native';
+import { Check, Users } from '../icons';
 import type { ContactCard } from '../../api/types';
 import {
   getContactDisplayName,

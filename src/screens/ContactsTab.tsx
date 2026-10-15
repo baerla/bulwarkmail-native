@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useNavigation, type NavigationProp, type ParamListBase } from '@react-navigation/native';
-import { BookUser } from 'lucide-react-native';
+import { BookUser } from '../components/icons';
 
 import ContactsScreen from './ContactsScreen';
 import ContactDetailScreen from './ContactDetailScreen';

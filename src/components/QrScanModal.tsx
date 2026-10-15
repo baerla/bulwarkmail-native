@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet, Modal, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
-import { X } from 'lucide-react-native';
+import { X } from './icons';
 import { spacing, radius, typography, type ThemePalette } from '../theme/tokens';
 import { useColors, useResolvedTheme } from '../theme/colors';
 import Button from './Button';

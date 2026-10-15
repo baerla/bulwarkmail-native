@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
-import { CalendarPlus, CircleCheck, Plus } from 'lucide-react-native';
+import { CalendarPlus, CircleCheck, Plus } from '../icons';
 import { componentSizes, radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useAnimDuration } from '../../theme/dynamic';

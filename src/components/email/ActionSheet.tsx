@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Modal, Animated, Easing } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X } from 'lucide-react-native';
+import { X } from '../icons';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useSheetDrag } from '../../lib/use-sheet-drag';

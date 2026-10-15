@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   X, Users, Tag, BookUser, Inbox, ChevronDown, ChevronRight, Plus, Share2, Check,
-} from 'lucide-react-native';
+} from '../icons';
 import type { RootStackParamList } from '../../navigation/types';
 import type { AddressBook } from '../../api/types';
 import type { ContactCategory } from '../../stores/contacts-store';
