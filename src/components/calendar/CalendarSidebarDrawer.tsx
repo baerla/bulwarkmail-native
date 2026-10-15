@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  Check, X, Upload, Rss, Shuffle, Star, Plus, Pencil, Share2, Eraser, Trash2, RefreshCw,
+  Check, X, Upload, Rss, Shuffle, Star, Plus, Pencil, Share2, Eraser, Trash2, RefreshCw, ArrowUp, ArrowDown,
   type AppIcon,
 } from '../icons';
 import type { Calendar } from '../../api/types';
@@ -55,6 +55,9 @@ interface CalendarSidebarDrawerProps {
   onShare?: (calendar: Calendar) => void;
   onClear?: (calendar: Calendar) => void;
   onDelete?: (calendar: Calendar) => void;
+  // Move one of the user's own calendars next to `targetId`, a neighbour in
+  // the same section (before it when moving up, after it when moving down).
+  onMove?: (calendar: Calendar, targetId: string) => void;
   // Client-side iCal subscriptions are managed from the subscriptions sheet.
   isSubscriptionCalendar?: (calendarId: string) => boolean;
 }
@@ -79,6 +82,7 @@ export function CalendarSidebarDrawer({
   onShare,
   onClear,
   onDelete,
+  onMove,
   isSubscriptionCalendar,
 }: CalendarSidebarDrawerProps) {
   const c = useColors();
@@ -148,6 +152,7 @@ export function CalendarSidebarDrawer({
     onShare,
     onClear,
     onDelete,
+    onMove,
     isSubscriptionCalendar,
   };
 
@@ -284,6 +289,7 @@ function Section({
   onShare,
   onClear,
   onDelete,
+  onMove,
   isSubscriptionCalendar,
 }: {
   title: string;
@@ -299,11 +305,14 @@ function Section({
   onShare?: (calendar: Calendar) => void;
   onClear?: (calendar: Calendar) => void;
   onDelete?: (calendar: Calendar) => void;
+  onMove?: (calendar: Calendar, targetId: string) => void;
   isSubscriptionCalendar?: (calendarId: string) => boolean;
 }) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
+  // Neighbours a calendar can move past: the server calendars of this section.
+  const orderable = calendars.filter((cal) => cal.id !== BIRTHDAY_CALENDAR_ID);
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -320,7 +329,11 @@ function Section({
         const canClear = !!onClear && isOwn && isWritableCalendar(cal);
         // Like webmail: the default calendar and shared calendars can't be deleted.
         const canDelete = !!onDelete && isOwn && !cal.isDefault && (!cal.myRights || cal.myRights.mayDelete !== false);
-        const hasActions = canSetDefault || canRecolor || canRename || canShare || canClear || canDelete;
+        const orderIndex = orderable.indexOf(cal);
+        const previousId = isOwn && orderIndex > 0 ? orderable[orderIndex - 1].id : undefined;
+        const nextId = isOwn && orderIndex >= 0 ? orderable[orderIndex + 1]?.id : undefined;
+        const canMove = !!onMove && (!!previousId || !!nextId);
+        const hasActions = canSetDefault || canRecolor || canRename || canShare || canClear || canDelete || canMove;
         const expanded = expandedId === cal.id && hasActions;
         return (
           <View key={cal.id}>
@@ -355,6 +368,27 @@ function Section({
 
             {expanded && (
               <View style={styles.actionsPanel}>
+                {/* The panel stays open so a calendar can be moved several places. */}
+                {canMove && previousId && (
+                  <Pressable
+                    onPress={() => onMove!(cal, previousId)}
+                    style={({ pressed }) => [styles.panelRow, pressed && styles.rowPressed]}
+                    accessibilityRole="button"
+                  >
+                    <ArrowUp size={16} color={c.textSecondary} />
+                    <Text style={styles.panelRowText}>{t('settings.account.accounts.move_up', 'Move up')}</Text>
+                  </Pressable>
+                )}
+                {canMove && nextId && (
+                  <Pressable
+                    onPress={() => onMove!(cal, nextId)}
+                    style={({ pressed }) => [styles.panelRow, pressed && styles.rowPressed]}
+                    accessibilityRole="button"
+                  >
+                    <ArrowDown size={16} color={c.textSecondary} />
+                    <Text style={styles.panelRowText}>{t('settings.account.accounts.move_down', 'Move down')}</Text>
+                  </Pressable>
+                )}
                 {canSetDefault && (
                   <Pressable
                     onPress={() => { onExpand(null); onSetDefault!(cal); }}
