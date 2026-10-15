@@ -316,6 +316,38 @@ const EmailListItem = React.memo(function EmailListItem({
   );
 });
 
+/**
+ * A text filter that applies once typing pauses (or on Return), like the main
+ * search: applying every keystroke ran a server query per character.
+ */
+function DebouncedFilterInput({
+  value,
+  onCommit,
+  ...props
+}: Omit<React.ComponentProps<typeof TextInput>, 'value' | 'onChangeText'> & {
+  value: string;
+  onCommit: (value: string) => void;
+}) {
+  const [text, setText] = React.useState(value);
+  React.useEffect(() => { setText(value); }, [value]);
+  const commitRef = React.useRef(onCommit);
+  commitRef.current = onCommit;
+  React.useEffect(() => {
+    if (text === value) return undefined;
+    const id = setTimeout(() => commitRef.current(text), 600);
+    return () => clearTimeout(id);
+  }, [text, value]);
+  return (
+    <TextInput
+      {...props}
+      value={text}
+      onChangeText={setText}
+      returnKeyType="search"
+      onSubmitEditing={() => { if (text !== value) onCommit(text); }}
+    />
+  );
+}
+
 function EmailRowSeparator() {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
@@ -1575,9 +1607,9 @@ export default function EmailListScreen({
                   <View style={styles.filterFieldRow}>
                     <View style={styles.filterFieldHalf}>
                       <Text style={styles.filterFieldLabel}>{t('advanced_search.from', 'From')}</Text>
-                      <TextInput
+                      <DebouncedFilterInput
                         value={filters.from ?? ''}
-                        onChangeText={(v) => setFilterField('from', v)}
+                        onCommit={(v) => setFilterField('from', v)}
                         placeholder={t('advanced_search.from_placeholder', 'Sender email or name')}
                         placeholderTextColor={c.textMuted}
                         autoCapitalize="none"
@@ -1587,9 +1619,9 @@ export default function EmailListScreen({
                     </View>
                     <View style={styles.filterFieldHalf}>
                       <Text style={styles.filterFieldLabel}>{t('advanced_search.to', 'To')}</Text>
-                      <TextInput
+                      <DebouncedFilterInput
                         value={filters.to ?? ''}
-                        onChangeText={(v) => setFilterField('to', v)}
+                        onCommit={(v) => setFilterField('to', v)}
                         placeholder={t('advanced_search.to_placeholder', 'Recipient email or name')}
                         placeholderTextColor={c.textMuted}
                         autoCapitalize="none"
@@ -1601,9 +1633,9 @@ export default function EmailListScreen({
 
                   <View>
                     <Text style={styles.filterFieldLabel}>{t('advanced_search.subject', 'Subject')}</Text>
-                    <TextInput
+                    <DebouncedFilterInput
                       value={filters.subject ?? ''}
-                      onChangeText={(v) => setFilterField('subject', v)}
+                      onCommit={(v) => setFilterField('subject', v)}
                       placeholder={t('advanced_search.subject_placeholder', 'Subject contains...')}
                       placeholderTextColor={c.textMuted}
                       style={styles.filterFieldInput}
@@ -1612,9 +1644,9 @@ export default function EmailListScreen({
 
                   <View>
                     <Text style={styles.filterFieldLabel}>{t('advanced_search.body', 'Body')}</Text>
-                    <TextInput
+                    <DebouncedFilterInput
                       value={filters.body ?? ''}
-                      onChangeText={(v) => setFilterField('body', v)}
+                      onCommit={(v) => setFilterField('body', v)}
                       placeholder={t('advanced_search.body_placeholder', 'Body contains...')}
                       placeholderTextColor={c.textMuted}
                       style={styles.filterFieldInput}
