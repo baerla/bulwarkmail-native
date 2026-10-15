@@ -462,6 +462,7 @@
     "share_no_matches": "No matches",
     "share_no_users": "No other users found",
     "share_remove": "Remove access",
+    "share_remove_confirm": "Remove access?",
     "share_role_custom": "Custom",
     "share_search_placeholder": "Search by name or email",
     "share_unavailable": "Sharing is not available on this device",

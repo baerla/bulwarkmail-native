@@ -449,6 +449,7 @@
     "share_no_matches": "Keine Treffer",
     "share_no_users": "Keine anderen Benutzer gefunden",
     "share_remove": "Zugriff entfernen",
+    "share_remove_confirm": "Zugriff entfernen?",
     "share_role_custom": "Benutzerdefiniert",
     "share_search_placeholder": "Nach Name oder E-Mail suchen",
     "share_unavailable": "Teilen ist auf diesem Gerät nicht verfügbar",

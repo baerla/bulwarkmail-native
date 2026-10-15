@@ -214,8 +214,21 @@ export default function ShareSheet({ node, onClose, onChanged }: ShareSheetProps
                             <ActivityIndicator size="small" color={c.textMuted} />
                           ) : (
                             <Pressable
-                              onPress={() => void applyShare(principalId, null)}
+                              // Revoking access is immediate on the server: ask first.
+                              onPress={() => Alert.alert(
+                                t('files.share_remove_confirm', 'Remove access?'),
+                                undefined,
+                                [
+                                  { text: t('common.cancel', 'Cancel'), style: 'cancel' },
+                                  {
+                                    text: t('files.share_remove', 'Remove access'),
+                                    style: 'destructive',
+                                    onPress: () => { void applyShare(principalId, null); },
+                                  },
+                                ],
+                              )}
                               hitSlop={8}
+                              accessibilityRole="button"
                               accessibilityLabel={t('files.share_remove', 'Remove access')}
                             >
                               <Trash2 size={18} color={c.error} />
