@@ -251,7 +251,7 @@ carries the commit that fixed it.
 - [x] **U-008 · P2 · all · After a cold start in German, the tab labels and the folder title stay
   English.** *(fixed in 512a28c)* The search placeholder is German. Screenshot `t_layo`.
   - Fix: re-render the tab labels and the title when the locale store hydrates.
-- [ ] **U-009 · P2 · TL TP (font 1.3) · Tab labels truncate with plenty of room.**
+- [x] **U-009 · P2 · TL TP (font 1.3) · Tab labels truncate with plenty of room.** *(fixed in 802474d)*
   - Example: "E-…", "Kalen…", "Einstellu…" in 256 dp-wide tabs (`q_de_mail`).
   - The label sits beside the icon with a fixed font size and no width.
   - Fix: let the label size itself; on wide screens use the side rail (phase 2).
@@ -273,7 +273,7 @@ carries the commit that fixed it.
   - Fix: use `c.tags`.
 - [x] **U-014 · P2 · all · `Button` has no `accessibilityRole` and no disabled or busy state.** *(fixed in f891bf3)*
   - Where: `Button.tsx:35`. This affects every dialog and prompt button.
-- [ ] **U-015 · P2 · all · Many icon buttons are under 48 dp.** *(partly fixed in c8434b0 (thread back, login header, Files header and row menu, account icons, switches, drawer chevron and folder icon, search clear, recipient chip, quick reply))*
+- [x] **U-015 · P2 · all · Many icon buttons are under 48 dp.** *(fixed in c8434b0,776447d)* *(partly fixed in c8434b0 (thread back, login header, Files header and row menu, account icons, switches, drawer chevron and folder icon, search clear, recipient chip, quick reply))*
   - Mail search clear 36, recent-search remove 28, filter chip remove 32, attachment chips about 22,
     drawer chevron 32.
   - Viewer: card pills about 36, collapse handle 18, quick-reply Send 28, subject star 34.
@@ -285,11 +285,11 @@ carries the commit that fixed it.
   - Lists with `file:line` are in the code passes; the fix commits name the places.
   - Fix: a shared 48 dp target (box plus `hitSlop`), applied screen by screen.
 - [ ] **U-016 · P3 · all · Sheet and dialog scrims are a literal `rgba(0,0,0,0.5)` in about 20
-  files.** Fix: an `overlay` token.
-- [ ] **U-017 · P3 · all · Some confirmations use the system alert, others the app's `Dialog`.**
+  files.** *(deferred: all scrims are already the same black at 0.5 on both themes; a token is a refactor with no visible change)* Fix: an `overlay` token.
+- [ ] **U-017 · P3 · all · Some confirmations use the system alert, others the app's `Dialog`.** *(deferred: switching every confirmation to Dialog changes a lot of flows for a style difference only; see product questions)*
   Examples: compose discard, event delete, folder empty. This is a style mismatch.
 - [ ] **U-018 · P3 · all · Changing the system font size while the app is open recreates the activity
-  and resets navigation to the mail list.** Text measured before the change can stay clipped until
+  and resets navigation to the mail list.** *(deferred: handling fontScale in the app (configChanges) was tried and left a mix of old and new text sizes until a restart, worse than Android's default recreate; needs RN to re-measure on a font scale change)* Text measured before the change can stay clipped until
   the next restart ("Layo" for "Layout").
 
 ### Mail list, drawer, unified inbox, scheduled
@@ -303,7 +303,7 @@ carries the commit that fixed it.
   - The 56 dp header, the 56 dp search row and the 64 dp tab bar take most of the 411 dp.
   - The compose FAB covers the second row. Screenshot `q_mail_list` PL.
   - Fix: in compact height, merge the title and search into one row and drop the tab labels.
-- [ ] **U-022 · P2 · PL (font 1.3) · Rows cut the sender to three letters and clip the time.**
+- [x] **U-022 · P2 · PL (font 1.3) · Rows cut the sender to three letters and clip the time.** *(no change needed: after a restart at 1.3 the rows keep the full time and name; the clipping was stale measurement from changing the font size live, see U-018)*
   - Example: "Us…", "17:4" (`q_de_mail` PL).
   - Where: the row header in `EmailListScreen.tsx` around 158-250.
   - Fix: let the time keep its width (`flexShrink: 0`) and let the name shrink.
@@ -328,14 +328,14 @@ carries the commit that fixed it.
   - Fix: debounce like the main search; add next/search return keys.
 - [x] **U-028 · P2 · PP PL · The unified inbox and Scheduled lists end under the gesture bar.** *(fixed in 984c359)*
   - Where: `UnifiedInboxScreen.tsx:384`, `ScheduledScreen.tsx:278` (top edge only, fixed padding).
-- [ ] **U-029 · P2 · all · Unified inbox rows ignore the font-size, density and preview settings.**
+- [x] **U-029 · P2 · all · Unified inbox rows ignore the font-size, density and preview settings.** *(fixed in 52eb18d)*
   - Where: `UnifiedInboxScreen.tsx:576`.
   - Its load and open failures are silent (`:103-112`, `:179-206`).
-- [ ] **U-030 · P3 · all · The menu button keeps a grey focus box after the drawer closes.**
+- [x] **U-030 · P3 · all · The menu button keeps a grey focus box after the drawer closes.** *(no change needed: did not reproduce after the drawer and rail changes; the button shows no focus box after closing the drawer by tap or Back)*
   Screenshot `q_search_results`.
-- [ ] **U-031 · P3 · PP · The selection header holds up to 7 buttons; its count has no
-  `numberOfLines`.** Where: `EmailListScreen.tsx:982-1066`.
-- [ ] **U-032 · P3 · all · Folders under a hidden empty parent show flattened at the top level.**
+- [x] **U-031 · P3 · PP · The selection header holds up to 7 buttons; its count has no
+  `numberOfLines`.** *(fixed in 0d96d8d)* Where: `EmailListScreen.tsx:982-1066`.
+- [x] **U-032 · P3 · all · Folders under a hidden empty parent show flattened at the top level.** *(no change needed: the tree only lifts a folder whose parent the server does not return; usera has no Clients folder, and on uxaudit Q4 nests under Clients / ACME / 2026)*
   - Example: "Q4 contracts" without Clients / ACME / 2026 (`q_drawer` PP).
   - This happens with "hide empty folders" on. To check before changing anything.
 
@@ -364,7 +364,7 @@ carries the commit that fixed it.
 - [x] **U-044 · P2 · PP (German, 1.3) · The toolbar overflows and pushes More off screen.** *(fixed in 975ed08)*
   - "Stern hinzufügen" is long (`d_de_thread`).
   - Fix: drop the toolbar labels when they don't fit; keep the a11y labels.
-- [ ] **U-045 · P3 · German · Prev/Next read "Zurück"/"Weiter".**
+- [ ] **U-045 · P3 · German · Prev/Next read "Zurück"/"Weiter".** *(deferred: the strings come from the vendored webmail catalog (locales/de/common.json); the fix belongs in the webmail's German translation)*
   - "Zurück" reads as Back. "Allen antworten" wraps in the bottom bar.
   - Fix: "Vorherige"/"Nächste" (locale), and a single line with shrinking text.
 - [x] **U-046 · P2 · all · The tag sheet doesn't scroll.** *(fixed in b59d00f)*
@@ -407,7 +407,7 @@ carries the commit that fixed it.
   with the usual "-- " delimiter and the composer adds its own separator above it (screenshot
   `t_compose_panel`).
   - Fix: don't add a separator to a signature that already starts with one.
-- [ ] **U-069 · P2 · PL · Recipient suggestions can't show in phone landscape.** With the keyboard
+- [ ] **U-069 · P2 · PL · Recipient suggestions can't show in phone landscape.** *(deferred: with the keyboard up a phone in landscape has about 100 dp left; suggestions need a different design (a full-screen picker), which is a feature)* With the keyboard
   up, about 50 dp are left under the To field, so the suggestion list is hidden behind the
   keyboard. Typing a full address still works.
 ### Calendar
@@ -435,22 +435,24 @@ carries the commit that fixed it.
   - Deleting a single event (`CalendarScreen.tsx:632`, `EventModal.tsx:371`).
   - Deleting a task (`TasksSheet.tsx:427`).
   - Unsubscribing from a feed, which also deletes its calendar (`ICalSubscriptionSheet.tsx:278`).
-- [ ] **U-085 · P2 · all · Cancelling the recurrence-scope dialog after editing a recurring event
-  throws the edits away.** Where: `CalendarScreen.tsx:786-790`.
+- [x] **U-085 · P2 · all · Cancelling the recurrence-scope dialog after editing a recurring event
+  throws the edits away.** *(fixed in 72b4f4a)* Where: `CalendarScreen.tsx:786-790`.
 - [x] **U-086 · P2 · TL TP · Wide screens get wider columns, not more days.** *(fixed in 2288d28)* 3 days stays 3 and
   day stays 1. Fix: phase 2.
 - [x] **U-087 · P2 · PL · The month dropdown is a fixed 346 dp tall and sized from the window.** *(fixed in bfa02f1)*
   - It overflows in landscape and lands on a half page after rotation.
   - Where: `MonthDropdown.tsx:23,52,72`.
-- [ ] **U-088 · P3 · all · Times and dates use English formats in other languages.**
+- [x] **U-088 · P3 · all · Times and dates use English formats in other languages.** *(fixed in cf7275c)*
   - Hour labels hard-code AM/PM (`TimeGridScrollView.tsx:437,640`, `WeekView.tsx:234,318`).
   - Dates use US-order patterns (`EventDetailSheet.tsx:96-108`, `EventModal.tsx:525,545`,
     `TasksSheet.tsx:212`).
-- [ ] **U-089 · P3 · all · ICalSubscriptionSheet and RecurrenceEditor are English only.** From
+  - The AM/PM labels only show with the 12-hour setting, where they are the right notation; left
+    as is.
+- [x] **U-089 · P3 · all · ICalSubscriptionSheet and RecurrenceEditor are English only.** *(no change needed: both components already go through t() and every key has a German entry; the parity doc is out of date)* From
   `docs/parity/05-calendar.md`.
-- [ ] **U-090 · P3 · PP (font 1.3) · Month chips show only the start time, no title.**
-- [ ] **U-091 · P3 · all · An event that starts above the visible hours shows as an untitled
-  block.**
+- [x] **U-090 · P3 · PP (font 1.3) · Month chips show only the start time, no title.** *(fixed in 95c3163)*
+- [x] **U-091 · P3 · all · An event that starts above the visible hours shows as an untitled
+  block.** *(no change needed: this is a block scrolled partly out of the top of the grid, so its title is above the viewport; Google Calendar and Apple Calendar behave the same)*
 
 ### Contacts
 
@@ -466,7 +468,7 @@ carries the commit that fixed it.
 - [x] **U-103 · P2 · all · The contact form's discard check only covers the on-screen back.** *(fixed in 1ebc5c6)*
   - Hardware back drops edits silently.
   - Where: `ContactFormScreen.tsx:764`. Fix: `usePreventRemove`.
-- [ ] **U-104 · P2 · all · Contact form fields have no next or submit chaining.** Where:
+- [x] **U-104 · P2 · all · Contact form fields have no next or submit chaining.** *(fixed in 33dc3cd)* Where:
   `ContactFormScreen.tsx:1197-1283`.
 - [x] **U-105 · P2 · TL TP · List and detail are separate full-screen pages.** *(fixed in 64a62b6)* Fix: phase 2.
 
@@ -495,7 +497,7 @@ carries the commit that fixed it.
   - Light yellow text on a faint brown fill.
   - Where: `FilterSettings.tsx:515-519`, `SieveEditorSheet.tsx:208-212`.
 - [x] **U-123 · P2 · TL TP · The section list and the page replace each other.** *(fixed in 8ab82cd)* Fix: phase 2.
-- [ ] **U-124 · P3 · all · The language list is in neither name nor code order.** Example: Česky,
+- [ ] **U-124 · P3 · all · The language list is in neither name nor code order.** *(deferred: the order copies the webmail language switcher on purpose (comment in src/i18n/index.ts); change both together)* Example: Česky,
   Slovenčina, Dansk.
 
 ### Login
@@ -503,13 +505,25 @@ carries the commit that fixed it.
 - [x] **U-130 · P2 · TL TP · Login steps stretch to the full width.** *(fixed in 250c0a9)*
   - Fields and buttons are 1248 dp wide (`t_login_confirm`).
   - Fix: a centred column of about 480 dp.
-- [ ] **U-131 · P2 · all · Small targets: show-password 20 dp, header back 32 dp, email suggestion
-  chips about 26 dp.** *(partly fixed in ae1ef5b (show password), c8434b0 (header); email suggestion chips still small)*
+- [x] **U-131 · P2 · all · Small targets: show-password 20 dp, header back 32 dp, email suggestion
+  chips about 26 dp.** *(fixed in ae1ef5b,c8434b0,776447d)* *(partly fixed in ae1ef5b (show password), c8434b0 (header); email suggestion chips still small)*
 - [x] **U-132 · P2 · all · The password step's return keys don't move on.** *(fixed in ae1ef5b)*
   - Username has no `next`. With TOTP on, the password field shows Next and does nothing.
   - Where: `PasswordStep.tsx:56,78`.
-- [ ] **U-133 · P2 · all · There is no way out while "Signing in" hangs.** Hardware back is
+- [ ] **U-133 · P2 · all · There is no way out while "Signing in" hangs.** *(deferred: a cancel needs an abortable sign-in in the auth flow, which is more than a UI fix; see product questions)* Hardware back is
   swallowed. Where: `SigningInStep.tsx`, `LoginScreen.tsx:165`.
+
+### Found in the re-walk
+
+- [x] **U-134 · P3 · all · The all-day label in the day and week grid reads "All".** A one-row
+  strip cut the second line of "All day" ("Ganztägig" in German). *(fixed in e452f72)*
+- [x] **U-135 · P2 · PP, split · The selection header pushed Delete off the screen.** Eight 44 dp
+  buttons with 12 dp gaps don't fit 412 dp; the count also kept its screen-reader label on the
+  normal header afterwards. *(fixed in 0d96d8d)*
+- [ ] **U-136 · P3 · all · The day view keeps an empty all-day strip on days without all-day
+  events.** The strip takes the height of the busiest day in the loaded range so the grid doesn't
+  jump while paging (comment in `TimeGridScrollView.tsx`). *(deferred: a product call between a
+  steady grid and less blank space; see product questions)*
 
 ## Adaptive layout plan
 
