@@ -179,7 +179,7 @@ function WeekViewInner({
       {allDayRowCount > 0 && (
         <View style={[styles.allDayStrip, { height: allDayStripHeight }]}>
           <View style={[styles.gutter, styles.allDayLabelWrap]}>
-            <Text style={styles.allDayLabel} numberOfLines={2}>{t('calendar.events.all_day', 'All day')}</Text>
+            <Text style={styles.allDayLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{t('calendar.events.all_day', 'All day')}</Text>
           </View>
           <View style={styles.allDayGrid}>
             {/* Empty per-day columns to draw vertical separators */}

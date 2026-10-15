@@ -412,7 +412,9 @@ function TimeGridScrollViewInner({
           <View style={{ height: HEADER_HEIGHT }} />
           {allDayHeight > 0 && (
             <View style={[styles.allDayLabelWrap, { height: allDayHeight }]}>
-              <Text style={styles.allDayLabel} numberOfLines={2}>
+              {/* One line that shrinks to the gutter: a second line was cut
+                  off by a one-row strip, leaving "All". */}
+              <Text style={styles.allDayLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>
                 {t('calendar.events.all_day', 'All day')}
               </Text>
             </View>
