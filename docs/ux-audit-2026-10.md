@@ -574,3 +574,76 @@ mail body, 640 dp for forms) inside wide panes.
 **State across rotation.** The activity keeps its state through `configChanges` (orientation,
 screen size, smallest screen size, layout). Panes keep their selection in component state or the
 store. Lists that depend on width remount with their focused index or date carried over.
+
+## Final report (2026-10-15)
+
+### Result
+
+86 findings (U-001 to U-136; numbers were skipped where a candidate turned out to be a duplicate).
+
+| Severity | Fixed | No change needed | Deferred |
+| --- | --- | --- | --- |
+| P1 | 9 | 0 | 0 |
+| P2 | 57 | 1 | 2 |
+| P3 | 7 | 4 | 6 |
+
+Every logic change has a vitest test that fails without it. The full suite (3273 tests), `tsc`
+and `npm run i18n:check` pass at the end.
+
+### Areas and cells after the last walk
+
+PP = phone portrait, PL = phone landscape, TP = tablet portrait, TL = tablet landscape. The last
+walk ran the phone in German and dark, the tablet in English and light. Font scale 1.3 was checked
+on PL and TL after a restart.
+
+| Area | PP | PL | TP | TL |
+| --- | --- | --- | --- | --- |
+| Mail list, drawer, selection | ok | ok (search in header) | ok (list + message) | ok (folders + list + message) |
+| Thread | ok | ok (icon-only toolbar) | ok (docked) | ok (docked) |
+| Compose | ok | ok (format bar hidden while typing) | ok (panel) | ok (panel) |
+| Calendar month / week / day | ok | ok | ok | ok |
+| Contacts list, detail, form | ok | ok | ok (split) | ok (split) |
+| Files and preview | ok | ok | ok (docked preview) | ok (docked preview) |
+| Settings | ok | ok | ok (split) | ok (split) |
+| Login | ok | ok | ok (centred column) | ok (centred column) |
+
+### Deferred
+
+- U-016 scrim token: all scrims are already the same; a refactor with no visible change.
+- U-017 system alert vs Dialog: a style mismatch only; see the questions below.
+- U-018 font size change while the app is open: handling `fontScale` in the app was tried and left
+  mixed old and new text sizes, worse than Android's recreate.
+- U-045 "Zurück"/"Weiter": the strings come from the webmail's German catalog.
+- U-069 recipient suggestions in phone landscape: no room above the keyboard; needs a new picker.
+- U-124 language order: copies the webmail switcher on purpose.
+- U-133 no way out of a hung sign-in: needs an abortable sign-in in the auth flow.
+- U-136 empty all-day strip in the day view: a product call; see below.
+
+### Product questions
+
+1. Dark-mode links stay blue (`#60a5fa`) while the rest follows the webmail's neutral palette.
+   Recommendation: keep blue; links in mail bodies need to stand out.
+2. Should every confirmation use the app's Dialog instead of the system alert (U-017)?
+   Recommendation: yes, for destructive actions first, as one pass of its own.
+3. Sign-in that hangs (U-133): add a Cancel that aborts discovery and the token request.
+   Recommendation: yes; it is the only screen with no way back.
+4. Day view all-day strip (U-136): keep one height across days, or size it to the day on screen?
+   Recommendation: size it to the visible days once paging settles.
+5. Month view on a phone now shows titles instead of start times even with "show time" on, since
+   the time filled the whole chip. Recommendation: keep; times come back where cells are wide.
+6. Files keeps a full-screen preview on phones and docks it on tablets. Recommendation: keep.
+7. The dark background of plain-text mail is fixed at `#0a0a0a` and ignores the built-in themes.
+   Recommendation: take it from the theme palette.
+8. APP.md still lists the dark palette as open; the app now uses the webmail standard theme. The
+   note should be updated in the branding repo.
+
+### Not tested
+
+- iOS and iPad: nothing was run. The risk is in the `supportedOrientations` change on every Modal,
+  the keyboard tracker (built around Android's missing frame after rotation) and the safe-area
+  insets in landscape.
+- Real phones and tablets, foldables (fold and unfold mid-task), split-screen on real hardware.
+- Push notifications and their deep links.
+- Home-screen widgets: they truncate German labels; not changed here.
+- The test account came from a login created for this audit ("Stalwart test – uxaudit@example.org"
+  in the Agent collection), because the "Stalwart test servers" item was not visible to the agent.
