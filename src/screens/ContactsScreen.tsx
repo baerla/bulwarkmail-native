@@ -16,6 +16,8 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useBackWhileFocused } from '../lib/use-back-while-focused';
+import { listBackStep } from '../lib/list-back';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   Search, Plus, UserCircle, X, Menu, Trash2, Tag, FolderInput, Upload, CheckSquare, Share2,
@@ -231,6 +233,17 @@ export default function ContactsScreen({ onOpenContact, activeContactId = null }
   };
 
   const clearSelection = () => setSelection(new Set());
+
+  // Back leaves selection mode, then the search, before it leaves the tab.
+  const backStep = listBackStep({ selecting: selectionMode, searching: searchActive || searchQuery.length > 0 });
+  useBackWhileFocused(backStep !== 'leave', () => {
+    if (backStep === 'clear-selection') {
+      clearSelection();
+    } else {
+      setSearchQuery('');
+      setSearchActive(false);
+    }
+  });
 
   const doBulkDelete = async () => {
     const ids = Array.from(selection);
