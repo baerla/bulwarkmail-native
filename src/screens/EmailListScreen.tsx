@@ -388,7 +388,8 @@ export default function EmailListScreen({
   const resolvedTheme = useResolvedTheme();
   // The undo bar floats over the list's bottom right on a phone (on a split
   // layout it sits over the reading pane instead).
-  const { isSplit, shortHeight } = useLayout();
+  const { isSplit, shortHeight, widthClass } = useLayout();
+  const selectionCountOnly = isSplit || widthClass === 'compact';
   const listUndo = useEmailStore((s) => s.pendingUndo != null);
   const sendUndo = useSendUndoStore((s) => s.pending != null);
   const undoBarUp = !isSplit && (listUndo || sendUndo);
@@ -588,6 +589,7 @@ export default function EmailListScreen({
   // Selection state
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const selectionMode = selectedIds.size > 0;
+  const selectedLabel = t('email_list.batch_actions.selected_messages', '{count, plural, one {1 email} other {# emails}} selected', { count: selectedIds.size });
   const allSelected =
     visibleEmails.length > 0 && visibleEmails.every((e) => selectedIds.has(rowKeyOf(e)));
 
@@ -1154,7 +1156,9 @@ export default function EmailListScreen({
     <View style={[styles.container, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       {/* Header */}
       {selectionMode ? (
-        <View style={styles.header}>
+        // Keyed apart from the normal header: reused in place, its title
+        // kept the "1 email selected" label for screen readers.
+        <View key="selection-header" style={[styles.header, styles.selectionHeader]}>
           <Pressable
             onPress={clearSelection}
             style={styles.headerButton}
@@ -1163,8 +1167,14 @@ export default function EmailListScreen({
           >
             <X size={20} color={c.text} />
           </Pressable>
-          <Text style={styles.headerTitle}>
-            {t('email_list.batch_actions.selected_messages', '{count, plural, one {1 email} other {# emails}} selected', { count: selectedIds.size })}
+          {/* Beside seven buttons a phone or the list pane has room for the
+              number only; the full label wrapped to three lines there. */}
+          <Text
+            style={[styles.headerTitle, styles.selectionCount]}
+            numberOfLines={1}
+            accessibilityLabel={selectedLabel}
+          >
+            {selectionCountOnly ? String(selectedIds.size) : selectedLabel}
           </Text>
           <Pressable
             onPress={() => reportFailure(handleBulkStar())}
@@ -1249,7 +1259,7 @@ export default function EmailListScreen({
           </Pressable>
         </View>
       ) : (
-        <View style={styles.header}>
+        <View key="header" style={styles.header}>
           {!sidebarDocked && (
             <Pressable
               onPress={() => setDrawerOpen(true)}
@@ -1954,6 +1964,10 @@ function makeStyles(c: ThemePalette) {
     borderBottomColor: c.border,
     gap: spacing.md,
   },
+  // Eight 44 dp buttons fit a 412 dp phone only without the header's gaps;
+  // Delete was pushed off the screen.
+  selectionHeader: { gap: 0, paddingHorizontal: spacing.sm },
+  selectionCount: { flex: 1, minWidth: 24, marginHorizontal: spacing.xs },
   headerButton: {
     width: componentSizes.buttonLg, height: componentSizes.buttonLg, // h-11 w-11 = 44px
     alignItems: 'center', justifyContent: 'center',
