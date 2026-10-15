@@ -987,6 +987,9 @@ function makeStyles(c: ThemePalette) {
     },
     sectionIcon: { width: 16 },
     sectionLabel: {
+      // Fill the row: shrink-wrapped, Android measured the letter-spaced
+      // label a few px short and wrapped its last word out of sight ("WOR").
+      flex: 1,
       ...typography.bodyMedium,
       color: c.textSecondary,
       textTransform: 'uppercase',
