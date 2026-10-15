@@ -1521,7 +1521,10 @@ function TagMenuSheet({ visible, onClose, keywords, activeKeywords, onToggle }: 
             {t('email_viewer.tag_no_matches', 'No matching tags')}
           </Text>
         ) : (
-          keywords.map((kw) => {
+          // Scrolls like the More sheet: a long tag list (or a landscape
+          // window) ran past the screen with no way to reach the last tags.
+          <ScrollView style={styles.sheetScroll} bounces={false}>
+          {keywords.map((kw) => {
             const token = keywordToken(kw.id);
             const active = !!activeKeywords[token];
             const palette = c.tags[kw.color];
@@ -1534,7 +1537,8 @@ function TagMenuSheet({ visible, onClose, keywords, activeKeywords, onToggle }: 
                 trailing={active ? <Check size={16} color={c.primary} /> : null}
               />
             );
-          })
+          })}
+          </ScrollView>
         )}
       </Animated.View>
     </Modal>
