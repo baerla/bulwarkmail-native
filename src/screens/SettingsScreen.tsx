@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLayout } from '../lib/use-layout';
+import { confirmSignOut } from '../lib/sign-out-confirm';
 import {
   ArrowLeft, LogOut, Settings, ChevronRight, Search, X,
   Palette, User, Shield, UserPen, Palmtree, Calendar,
@@ -506,7 +507,8 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
         {/* Logout - matches webmail: border-t, destructive text, icon + label */}
         <View style={styles.logoutSection}>
           <Pressable
-            onPress={onLogout}
+            onPress={() => { if (onLogout) confirmSignOut(t, {}, onLogout); }}
+            accessibilityRole="button"
             style={({ pressed }) => [styles.logoutBtn, pressed && styles.logoutBtnPressed]}
           >
             <LogOut size={16} color={c.error} />

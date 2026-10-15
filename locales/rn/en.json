@@ -1148,6 +1148,11 @@
     "remove_account_message": "Sign out of {account} on this device. Your mail stays on the server.",
     "remove_account_title": "Remove account?",
     "show_unread": "Show unread",
+    "sign_out_all_confirm_message": "Every account is removed from this device. You can sign in again at any time.",
+    "sign_out_all_confirm_title": "Sign out of all accounts?",
+    "sign_out_confirm_message": "The account is removed from this device. You can sign in again at any time.",
+    "sign_out_confirm_title": "Sign out?",
+    "sign_out_confirm_title_account": "Sign out of {account}?",
     "tab_unavailable": "{name} (unavailable)"
   },
   "unified_mailbox": {

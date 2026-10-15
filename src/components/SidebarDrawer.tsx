@@ -38,6 +38,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import type { Mailbox } from '../api/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import { confirmSignOut } from '../lib/sign-out-confirm';
 
 const CHEVRON_SLOT = 20;
 const INDENT_STEP = 12;
@@ -919,7 +920,10 @@ export default function SidebarDrawer({ visible, onClose, docked = false }: Side
                 styles.accountMenuAction,
                 pressed && styles.accountMenuActionPressed,
               ]}
-              onPress={() => { setAccountMenuOpen(false); onClose(); void logout(); }}
+              onPress={() => {
+                setAccountMenuOpen(false);
+                confirmSignOut(t, { account: accountEmailFull || undefined }, () => { onClose(); void logout(); });
+              }}
             >
               <LogOut size={16} color={c.textSecondary} />
               <Text style={styles.accountMenuActionText} numberOfLines={1}>
@@ -932,7 +936,10 @@ export default function SidebarDrawer({ visible, onClose, docked = false }: Side
                   styles.accountMenuAction,
                   pressed && styles.accountMenuActionPressed,
                 ]}
-                onPress={() => { setAccountMenuOpen(false); onClose(); void logoutAll(); }}
+                onPress={() => {
+                  setAccountMenuOpen(false);
+                  confirmSignOut(t, { all: true }, () => { onClose(); void logoutAll(); });
+                }}
               >
                 <LogOut size={16} color={c.error} />
                 <Text style={[styles.accountMenuActionText, { color: c.error }]}>
