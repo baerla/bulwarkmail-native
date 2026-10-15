@@ -747,6 +747,15 @@ export default function ContactFormScreen() {
   const [saving, setSaving] = React.useState(false);
   const [dirty, setDirty] = React.useState(!!prefill || !!initialMemberIds?.length);
   const [confirmDiscard, setConfirmDiscard] = React.useState(false);
+  // Return walks the name fields in reading order, then on to the email.
+  const prefixRef = React.useRef<TextInput>(null);
+  const suffixRef = React.useRef<TextInput>(null);
+  const givenRef = React.useRef<TextInput>(null);
+  const middleRef = React.useRef<TextInput>(null);
+  const surnameRef = React.useRef<TextInput>(null);
+  const orgRef = React.useRef<TextInput>(null);
+  const fullRef = React.useRef<TextInput>(null);
+  const firstEmailRef = React.useRef<TextInput>(null);
   const [datePickerIndex, setDatePickerIndex] = React.useState<number | null>(null);
   const [memberPickerOpen, setMemberPickerOpen] = React.useState(false);
 
@@ -1203,6 +1212,10 @@ export default function ContactFormScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder={t('contacts.form.organization_placeholder', 'Company name')}
+                  ref={orgRef}
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => fullRef.current?.focus()}
                   placeholderTextColor={c.textMuted}
                   value={form.orgs[0]?.name || ''}
                   onChangeText={(v) => {
@@ -1219,6 +1232,10 @@ export default function ContactFormScreen() {
                     <TextInput
                       style={styles.input}
                       placeholder={t('contacts.form.prefix_placeholder', 'Dr., Mr., Mrs.')}
+                      ref={prefixRef}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => suffixRef.current?.focus()}
                       placeholderTextColor={c.textMuted}
                       value={form.prefix}
                       onChangeText={(v) => updateForm('prefix', v)}
@@ -1228,6 +1245,10 @@ export default function ContactFormScreen() {
                     <TextInput
                       style={styles.input}
                       placeholder={t('contacts.form.suffix_placeholder', 'Jr., Sr., III')}
+                      ref={suffixRef}
+                      returnKeyType="next"
+                      blurOnSubmit={false}
+                      onSubmitEditing={() => givenRef.current?.focus()}
                       placeholderTextColor={c.textMuted}
                       value={form.suffix}
                       onChangeText={(v) => updateForm('suffix', v)}
@@ -1238,6 +1259,10 @@ export default function ContactFormScreen() {
                   <TextInput
                     style={styles.input}
                     placeholder={t('contacts.form.given_name', 'First name')}
+                    ref={givenRef}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => middleRef.current?.focus()}
                     placeholderTextColor={c.textMuted}
                     value={form.given}
                     onChangeText={(v) => updateForm('given', v)}
@@ -1247,6 +1272,10 @@ export default function ContactFormScreen() {
                   <TextInput
                     style={styles.input}
                     placeholder={t('contacts.form.middle_name', 'Middle name')}
+                    ref={middleRef}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => surnameRef.current?.focus()}
                     placeholderTextColor={c.textMuted}
                     value={form.middle}
                     onChangeText={(v) => updateForm('middle', v)}
@@ -1256,6 +1285,10 @@ export default function ContactFormScreen() {
                   <TextInput
                     style={styles.input}
                     placeholder={t('contacts.form.surname', 'Last name')}
+                    ref={surnameRef}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => fullRef.current?.focus()}
                     placeholderTextColor={c.textMuted}
                     value={form.surname}
                     onChangeText={(v) => updateForm('surname', v)}
@@ -1298,6 +1331,10 @@ export default function ContactFormScreen() {
               <TextInput
                 style={styles.input}
                 placeholder={t('contacts.form.display_name_placeholder', 'Custom display name')}
+                ref={fullRef}
+                returnKeyType="next"
+                blurOnSubmit={false}
+                onSubmitEditing={() => firstEmailRef.current?.focus()}
                 placeholderTextColor={c.textMuted}
                 value={form.full}
                 onChangeText={(v) => updateForm('full', v)}
@@ -1315,6 +1352,7 @@ export default function ContactFormScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder={t('contacts.form.email_placeholder', 'email@example.com')}
+                  ref={i === 0 ? firstEmailRef : undefined}
                   placeholderTextColor={c.textMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
