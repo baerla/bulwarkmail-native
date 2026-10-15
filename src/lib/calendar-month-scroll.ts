@@ -87,3 +87,12 @@ export function dayIndexIn(days: Date[], date: Date): number {
   const diff = differenceInCalendarDays(date, days[0]);
   return diff >= 0 && diff < days.length ? diff : -1;
 }
+
+// Below this cell width a start time fills the whole chip and the title never
+// shows, as on a phone in portrait (about 58 dp, less at a larger font).
+const MIN_CELL_WIDTH_FOR_TIME = 80;
+
+/** Whether a full month cell of about `cellWidth` dp puts the start time before the title. */
+export function monthChipShowsTime(showTimeSetting: boolean, cellWidth: number): boolean {
+  return showTimeSetting && cellWidth >= MIN_CELL_WIDTH_FOR_TIME;
+}

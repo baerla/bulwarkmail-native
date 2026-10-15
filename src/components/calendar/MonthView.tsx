@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import {
   addDays,
   endOfMonth,
@@ -24,7 +24,7 @@ import {
   type EventDayIndex,
   type TimeFormat,
 } from '../../lib/calendar-utils';
-import { dayIndexIn, monthKeyOf, monthMask } from '../../lib/calendar-month-scroll';
+import { dayIndexIn, monthChipShowsTime, monthKeyOf, monthMask } from '../../lib/calendar-month-scroll';
 import { isInactiveEvent } from '../../lib/calendar-participants';
 import { eventBlockColors } from '../../lib/event-colors';
 import { useCalendarLocale } from '../../lib/calendar-locale';
@@ -153,6 +153,8 @@ function MonthWeekRowInner({
   onLongPressDate,
 }: MonthWeekRowProps) {
   const c = useColors();
+  const { width } = useWindowDimensions();
+  const chipTime = monthChipShowsTime(true, width / 7);
   if (variant === 'full') {
     return (
       <FullWeekRow
@@ -258,7 +260,7 @@ function MonthWeekRowInner({
                       ]}
                     >
                       <Text style={[styles.chipText, { color: colors.text }]} numberOfLines={1}>
-                        {event.showWithoutTime
+                        {event.showWithoutTime || !chipTime
                           ? null
                           : `${format(getEventStartDate(event), timePattern(timeFormat), { locale })} `}
                         <Text style={inactive && styles.chipTextInactive}>{event.title || ''}</Text>
@@ -318,6 +320,8 @@ function FullWeekRow({
   height: number;
   colors: ThemePalette;
 }) {
+  const { width } = useWindowDimensions();
+  const showTime = monthChipShowsTime(showTimeInMonthView, width / 7);
   return (
     <View style={[styles.fullWeekRow, { height }]}>
       {showWeekNumbers && (
@@ -357,7 +361,7 @@ function FullWeekRow({
               const inactive = isInactiveEvent(event, currentUserEmails);
               const colors = eventBlockColors(getEventColor(event, calendars), inactive, c);
               // No time on events that fill the whole day.
-              const time = showTimeInMonthView && !event.showWithoutTime && !isTimedEventFullDayOnDate(event, d)
+              const time = showTime && !event.showWithoutTime && !isTimedEventFullDayOnDate(event, d)
                 ? `${format(getEventStartDate(event), timePattern(timeFormat), { locale })} `
                 : '';
               return (
