@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import {
   ChevronLeft, FileText, Folder, FolderPlus, HardDrive, FileImage, FileVideo,
@@ -52,6 +53,8 @@ import { jmapClient } from '../api/jmap-client';
 import { downloadAttachment, shareAttachment } from '../lib/email-export';
 import { secureFetch } from '../lib/client-cert';
 import { getUniqueName } from '../lib/filenode-name';
+import { filesGridLayout } from '../lib/files-grid';
+import { useLayout, useSheetInsets } from '../lib/use-layout';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
 import { filesBackStep } from '../lib/files-back';
 import type { FileNode } from '../api/types';
@@ -66,7 +69,6 @@ import Dialog from '../components/Dialog';
 import ShareSheet from '../components/files/ShareSheet';
 import { FilePreviewModal, canPreviewInApp } from '../components/files/FilePreviewModal';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
-import { useSheetInsets } from '../lib/use-layout';
 
 // A file row carries the display name alongside the rest of the node.
 interface FileRow extends FileNode {
@@ -206,6 +208,11 @@ export default function FilesScreen() {
 
   const [viewOverride, setViewOverride] = useState<FilesViewMode | null>(null);
   const viewMode: FilesViewMode = viewOverride ?? defaultViewMode;
+  const { isSplit } = useLayout();
+  // The grid's columns follow its measured width (rotation, tablet panes).
+  const { width: windowWidth } = useWindowDimensions();
+  const [gridWidth, setGridWidth] = React.useState(0);
+  const grid = filesGridLayout(gridWidth || windowWidth);
 
   const uploading = uploadProgress != null;
   const selectionMode = selection.size > 0;
@@ -987,12 +994,14 @@ export default function FilesScreen() {
     body = (
       <FlatList
         data={visibleFiles}
-        key="grid"
-        numColumns={3}
+        // A new column count needs a fresh list.
+        key={`grid-${grid.columns}`}
+        numColumns={grid.columns}
         keyExtractor={(item) => item.id}
         columnWrapperStyle={styles.gridRow}
         contentContainerStyle={styles.gridContent}
-        renderItem={({ item }) => renderGridCell(item)}
+        onLayout={(e) => setGridWidth(Math.round(e.nativeEvent.layout.width))}
+        renderItem={({ item }) => <View style={{ width: grid.cellWidth }}>{renderGridCell(item)}</View>}
         keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={c.primary} />
@@ -1014,10 +1023,19 @@ export default function FilesScreen() {
     );
   }
 
+  // On a wide window an open file shows beside the list instead of covering it.
+  const previewDocked = isSplit && previewTarget != null;
   return (
-    <View style={styles.container}>
-      {renderHeader()}
-      {body}
+    <View style={[styles.container, previewDocked && styles.splitRow]}>
+      <View style={styles.listColumn}>
+        {renderHeader()}
+        {body}
+      </View>
+      {previewDocked && (
+        <View style={styles.previewPane}>
+          <FilePreviewModal docked file={previewTarget} onClose={() => setPreviewTarget(null)} />
+        </View>
+      )}
 
       <PromptModal
         visible={newFolderOpen}
@@ -1108,7 +1126,7 @@ export default function FilesScreen() {
         onChangeDir={(d) => setSetting('filesDefaultSortDir', d)}
       />
 
-      <FilePreviewModal file={previewTarget} onClose={() => setPreviewTarget(null)} />
+      {!isSplit && <FilePreviewModal file={previewTarget} onClose={() => setPreviewTarget(null)} />}
 
       <ShareSheet
         node={shareTarget}
@@ -1442,6 +1460,9 @@ function makeStyles(c: ThemePalette) {
       flex: 1,
       backgroundColor: c.background,
     },
+    splitRow: { flexDirection: 'row' },
+    listColumn: { flex: 1 },
+    previewPane: { width: '45%', borderLeftWidth: 1, borderLeftColor: c.border },
     header: {
       paddingTop: 60,
       paddingHorizontal: spacing.md,
@@ -1611,7 +1632,6 @@ function makeStyles(c: ThemePalette) {
       gap: spacing.sm,
     },
     gridItem: {
-      flex: 1,
       alignItems: 'center',
       gap: spacing.xs,
       paddingVertical: spacing.md,

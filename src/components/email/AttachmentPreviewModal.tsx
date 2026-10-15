@@ -39,6 +39,8 @@ interface Props {
   onShare: () => void;
   /** Save a copy; adds a Download button to the header. */
   onDownload?: () => void;
+  /** Render in place (a split view's side pane) instead of a full-screen modal. */
+  docked?: boolean;
 }
 
 /**
@@ -48,7 +50,7 @@ interface Props {
  * Used by the reader's attachment chips and the Files tab.
  */
 export function AttachmentPreviewModal({
-  item, loading, title, onClose, onOpenExternal, onShare, onDownload,
+  item, loading, title, onClose, onOpenExternal, onShare, onDownload, docked = false,
 }: Props) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
@@ -57,6 +59,9 @@ export function AttachmentPreviewModal({
   // An image the platform can't decode would stay blank; fall back to the
   // external viewer instead. Keyed by URI so the next item starts clean.
   const [failedImageUri, setFailedImageUri] = React.useState<string | null>(null);
+  // The image fits the area it is shown in (a pane, a landscape window),
+  // not a box derived from the window width that ran past the screen.
+  const [imageArea, setImageArea] = React.useState<{ width: number; height: number } | null>(null);
 
   const emlEmail = React.useMemo<Email | null>(() => {
     if (!item?.eml) return null;
@@ -104,13 +109,19 @@ export function AttachmentPreviewModal({
           <ScrollView
             style={styles.flex}
             contentContainerStyle={styles.imageScroll}
+            onLayout={(e) => {
+              const { width: w, height: h } = e.nativeEvent.layout;
+              setImageArea((prev) => (prev && prev.width === w && prev.height === h ? prev : { width: w, height: h }));
+            }}
             maximumZoomScale={4}
             minimumZoomScale={1}
             bouncesZoom
           >
             <Image
               source={{ uri: item.fileUri }}
-              style={{ width: width - spacing.lg * 2, height: width * 1.2 }}
+              style={imageArea
+                ? { width: imageArea.width - spacing.lg * 2, height: imageArea.height - spacing.lg * 2 }
+                : { width: width - spacing.lg * 2, height: width * 1.2 }}
               resizeMode="contain"
               accessibilityLabel={item.name}
               onError={() => setFailedImageUri(item.fileUri ?? null)}
@@ -160,9 +171,8 @@ export function AttachmentPreviewModal({
     }
   };
 
-  return (
-    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!item || loading} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+  const content = (
+      <SafeAreaView style={styles.container} edges={docked ? ['top', 'right'] : ['top', 'bottom', 'left', 'right']}>
         <View style={styles.header}>
           <Pressable
             onPress={onClose}
@@ -210,6 +220,11 @@ export function AttachmentPreviewModal({
         </View>
         {renderBody()}
       </SafeAreaView>
+  );
+  if (docked) return item || loading ? content : null;
+  return (
+    <Modal supportedOrientations={MODAL_ORIENTATIONS} visible={!!item || loading} animationType="slide" onRequestClose={onClose}>
+      {content}
     </Modal>
   );
 }

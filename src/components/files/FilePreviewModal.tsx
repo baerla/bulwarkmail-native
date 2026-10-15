@@ -25,6 +25,8 @@ interface Props {
   /** The file to show; null closes the preview. */
   file: PreviewableFileNode | null;
   onClose: () => void;
+  /** Show it in a side pane instead of a full-screen modal. */
+  docked?: boolean;
 }
 
 /**
@@ -35,7 +37,7 @@ interface Props {
  * of fetching it again. The copy is deleted when the preview closes, unless
  * another app got it, in which case the stale-export sweep removes it.
  */
-export function FilePreviewModal({ file, onClose }: Props) {
+export function FilePreviewModal({ file, onClose, docked = false }: Props) {
   const t = useLocaleStore((s) => s.t);
   const [item, setItem] = React.useState<PreviewItem | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -123,6 +125,7 @@ export function FilePreviewModal({ file, onClose }: Props) {
       item={item}
       loading={loading}
       title={name}
+      docked={docked}
       onClose={onClose}
       onOpenExternal={() => act(
         (local) => shareLocalFile(local, type, name, { keep: true }),
