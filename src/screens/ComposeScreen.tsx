@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, TextInput, Pressable, ScrollView,
-  Keyboard, Platform, ActivityIndicator, Alert, Modal, Switch, useWindowDimensions,
+  Keyboard, Platform, ActivityIndicator, Alert, Modal, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePreventRemove } from '@react-navigation/native';
@@ -79,6 +79,7 @@ import { sanitizeDisplayName } from '../lib/rfc5322-mailbox';
 import type { EmailAddress, Identity } from '../api/types';
 import type { RootStackParamList } from '../navigation/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
+import ToggleSwitch from '../components/ToggleSwitch';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Compose'>;
 
@@ -2861,7 +2862,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
             )}
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>{t('email_composer.from_override.toggle_off', 'Override')}</Text>
-              <Switch
+              <ToggleSwitch
                 value={overrideEnabled}
                 onValueChange={setOverrideEnabled}
                 accessibilityLabel={t('email_composer.from_override.toggle_off', 'Override')}
