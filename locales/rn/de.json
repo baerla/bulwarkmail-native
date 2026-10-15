@@ -312,6 +312,10 @@
     "send_now": "Jetzt senden",
     "send_timeout_body": "Die Nachricht wurde möglicherweise bereits versendet. Prüfen Sie Ihren Gesendet-Ordner, bevor Sie sie erneut senden.",
     "send_timeout_title": "Keine Antwort vom Server",
+    "toolbar": {
+      "insert_image": "Bild einfügen",
+      "remove_link": "Link entfernen"
+    },
     "undo_send_label": "Senden in {seconds} s…",
     "upload_failed_short": "Upload fehlgeschlagen",
     "uploading": "Wird hochgeladen...",

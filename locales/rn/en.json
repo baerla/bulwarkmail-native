@@ -323,7 +323,9 @@
     "send_timeout_title": "No answer from the server",
     "toolbar": {
       "background_color": "Background color",
-      "remove_background_color": "Remove background color"
+      "insert_image": "Insert image",
+      "remove_background_color": "Remove background color",
+      "remove_link": "Remove link"
     },
     "undo_send_label": "Sending in {seconds}s…",
     "upload_failed_short": "Upload failed",

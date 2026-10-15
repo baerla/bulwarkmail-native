@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, TextInput, Pressable, ScrollView,
-  Keyboard, Dimensions, Platform, ActivityIndicator, Alert, Modal, Switch,
+  Keyboard, Platform, ActivityIndicator, Alert, Modal, Switch,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePreventRemove } from '@react-navigation/native';
@@ -341,7 +341,9 @@ function ToolbarButton({
       onPress={onPress}
       hitSlop={4}
       disabled={disabled}
+      accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ selected: !!active, disabled: !!disabled }}
       style={[styles.formatBtn, active && styles.formatBtnActive, disabled && styles.formatBtnDisabled]}
     >
       {icon}
@@ -2463,8 +2465,10 @@ export default function ComposeScreen({ route, navigation }: Props) {
             keyboardShouldPersistTaps="always"
           >
             <ToolbarButton onPress={() => setTemplateSheetOpen(true)}
+              label={t('email_composer.use_template', 'Template')}
               icon={<LayoutTemplate size={18} color={c.textSecondary} />} />
             <ToolbarButton active={requestReadReceipt} onPress={() => setRequestReadReceipt((v) => !v)}
+              label={t('email_composer.read_receipt_off', 'Request a read receipt')}
               icon={<MailCheck size={18} color={requestReadReceipt ? c.primary : c.textSecondary} />} />
             <ToolbarButton active={plainTextMode} onPress={() => { void togglePlainTextMode(); }}
               label={plainTextMode
@@ -2477,12 +2481,16 @@ export default function ComposeScreen({ route, navigation }: Props) {
                 <View style={styles.formatSep} />
 
                 <ToolbarButton active={selState.bold} onPress={() => editorRef.current?.exec('bold')}
+                  label={t('email_composer.toolbar.bold', 'Bold')}
                   icon={<Bold size={18} color={selState.bold ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.italic} onPress={() => editorRef.current?.exec('italic')}
+                  label={t('email_composer.toolbar.italic', 'Italic')}
                   icon={<Italic size={18} color={selState.italic ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.underline} onPress={() => editorRef.current?.exec('underline')}
+                  label={t('email_composer.toolbar.underline', 'Underline')}
                   icon={<Underline size={18} color={selState.underline ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.strikeThrough} onPress={() => editorRef.current?.exec('strikeThrough')}
+                  label={t('email_composer.toolbar.strikethrough', 'Strikethrough')}
                   icon={<Strikethrough size={18} color={selState.strikeThrough ? c.primary : c.textSecondary} />} />
                 <ToolbarButton onPress={() => setColorTarget('text')}
                   label={t('email_composer.toolbar.text_color', 'Text color')}
@@ -2494,46 +2502,60 @@ export default function ComposeScreen({ route, navigation }: Props) {
                 <View style={styles.formatSep} />
 
                 <ToolbarButton active={selState.h1} onPress={() => editorRef.current?.exec('formatBlock:H1')}
+                  label={t('email_composer.toolbar.heading_1', 'Heading 1')}
                   icon={<Heading1 size={18} color={selState.h1 ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.h2} onPress={() => editorRef.current?.exec('formatBlock:H2')}
+                  label={t('email_composer.toolbar.heading_2', 'Heading 2')}
                   icon={<Heading2 size={18} color={selState.h2 ? c.primary : c.textSecondary} />} />
 
                 <View style={styles.formatSep} />
 
                 <ToolbarButton active={selState.ul} onPress={() => editorRef.current?.exec('insertUnorderedList')}
+                  label={t('email_composer.toolbar.bullet_list', 'Bullet list')}
                   icon={<List size={18} color={selState.ul ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.ol} onPress={() => editorRef.current?.exec('insertOrderedList')}
+                  label={t('email_composer.toolbar.ordered_list', 'Ordered list')}
                   icon={<ListOrdered size={18} color={selState.ol ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.blockquote} onPress={() => editorRef.current?.exec('formatBlock:BLOCKQUOTE')}
+                  label={t('email_composer.toolbar.quote', 'Quote')}
                   icon={<Quote size={18} color={selState.blockquote ? c.primary : c.textSecondary} />} />
                 <ToolbarButton onPress={() => setTableMenuOpen(true)}
+                  label={t('email_composer.toolbar.table', 'Table')}
                   icon={<Table size={18} color={c.textSecondary} />} />
 
                 <View style={styles.formatSep} />
 
                 <ToolbarButton active={selState.alignLeft} onPress={() => editorRef.current?.exec('justifyLeft')}
+                  label={t('email_composer.toolbar.align_left', 'Align left')}
                   icon={<AlignLeft size={18} color={selState.alignLeft ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.alignCenter} onPress={() => editorRef.current?.exec('justifyCenter')}
+                  label={t('email_composer.toolbar.align_center', 'Align center')}
                   icon={<AlignCenter size={18} color={selState.alignCenter ? c.primary : c.textSecondary} />} />
                 <ToolbarButton active={selState.alignRight} onPress={() => editorRef.current?.exec('justifyRight')}
+                  label={t('email_composer.toolbar.align_right', 'Align right')}
                   icon={<AlignRight size={18} color={selState.alignRight ? c.primary : c.textSecondary} />} />
 
                 <View style={styles.formatSep} />
 
                 <ToolbarButton active={selState.link} onPress={onLinkPress}
+                  label={selState.link ? t('email_composer.toolbar.remove_link', 'Remove link') : t('email_composer.toolbar.link', 'Link')}
                   icon={selState.link
                     ? <Link2Off size={18} color={c.primary} />
                     : <Link2 size={18} color={c.textSecondary} />} />
                 <ToolbarButton onPress={() => { void insertInlineImage(); }}
+                  label={t('email_composer.toolbar.insert_image', 'Insert image')}
                   icon={<ImageIcon size={18} color={c.textSecondary} />} />
                 <ToolbarButton onPress={() => editorRef.current?.exec('removeFormat')}
+                  label={t('email_composer.toolbar.clear_formatting', 'Clear formatting')}
                   icon={<RemoveFormatting size={18} color={c.textSecondary} />} />
 
                 <View style={styles.formatSep} />
 
                 <ToolbarButton onPress={() => editorRef.current?.exec('undo')}
+                  label={t('email_composer.toolbar.undo', 'Undo')}
                   icon={<Undo2 size={18} color={c.textSecondary} />} />
                 <ToolbarButton onPress={() => editorRef.current?.exec('redo')}
+                  label={t('email_composer.toolbar.redo', 'Redo')}
                   icon={<Redo2 size={18} color={c.textSecondary} />} />
               </>
             )}
