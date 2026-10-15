@@ -67,7 +67,7 @@ import { shouldBlockEditorRemoteImages } from '../lib/editor-html';
 import {
   signatureIdentityFor, buildEmbeddedSignatureHtml, containsEmbeddedSignature, spliceSignature,
   insertSignatureAboveQuote, getPlainTextSignature, appendPlainTextSignature,
-  plainTextBodyHasSignature, plainTextBodyWithoutSignature, SIGNATURE_RANGE_MARKER,
+  plainTextBodyHasSignature, plainTextBodyWithoutSignature, SIGNATURE_RANGE_MARKER, wantsSignatureSeparator,
 } from '../lib/signature-utils';
 import {
   getAutoFilledPlaceholders, getPlaceholdersFromTemplate, substitutePlaceholders, templateBodyToHtml,
@@ -1083,7 +1083,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
   const placeSignaturePlain = React.useCallback((body: string, identity: Identity): string => {
     const sig = getPlainTextSignature(identity);
     if (!sig) return body;
-    const sep = signatureSeparatorEnabled ? '\n\n-- \n' : '\n\n';
+    const sep = wantsSignatureSeparator(signatureSeparatorEnabled, identity) ? '\n\n-- \n' : '\n\n';
     if (isReplyLike && signaturePosition === 'above_quote') {
       const idx = body.indexOf('\n\n');
       const head = idx === -1 ? body : body.slice(0, idx);
@@ -1139,7 +1139,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
           stripped = plainTextBodyWithoutSignature(body, prev);
         } else if (prev) {
           const old = getPlainTextSignature(prev);
-          const marker = `${signatureSeparatorEnabled ? '\n\n-- \n' : '\n\n'}${old}`;
+          const marker = `${wantsSignatureSeparator(signatureSeparatorEnabled, prev) ? '\n\n-- \n' : '\n\n'}${old}`;
           if (old && body.includes(marker)) stripped = body.replace(marker, '');
         }
         return signatureIdentity ? placeSignaturePlain(stripped, signatureIdentity) : stripped;
