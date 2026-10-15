@@ -7,6 +7,7 @@ import {
   Modal,
   ScrollView,
   ViewStyle,
+  type LayoutChangeEvent,
 } from 'react-native';
 import { FlaskConical, Lock, ChevronDown, ChevronRight, Check, ExternalLink, type AppIcon } from '../icons';
 import { spacing, radius, typography, type ThemePalette } from '../../theme/tokens';
@@ -68,6 +69,9 @@ export function SettingsSection({
   );
 }
 
+/** Narrowest label column before a row's control moves under the label. */
+const STACK_BELOW = 140;
+
 // The label of the SettingItem a control sits in. A switch has no text of
 // its own, so without it a screen reader only announces "switch, off".
 const SettingLabelContext = React.createContext<string | undefined>(undefined);
@@ -95,10 +99,27 @@ export function SettingItem({
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const highlight = useSearchHighlight(label);
-  const rowStyle = [styles.settingItem, !noBorder && styles.settingItemBorder, locked && styles.locked, highlight.highlighted && styles.searchHighlight];
+  // The control sits on the right. When that leaves the label column narrower
+  // than STACK_BELOW (a long translation, two buttons), the control moves
+  // under the label, as the webmail stacks it on a phone. A new row width
+  // (rotation, split view) measures again.
+  const [stacked, setStacked] = useState(false);
+  const rowWidth = React.useRef(0);
+  const onRowLayout = (e: LayoutChangeEvent) => {
+    highlight.onLayout(e);
+    const width = e.nativeEvent.layout.width;
+    if (Math.abs(width - rowWidth.current) > 1) {
+      rowWidth.current = width;
+      setStacked(false);
+    }
+  };
+  const onContentLayout = (e: LayoutChangeEvent) => {
+    if (!stacked && children && e.nativeEvent.layout.width < STACK_BELOW) setStacked(true);
+  };
+  const rowStyle = [styles.settingItem, stacked && styles.settingItemStacked, !noBorder && styles.settingItemBorder, locked && styles.locked, highlight.highlighted && styles.searchHighlight];
   const body = (
     <>
-      <View style={styles.settingContent}>
+      <View style={[styles.settingContent, stacked && styles.settingContentStacked]} onLayout={onContentLayout}>
         <View style={styles.settingLabelRow}>
           <Text style={styles.settingLabel}>{label}</Text>
           {locked && <Lock size={12} color={c.mutedForeground} />}
@@ -119,7 +140,7 @@ export function SettingItem({
     return (
       <Pressable
         ref={highlight.ref}
-        onLayout={highlight.onLayout}
+        onLayout={onRowLayout}
         onPress={onPress}
         accessibilityRole={link === 'external' ? 'link' : 'button'}
         style={({ pressed }) => [...rowStyle, pressed && styles.settingItemPressed]}
@@ -129,7 +150,7 @@ export function SettingItem({
     );
   }
   return (
-    <View ref={highlight.ref} onLayout={highlight.onLayout} style={rowStyle}>
+    <View ref={highlight.ref} onLayout={onRowLayout} style={rowStyle}>
       {body}
     </View>
   );
@@ -365,6 +386,16 @@ function makeStyles(c: ThemePalette) {
   },
   settingContent: {
     flex: 1,
+  },
+  // The control under the label instead of beside it (see SettingItem).
+  settingItemStacked: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
+  settingContentStacked: {
+    flex: 0,
+    alignSelf: 'stretch',
   },
   settingLabelRow: {
     flexDirection: 'row',
