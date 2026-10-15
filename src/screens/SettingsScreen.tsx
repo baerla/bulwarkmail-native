@@ -416,7 +416,9 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
           <Text style={styles.headerTitle} numberOfLines={1} accessibilityRole="header">{tabLabel}</Text>
         </View>
 
-        <ScrollView ref={paneScrollRef} style={styles.scrollArea} contentContainerStyle={styles.detailContent}>
+        {/* Keyed per page: React would otherwise reuse the list's ScrollView
+            and open the page at the list's scroll offset. */}
+        <ScrollView key={`page-${selectedTab}`} ref={paneScrollRef} style={styles.scrollArea} contentContainerStyle={styles.detailContent}>
           <View ref={paneContentRef}>
             <SearchHighlightContext.Provider value={searchHighlight}>
               {scopeBanner}
@@ -458,6 +460,7 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
       </View>
 
       <ScrollView
+        key="list"
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
