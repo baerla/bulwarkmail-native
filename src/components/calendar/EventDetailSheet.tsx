@@ -57,6 +57,7 @@ import {
 import { getEventEditability } from '../../lib/calendar-editability';
 import { useContactNameResolver } from '../../lib/contact-name-resolver';
 import { useCalendarLocale } from '../../lib/calendar-locale';
+import { formatCalendarDate } from '../../lib/date-format';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { recurrenceEndLabel, recurrenceIntervalLabel } from '../../lib/recurrence';
 import type { TranslateFn } from '../../stores/locale-store';
@@ -95,9 +96,9 @@ function formatRange(event: CalendarEvent, timeFormat: TimeFormat | undefined, l
       start.getMonth() === end.getMonth() &&
       start.getDate() === end.getDate()
     ) {
-      return format(start, 'EEEE, MMM d, yyyy', opts);
+      return formatCalendarDate(start, locale.code, 'longWeekdayMonthDayYear');
     }
-    return `${format(start, 'MMM d', opts)} – ${format(end, 'MMM d, yyyy', opts)}`;
+    return `${formatCalendarDate(start, locale.code, 'monthDay')} – ${formatCalendarDate(end, locale.code, 'monthDayYear')}`;
   }
   const tp = timePattern(timeFormat);
   const sameDay =
@@ -105,9 +106,9 @@ function formatRange(event: CalendarEvent, timeFormat: TimeFormat | undefined, l
     start.getMonth() === end.getMonth() &&
     start.getDate() === end.getDate();
   if (sameDay) {
-    return `${format(start, 'EEE, MMM d', opts)} · ${format(start, tp, opts)} – ${format(end, tp, opts)}`;
+    return `${formatCalendarDate(start, locale.code, 'weekdayMonthDay')} · ${format(start, tp, opts)} – ${format(end, tp, opts)}`;
   }
-  return `${format(start, `MMM d, ${tp}`, opts)} – ${format(end, `MMM d, ${tp}`, opts)}`;
+  return `${formatCalendarDate(start, locale.code, 'monthDay')}, ${format(start, tp, opts)} – ${formatCalendarDate(end, locale.code, 'monthDay')}, ${format(end, tp, opts)}`;
 }
 
 function recurrenceLabel(event: CalendarEvent, t: TranslateFn, locale: Locale): string | null {
@@ -276,7 +277,7 @@ export function EventDetailSheet({
               <Pressable
                 onPress={onClose}
                 style={styles.closeBtn}
-                hitSlop={8}
+                hitSlop={10}
                 accessibilityRole="button"
                 accessibilityLabel={t('common.close', 'Close')}
               >

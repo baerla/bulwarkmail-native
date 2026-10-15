@@ -1356,7 +1356,7 @@ function MoreMenuSheet({
             <Text style={styles.sheetTitle}>{t('email_viewer.more_actions', 'More actions')}</Text>
             <Pressable
               onPress={onClose}
-              hitSlop={8}
+              hitSlop={10}
               style={styles.sheetClose}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}
@@ -1507,7 +1507,7 @@ function TagMenuSheet({ visible, onClose, keywords, activeKeywords, onToggle }: 
             <Text style={styles.sheetTitle}>{t('email_viewer.tag', 'Tag')}</Text>
             <Pressable
               onPress={onClose}
-              hitSlop={8}
+              hitSlop={10}
               style={styles.sheetClose}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}

@@ -536,6 +536,7 @@ export default function ContactsScreen({ onOpenContact, activeContactId = null }
                 key={chip.key}
                 onPress={() => setSelectedCategory(chip.category)}
                 style={[styles.chip, chip.active && styles.chipActive]}
+                hitSlop={{ top: 6, bottom: 6 }}
                 accessibilityRole="button"
                 accessibilityState={{ selected: chip.active }}
               >
@@ -718,15 +719,20 @@ function makeStyles(c: ThemePalette) {
 
   // flexShrink 0: in a short (landscape) window the column squeezed the
   // horizontal scroller and cut the chips off at the bottom.
-  chipBar: { flexGrow: 0, flexShrink: 0, marginBottom: spacing.sm },
+  chipBar: { flexGrow: 0, flexShrink: 0, marginBottom: 2 },
+  // The vertical padding leaves room for the chips' slop, which makes them
+  // 48 dp targets (they were about 28 dp).
   chipBarContent: {
     paddingHorizontal: spacing.lg,
+    paddingVertical: 6,
     gap: spacing.sm,
     alignItems: 'center',
   },
   chip: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
+    minHeight: 36,
+    justifyContent: 'center',
     borderRadius: radius.full,
     backgroundColor: c.surface,
     borderWidth: 1,

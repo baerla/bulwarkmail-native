@@ -82,7 +82,7 @@ export default function TagAssignSheet({
             <Text style={styles.title}>{title ?? t('contacts.bulk.add_tag', 'Add tag')}</Text>
             <Pressable
               onPress={onClose}
-              hitSlop={8}
+              hitSlop={10}
               style={styles.close}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}

@@ -41,6 +41,7 @@ import {
 } from '../../lib/task-editor';
 import { isWritableCalendar } from '../../lib/calendar-editability';
 import { useCalendarLocale } from '../../lib/calendar-locale';
+import { formatCalendarDate } from '../../lib/date-format';
 import { useSheetDrag } from '../../lib/use-sheet-drag';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 import { useSheetInsets } from '../../lib/use-layout';
@@ -213,8 +214,8 @@ export function TasksSheet({
     if (!d || !task.due) return null;
     const hasTime = !task.showWithoutTime && !/^\d{4}-\d{2}-\d{2}$/.test(task.due);
     return hasTime
-      ? format(d, `EEE, MMM d · ${timePattern(timeFormat)}`, { locale })
-      : format(d, 'EEE, MMM d', { locale });
+      ? `${formatCalendarDate(d, locale.code, 'weekdayMonthDay')} · ${format(d, timePattern(timeFormat), { locale })}`
+      : formatCalendarDate(d, locale.code, 'weekdayMonthDay');
   };
 
   const priorityColor = (level: PriorityLevel): string =>
@@ -251,7 +252,7 @@ export function TasksSheet({
               <Pressable
                 onPress={onClose}
                 style={styles.closeBtn}
-                hitSlop={8}
+                hitSlop={10}
                 accessibilityRole="button"
                 accessibilityLabel={t('common.close', 'Close')}
               >
@@ -299,7 +300,7 @@ export function TasksSheet({
                 >
                   <CalendarIcon size={14} color={editor.due ? c.primary : c.textMuted} />
                   <Text style={[styles.chipText, editor.due && styles.chipTextActive]}>
-                    {editor.due ? format(editor.due, 'MMM d', { locale }) : t('calendar.tasks.due_date', 'Due date')}
+                    {editor.due ? formatCalendarDate(editor.due, locale.code, 'monthDay') : t('calendar.tasks.due_date', 'Due date')}
                   </Text>
                   {editor.due && (
                     <Pressable

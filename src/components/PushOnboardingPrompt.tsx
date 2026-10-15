@@ -150,7 +150,7 @@ export function PushOnboardingPrompt(): React.ReactElement | null {
         </View>
         <Pressable
           onPress={handleDismiss}
-          hitSlop={8}
+          hitSlop={14}
           accessibilityRole="button"
           accessibilityLabel={t('settings.notifications.push.dismiss_aria', 'Dismiss notification prompt')}
           style={styles.close}

@@ -74,15 +74,15 @@ export function ThreadMessageCard({
       <MessageContent {...content} compact={false} onToggleStar={bare ? undefined : onToggleStar} />
       {!bare && (
         <View style={[styles.actions, !replyable && styles.actionsDisabled]}>
-          <Pressable style={styles.actionBtn} onPress={reply('reply')} hitSlop={4}>
+          <Pressable style={styles.actionBtn} onPress={reply('reply')} hitSlop={9}>
             <Reply size={16} color={c.textSecondary} />
             <Text style={styles.actionLabel}>{t('email_viewer.reply', 'Reply')}</Text>
           </Pressable>
-          <Pressable style={styles.actionBtn} onPress={reply('replyAll')} hitSlop={4}>
+          <Pressable style={styles.actionBtn} onPress={reply('replyAll')} hitSlop={9}>
             <ReplyAll size={16} color={c.textSecondary} />
             <Text style={styles.actionLabel}>{t('email_viewer.reply_all', 'Reply All')}</Text>
           </Pressable>
-          <Pressable style={styles.actionBtn} onPress={reply('forward')} hitSlop={4}>
+          <Pressable style={styles.actionBtn} onPress={reply('forward')} hitSlop={9}>
             <Forward size={16} color={c.textSecondary} />
             <Text style={styles.actionLabel}>{t('email_viewer.forward', 'Forward')}</Text>
           </Pressable>

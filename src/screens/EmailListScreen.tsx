@@ -1305,7 +1305,7 @@ export default function EmailListScreen({
                   </Pressable>
                   <Pressable
                     onPress={() => removeRecentSearch(q)}
-                    hitSlop={8}
+                    hitSlop={18}
                     accessibilityRole="button"
                     accessibilityLabel={t('advanced_search.suggestions_remove_recent', 'Remove from recent searches')}
                   >
@@ -1600,7 +1600,7 @@ export default function EmailListScreen({
                     <Pressable
                       onPress={() => setFilterMenuOpen(false)}
                       style={styles.filterMenuClose}
-                      hitSlop={6}
+                      hitSlop={10}
                       accessibilityRole="button"
                       accessibilityLabel={t('common.close', 'Close')}
                     >
@@ -1702,7 +1702,7 @@ export default function EmailListScreen({
                         {filters.dateAfter ? (
                           <Pressable
                             onPress={() => setFilterField('dateAfter', undefined)}
-                            hitSlop={6}
+                            hitSlop={12}
                             accessibilityRole="button"
                             accessibilityLabel={t('advanced_search.clear', 'Clear')}
                           >
@@ -1724,7 +1724,7 @@ export default function EmailListScreen({
                         {filters.dateBefore ? (
                           <Pressable
                             onPress={() => setFilterField('dateBefore', undefined)}
-                            hitSlop={6}
+                            hitSlop={12}
                             accessibilityRole="button"
                             accessibilityLabel={t('advanced_search.clear', 'Clear')}
                           >

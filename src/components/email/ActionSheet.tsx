@@ -78,7 +78,7 @@ export function ActionSheet({ visible, title, subtitle, items, onClose, children
               <Text style={styles.title} numberOfLines={1}>{title}</Text>
               {subtitle ? <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text> : null}
             </View>
-            <Pressable onPress={onClose} hitSlop={8} style={styles.close}
+            <Pressable onPress={onClose} hitSlop={10} style={styles.close}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}
             >

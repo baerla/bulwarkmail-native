@@ -137,7 +137,7 @@ export function DeviceSyncCollectionsSheet({ visible, onClose, registryId, autho
             </View>
             <Pressable
               onPress={close}
-              hitSlop={8}
+              hitSlop={10}
               style={styles.close}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}

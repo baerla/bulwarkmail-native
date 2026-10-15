@@ -92,7 +92,7 @@ export default function AddressBookPickerSheet({
             <Text style={styles.title}>{title ?? t('contacts.bulk.move_to_address_book', 'Move to address book')}</Text>
             <Pressable
               onPress={onClose}
-              hitSlop={8}
+              hitSlop={10}
               style={styles.close}
               accessibilityRole="button"
               accessibilityLabel={t('common.close', 'Close')}

@@ -2282,12 +2282,12 @@ export default function ComposeScreen({ route, navigation }: Props) {
           />
         )}
         {field === 'to' && !ccVisible && (
-          <Pressable onPress={() => setCcVisible(true)} style={styles.ccToggle}>
+          <Pressable onPress={() => setCcVisible(true)} style={styles.ccToggle} hitSlop={10} accessibilityRole="button">
             <Text style={styles.ccToggleText}>{t('email_composer.cc', 'Cc')}</Text>
           </Pressable>
         )}
         {field === 'cc' && !bccVisible && (
-          <Pressable onPress={() => setBccVisible(true)} style={styles.ccToggle}>
+          <Pressable onPress={() => setBccVisible(true)} style={styles.ccToggle} hitSlop={10} accessibilityRole="button">
             <Text style={styles.ccToggleText}>{t('email_composer.bcc', 'Bcc')}</Text>
           </Pressable>
         )}
