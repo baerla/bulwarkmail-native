@@ -3,10 +3,24 @@
 // order: en-AU writes 15/10/2026, en-US 10/15/2026. intlLocale() hands the
 // date formatters the device's full tag when its language matches the app
 // language, so an Australian or British phone gets its own dates (#75).
-import { getLocales } from 'expo-localization';
-import { resolveLocaleTag } from '../i18n';
+//
+// This module stays free of react-native and expo because the device sync
+// engine reaches it through quote-header (see device-sync purity test). The
+// i18n module reads the device locales and registers them here on load.
 
+export interface DeviceLocale {
+  /** The app language this device locale selects, from resolveLocaleTag. */
+  appLocale: string | null;
+  languageTag: string;
+}
+
+let deviceLocales: DeviceLocale[] = [];
 const cache = new Map<string, string>();
+
+export function setDeviceLocales(locales: DeviceLocale[]): void {
+  deviceLocales = locales;
+  cache.clear();
+}
 
 // Android 14 appends regional preferences such as `-u-fw-mon-mu-celsius`.
 // The app has its own time-format and week-start settings, so keep only the
@@ -25,14 +39,8 @@ function isUsable(tag: string): boolean {
 }
 
 function deviceTagFor(locale: string): string | null {
-  let devices: ReturnType<typeof getLocales>;
-  try {
-    devices = getLocales();
-  } catch {
-    return null;
-  }
-  for (const l of devices) {
-    if (!l.languageTag || resolveLocaleTag(l) !== locale) continue;
+  for (const l of deviceLocales) {
+    if (!l.languageTag || l.appLocale !== locale) continue;
     const tag = baseTag(l.languageTag);
     // A tag without a region adds nothing over the language subtag.
     if (tag.includes('-') && isUsable(tag)) return tag;
@@ -51,9 +59,4 @@ export function intlLocale(locale: string | null | undefined): string {
     : deviceTagFor(lang) ?? (lang === 'en' ? 'en-US' : lang);
   cache.set(lang, resolved);
   return resolved;
-}
-
-/** Test hook: forget the resolved tags so a changed device locale is seen. */
-export function resetIntlLocaleCache(): void {
-  cache.clear();
 }

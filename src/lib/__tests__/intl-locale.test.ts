@@ -7,13 +7,14 @@ vi.mock('expo-localization', () => ({
   getCalendars: () => [{ timeZone: 'UTC', firstWeekday: 1 }],
 }));
 
-import { intlLocale, resetIntlLocaleCache } from '../intl-locale';
+import { intlLocale } from '../intl-locale';
+import { registerDeviceLocales } from '../../i18n';
 import { formatCalendarDate, formatListDate } from '../date-format';
 import { formatHeaderDate } from '../email-date';
 
 function setDevice(...tags: string[]) {
   device.locales = tags.map((t) => ({ languageTag: t, languageCode: t.split('-')[0] }));
-  resetIntlLocaleCache();
+  registerDeviceLocales();
 }
 
 describe('intlLocale', () => {
