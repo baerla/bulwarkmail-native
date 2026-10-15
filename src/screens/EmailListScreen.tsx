@@ -33,6 +33,7 @@ import { useSettingsStore, type SwipeAction, type SwipeMode } from '../stores/se
 import { useKeywordsStore, type KeywordDef } from '../stores/keywords-store';
 import { useBackWhileFocused } from '../lib/use-back-while-focused';
 import { listBackStep } from '../lib/list-back';
+import { reportFailure } from '../lib/report-failure';
 import { useLayout } from '../lib/use-layout';
 import { useSendUndoStore } from '../stores/send-undo-store';
 import { useLocaleStore } from '../stores/locale-store';
@@ -535,6 +536,12 @@ export default function EmailListScreen({
             ? t('email_list.import.none', 'No messages were imported.')
             : t('email_list.import.success', '{count, plural, one {# message imported.} other {# messages imported.}}', { count: imported }),
       );
+    } catch (err) {
+      // A failed import used to end without a word.
+      Alert.alert(
+        t('email_list.import.title', 'Import'),
+        err instanceof Error ? err.message : t('email_list.import.none', 'No messages were imported.'),
+      );
     } finally {
       setImporting(false);
     }
@@ -644,8 +651,8 @@ export default function EmailListScreen({
       case 'archive':
         if (archiveMailboxId && currentMailboxId !== archiveMailboxId) {
           const ids = idsForRow(id);
-          if (ids.length > 1) void archiveEmailsBatch(ids);
-          else void archiveEmailAction(id);
+          if (ids.length > 1) reportFailure(archiveEmailsBatch(ids));
+          else reportFailure(archiveEmailAction(id));
         } else if (!archiveMailboxId) {
           Alert.alert(
             t('email_list.error', 'Error'),
@@ -654,16 +661,16 @@ export default function EmailListScreen({
         }
         break;
       case 'delete':
-        void deleteIds(idsForRow(id));
+        reportFailure(deleteIds(idsForRow(id)));
         break;
       case 'spam':
         // Your own outgoing mail is never spam (webmail hides the action in
         // Sent/Drafts); inside Junk the same swipe means "not spam".
         if (currentRole === 'sent' || currentRole === 'drafts') break;
         if (inJunk) {
-          void unmarkSpam(idsForRow(id));
+          reportFailure(unmarkSpam(idsForRow(id)));
         } else if (junkMailboxId) {
-          void markSpam(idsForRow(id));
+          reportFailure(markSpam(idsForRow(id)));
         } else {
           Alert.alert(
             t('email_list.error', 'Error'),
@@ -672,14 +679,14 @@ export default function EmailListScreen({
         }
         break;
       case 'read':
-        if (isUnread(email)) void markRead(id);
-        else void markUnread(id);
+        if (isUnread(email)) reportFailure(markRead(id));
+        else reportFailure(markUnread(id));
         break;
       case 'star':
-        void toggleStar(id, !isStarred(email));
+        reportFailure(toggleStar(id, !isStarred(email)));
         break;
       case 'pin':
-        void togglePin(id, !isPinned(email));
+        reportFailure(togglePin(id, !isPinned(email)));
         break;
       case 'move':
         setPendingMoveId(id);
@@ -788,7 +795,11 @@ export default function EmailListScreen({
   const handleBulkDelete = async () => {
     const trash = findTrashMailbox(scopedMailboxes);
     if (!trash || !currentMailboxId) {
-      clearSelection();
+      // Said, as the swipe says it, instead of dropping the selection.
+      Alert.alert(
+        t('email_list.error', 'Error'),
+        t('email_list.no_trash_folder', 'Could not find a Trash folder on the server. Please check your mailbox configuration.'),
+      );
       return;
     }
     const ids = selectedMessageIds;
@@ -824,11 +835,11 @@ export default function EmailListScreen({
     const ids = selectedMessageIds;
     setBatchMoveOpen(false);
     clearSelection();
-    void moveEmailsToMailbox(ids, toId);
+    reportFailure(moveEmailsToMailbox(ids, toId));
   };
 
   const handleBatchTagToggle = (token: string, on: boolean) => {
-    void setKeywordForEmails(selectedMessageIds, token, on);
+    reportFailure(setKeywordForEmails(selectedMessageIds, token, on));
   };
 
   // Local input state for uninterrupted typing. The search runs on submit,
@@ -1040,7 +1051,7 @@ export default function EmailListScreen({
             {t('email_list.batch_actions.selected_messages', '{count, plural, one {1 email} other {# emails}} selected', { count: selectedIds.size })}
           </Text>
           <Pressable
-            onPress={() => { void handleBulkStar(); }}
+            onPress={() => reportFailure(handleBulkStar())}
             style={styles.headerButton}
             hitSlop={6}
             accessibilityRole="button"
@@ -1053,7 +1064,7 @@ export default function EmailListScreen({
             />
           </Pressable>
           <Pressable
-            onPress={() => { void handleBulkMarkReadToggle(); }}
+            onPress={() => reportFailure(handleBulkMarkReadToggle())}
             style={styles.headerButton}
             hitSlop={6}
             accessibilityRole="button"
@@ -1087,7 +1098,7 @@ export default function EmailListScreen({
           </Pressable>
           {canSpamSelection && (
             <Pressable
-              onPress={() => { void handleBulkSpam(); }}
+              onPress={() => reportFailure(handleBulkSpam())}
               style={styles.headerButton}
               hitSlop={6}
               accessibilityRole="button"
@@ -1102,7 +1113,7 @@ export default function EmailListScreen({
           )}
           {canArchiveSelection && (
             <Pressable
-              onPress={() => { void handleBulkArchive(); }}
+              onPress={() => reportFailure(handleBulkArchive())}
               style={styles.headerButton}
               hitSlop={6}
               accessibilityRole="button"
@@ -1112,7 +1123,7 @@ export default function EmailListScreen({
             </Pressable>
           )}
           <Pressable
-            onPress={() => { void handleBulkDelete(); }}
+            onPress={() => reportFailure(handleBulkDelete())}
             style={styles.headerButton}
             hitSlop={6}
             accessibilityRole="button"
@@ -1772,8 +1783,8 @@ export default function EmailListScreen({
           setPendingMoveId(null);
           if (id && currentMailboxId && toId !== currentMailboxId) {
             const ids = idsForRow(id);
-            if (ids.length > 1) void moveEmailsToMailbox(ids, toId);
-            else void moveToMailboxAction(id, currentMailboxId, toId);
+            if (ids.length > 1) reportFailure(moveEmailsToMailbox(ids, toId));
+            else reportFailure(moveToMailboxAction(id, currentMailboxId, toId));
           }
         }}
       />
