@@ -179,7 +179,7 @@ function makeStyles(c: ThemePalette) {
       backgroundColor: c.muted,
       gap: 2,
     },
-    previewLabel: { fontSize: 11, fontWeight: '600', color: c.mutedForeground, textTransform: 'uppercase' },
+    previewLabel: { fontSize: 12, fontWeight: '500', color: c.mutedForeground },
     previewValue: { ...typography.captionMedium, color: c.text },
     tokenWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: spacing.md },
     tokenPill: {

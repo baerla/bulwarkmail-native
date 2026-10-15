@@ -317,6 +317,7 @@ function makeStyles(c: ThemePalette) {
   },
   bottomActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
     paddingTop: spacing.sm,
   },

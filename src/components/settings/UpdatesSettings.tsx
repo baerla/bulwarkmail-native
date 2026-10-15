@@ -267,7 +267,7 @@ function makeStyles(c: ThemePalette) {
     backgroundColor: c.muted,
     gap: spacing.sm,
   },
-  notesTitle: { ...typography.caption, color: c.mutedForeground, textTransform: 'uppercase' },
+  notesTitle: { ...typography.captionMedium, color: c.mutedForeground },
   notesBody: { ...typography.body, color: c.text, lineHeight: 20 },
   progressBox: {
     paddingHorizontal: spacing.md,

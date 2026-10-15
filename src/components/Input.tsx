@@ -14,13 +14,12 @@ interface InputProps extends TextInputProps {
 }
 
 /**
- * Matches webmail input.tsx:
- * - h-10 w-full rounded-md border border-input bg-background
- * - px-3 py-2 text-sm text-foreground
- * - placeholder:text-muted-foreground
- * - hover:border-muted-foreground
- * - focus:ring-2 ring-ring border-ring
- * - disabled:opacity-50
+ * Matches webmail input.tsx in the standard theme:
+ * - h-10 rounded-md border border-input, transparent background
+ * - px-3 text-sm text-foreground, placeholder in muted-foreground
+ * - focus: border-ring
+ * - disabled: opacity-50
+ * - label above in text-sm font-medium text-foreground
  */
 export default function Input({
   label,
@@ -50,7 +49,7 @@ export default function Input({
           ref={ref}
           {...props}
           style={[styles.input, style]}
-          placeholderTextColor={c.textMuted}
+          placeholderTextColor={c.mutedForeground}
           onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
           onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
         />
@@ -65,8 +64,8 @@ function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
   label: {
     ...typography.bodyMedium,
-    color: c.textSecondary,
-    marginBottom: spacing.sm,
+    color: c.text,
+    marginBottom: 6,
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -75,12 +74,12 @@ function makeStyles(c: ThemePalette) {
     borderWidth: 1,
     borderColor: c.border,            // border-input
     borderRadius: radius.sm,               // rounded-md = 6px
-    backgroundColor: c.background,    // bg-background
+    backgroundColor: 'transparent',
     paddingHorizontal: spacing.md,         // px-3 = 12px
   },
+  // Colour only, so focusing doesn't shift the text by a pixel.
   inputFocused: {
-    borderColor: c.borderFocus,       // border-ring (blue-500)
-    borderWidth: 2,
+    borderColor: c.borderFocus,
   },
   inputError: {
     borderColor: c.error,

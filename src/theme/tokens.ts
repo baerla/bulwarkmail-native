@@ -326,6 +326,6 @@ export const componentSizes = {
   headerHeight: 56, inputHeight: 40,
   buttonSm: 36, buttonMd: 40, buttonLg: 44,
   tagDot: 6, eventDot: 6,
-  toggleHeight: 24, toggleWidth: 44, toggleThumb: 16,
+  toggleHeight: 24, toggleWidth: 44, toggleThumb: 20,
   fab: 56, badgeSize: 16,
 } as const;
