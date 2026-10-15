@@ -887,6 +887,7 @@
       "text_signature": "Plain-text signature"
     },
     "keywords": {
+      "delete_confirm_title": "Delete tag \"{label}\"?",
       "description_mobile": "Colored tags to organize your mail.",
       "discover": {
         "add_all": "Add all",

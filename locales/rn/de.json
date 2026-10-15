@@ -868,6 +868,7 @@
       "text_signature": "Klartext-Signatur"
     },
     "keywords": {
+      "delete_confirm_title": "Tag „{label}“ löschen?",
       "description_mobile": "Farbige Labels zum Organisieren Ihrer E-Mails.",
       "discover": {
         "add_all": "Alle hinzufügen",
