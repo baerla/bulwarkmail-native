@@ -36,6 +36,7 @@ import { shareEmailEml } from '../lib/email-export';
 import { useKeywordsStore, keywordToken, type KeywordDef } from '../stores/keywords-store';
 import { useSheetDrag } from '../lib/use-sheet-drag';
 import { useKeyboardObstruction } from '../lib/use-keyboard-obstruction';
+import { useLayout } from '../lib/use-layout';
 import { useLocaleStore } from '../stores/locale-store';
 import {
   findArchiveMailbox, findTrashMailbox, mailboxAccountId, mailboxesOfAccount, mailboxOfEmail,
@@ -1562,7 +1563,10 @@ function ToolbarButton({
 }: { icon: React.ReactNode; label: string; onPress?: () => void }) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
-  const showLabels = useSettingsStore((s) => s.showToolbarLabels);
+  // Icons only in a short (landscape) window, which leaves room for the message.
+  const labelsSetting = useSettingsStore((s) => s.showToolbarLabels);
+  const { shortHeight } = useLayout();
+  const showLabels = labelsSetting && !shortHeight;
   return (
     <Pressable
       onPress={onPress}
@@ -1571,7 +1575,7 @@ function ToolbarButton({
       accessibilityLabel={label}
     >
       {icon}
-      {showLabels && <Text style={styles.toolbarActionLabel}>{label}</Text>}
+      {showLabels && <Text style={styles.toolbarActionLabel} numberOfLines={1}>{label}</Text>}
     </Pressable>
   );
 }
@@ -1581,7 +1585,10 @@ function BottomBarButton({
 }: { icon: React.ReactNode; label: string; onPress?: () => void; disabled?: boolean }) {
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
-  const showLabels = useSettingsStore((s) => s.showToolbarLabels);
+  // Icons only in a short (landscape) window, which leaves room for the message.
+  const labelsSetting = useSettingsStore((s) => s.showToolbarLabels);
+  const { shortHeight } = useLayout();
+  const showLabels = labelsSetting && !shortHeight;
   return (
     <Pressable
       onPress={disabled ? undefined : onPress}
@@ -1623,11 +1630,16 @@ function makeStyles(c: ThemePalette) {
     borderRadius: radius.full,
   },
   toolbarEmbedded: { justifyContent: 'flex-end' },
+  // The actions shrink (labels truncate) rather than push "More" off a
+  // narrow screen, as long German labels at a large font did.
   toolbarActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
   },
   toolbarAction: {
+    flexShrink: 1,
+    minWidth: 48,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
