@@ -27,6 +27,7 @@ import { jmapClient } from '../../api/jmap-client';
 import type { Mailbox } from '../../api/types';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 import { useSheetInsets } from '../../lib/use-layout';
+import Badge from '../Badge';
 
 const ROLE_ICON: Record<string, any> = {
   inbox: Inbox, drafts: FileText, sent: Send, trash: Trash,
@@ -275,11 +276,7 @@ export function FolderSettings() {
                   <View style={styles.folderLeft}>
                     <Icon size={16} color={mb.role ? c.primary : c.mutedForeground} />
                     <Text style={styles.folderName} numberOfLines={1}>{localizeMailboxName(mb.role, mb.name, t)}</Text>
-                    {mb.role && (
-                      <View style={styles.rolePill}>
-                        <Text style={styles.rolePillText}>{mb.role}</Text>
-                      </View>
-                    )}
+                    {mb.role && <Badge>{mb.role}</Badge>}
                   </View>
                   <View style={styles.folderRight}>
                     {mb.unreadEmails > 0 && (
@@ -416,11 +413,6 @@ function makeStyles(c: ThemePalette) {
     folderRowPressed: { backgroundColor: c.muted },
     folderLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flex: 1 },
     folderName: { ...typography.body, color: c.text, flexShrink: 1 },
-    rolePill: {
-      paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.full,
-      backgroundColor: c.primaryBg,
-    },
-    rolePillText: { fontSize: 10, fontWeight: '500', color: c.primary },
     folderRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
     unreadBadge: {
       paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.full,

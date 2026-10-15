@@ -21,6 +21,7 @@ import { FilterRuleModal } from '../filters/FilterRuleModal';
 import { SieveEditorSheet } from '../filters/SieveEditorSheet';
 import type { FilterRule } from '../../lib/sieve/types';
 import { formatConditionValue, summarizeRule } from '../../lib/sieve/condition-value';
+import Badge from '../Badge';
 
 type Translate = (key: string, fallback?: string) => string;
 
@@ -366,7 +367,7 @@ export function FilterSettings({ onOpenVacation }: FilterSettingsProps = {}) {
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <View style={styles.ruleNameRow}>
                         <Text style={styles.ruleName} numberOfLines={1}>{rule.name}</Text>
-                        <View style={styles.originBadge}><Text style={styles.originBadgeText}>{label}</Text></View>
+                        <Badge>{label}</Badge>
                       </View>
                       {hasStructured ? (
                         expandedView ? (
@@ -571,8 +572,6 @@ function makeStyles(c: ThemePalette) {
       backgroundColor: c.muted,
       borderRadius: radius.xs,
     },
-    originBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.full, backgroundColor: c.muted },
-    originBadgeText: { fontSize: 10, fontWeight: '500', color: c.mutedForeground },
 
     reorderCol: { alignItems: 'center' },
     reorderBtn: { padding: 2 },

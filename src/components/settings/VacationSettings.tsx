@@ -417,7 +417,7 @@ function makeStyles(c: ThemePalette) {
   },
   pillActive: { backgroundColor: c.successBg },
   pillInactive: { backgroundColor: c.muted },
-  pillText: { fontSize: 11, fontWeight: '500' },
+  pillText: { fontSize: 12 },
   pillTextActive: { color: c.success },
   pillTextInactive: { color: c.mutedForeground },
   dateInput: {

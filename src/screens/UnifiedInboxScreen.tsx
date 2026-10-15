@@ -637,7 +637,7 @@ function makeStyles(c: ThemePalette) {
       backgroundColor: c.muted,
       maxWidth: 140,
     },
-    sharedBadgeText: { fontSize: 10, fontWeight: '500', color: c.mutedForeground },
+    sharedBadgeText: { fontSize: 12, color: c.mutedForeground },
     preview: { ...typography.caption, color: c.textMuted },
   });
 }
