@@ -57,6 +57,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'EmailThread'> & {
   onActiveChange?: (emailId: string) => void;
 };
 
+// How much of the card above the opened one stays in view when a long
+// conversation opens scrolled to it.
+const OPENED_CARD_PEEK = 56;
+/** How long after opening the viewer may still scroll to the open card. */
+const REVEAL_WINDOW_MS = 2000;
+
 // How long the pages beside the one on screen wait for its body at most.
 const NEIGHBOUR_FALLBACK_MS = 1500;
 
@@ -1027,6 +1033,32 @@ function EmailPane({
   // renders the skeleton first, and a hook after it crashed the app.
   const scrollRef = React.useRef<ScrollView>(null);
   const isInputFocused = React.useRef(false);
+  const cardsTopRef = React.useRef(0);
+  // The cards above the open one settle over a few frames (their rows fill
+  // in), so the reveal waits until the open card stops moving, gives up
+  // after a moment, and never fights a scroll the user started.
+  const revealDoneRef = React.useRef(false);
+  const revealTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedAtRef = React.useRef(Date.now());
+  const viewportHeightRef = React.useRef(0);
+  const revealOpenedCard = React.useCallback((cardY: number) => {
+    if (revealDoneRef.current || Date.now() - mountedAtRef.current > REVEAL_WINDOW_MS) return;
+    if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+    revealTimerRef.current = setTimeout(() => {
+      if (revealDoneRef.current) return;
+      // Only when the card starts low on the screen (a short conversation
+      // is fine as it is); keep the bottom of the previous card in sight so
+      // it reads as a thread.
+      const top = cardsTopRef.current + cardY;
+      if (top < viewportHeightRef.current * 0.6) return;
+      scrollRef.current?.scrollTo({ y: top - OPENED_CARD_PEEK, animated: false });
+    }, 250);
+  }, []);
+  const stopReveal = React.useCallback(() => {
+    revealDoneRef.current = true;
+    if (revealTimerRef.current) clearTimeout(revealTimerRef.current);
+  }, []);
+  React.useEffect(() => stopReveal, [stopReveal]);
   React.useEffect(() => {
     if (kbObstruction > 0 && isInputFocused.current) {
       setTimeout(() => {
@@ -1074,6 +1106,7 @@ function EmailPane({
   // A single message goes through the same card list (bare), so its content
   // and WebView stay mounted when a conversation arrives around it.
   const members = conversation ?? [shown];
+  const firstOpenId = conversation?.find((m) => expanded?.has(m.id) ?? m.id === id)?.id;
   const newest = conversation ? conversation[conversation.length - 1] : email;
   // The quick reply quotes the message, so it waits for the newest one's body.
   const newestLoaded = !!newest && !!peekDetail(newest.id, jmapAccountId);
@@ -1107,6 +1140,8 @@ function EmailPane({
       contentContainerStyle={[styles.paneContent, { paddingBottom: bottomPadding }]}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
+      onScrollBeginDrag={stopReveal}
+      onLayout={(e) => { viewportHeightRef.current = e.nativeEvent.layout.height; }}
       scrollEnabled={!pinching}
     >
       {/* Subject block */}
@@ -1144,13 +1179,16 @@ function EmailPane({
         </View>
       </View>
 
-      <View style={asConversation ? undefined : styles.paneFill}>
+      <View
+        style={asConversation ? undefined : styles.paneFill}
+        onLayout={(e) => { cardsTopRef.current = e.nativeEvent.layout.y; }}
+      >
         {Array.from({ length: pendingCards }, (_, i) => <ThreadCardPlaceholder key={`pending-${i}`} />)}
         {members.map((m) => {
           const open = !asConversation || (expanded?.has(m.id) ?? m.id === id);
           // An open card without its body yet shows its header over placeholder lines.
           const full = peekDetail(m.id, jmapAccountId);
-          return (
+          const card = (
             <ThreadMessageCard
               key={m.id}
               bare={!asConversation}
@@ -1174,6 +1212,14 @@ function EmailPane({
               onEmailPatched={onEmailPatched}
             />
           );
+          // In a long conversation the open messages (the opened one, and
+          // unread ones) sit below the older, collapsed cards. Bring the first
+          // open card into view once, like Gmail, instead of opening on the
+          // oldest message. Only collapsed rows sit above it, so its place
+          // doesn't move as message bodies load.
+          return conversation && m.id === firstOpenId ? (
+            <View key={m.id} onLayout={(e) => revealOpenedCard(e.nativeEvent.layout.y)}>{card}</View>
+          ) : card;
         })}
       </View>
 
