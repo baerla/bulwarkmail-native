@@ -662,6 +662,9 @@ export default function ComposeScreen({ route, navigation }: Props) {
   });
 
   const editorRef = React.useRef<RichTextEditorHandle>(null);
+  const subjectRef = React.useRef<TextInput>(null);
+  const plainBodyRef = React.useRef<TextInput>(null);
+  const [subjectFocused, setSubjectFocused] = React.useState(false);
   const isPickingSuggestion = React.useRef(false);
   // Track inline-image placeholders that haven't yet been rewritten to cid:
   // until send time. Maps cid → blobId/type/name/size.
@@ -2249,7 +2252,13 @@ export default function ComposeScreen({ route, navigation }: Props) {
                 isPickingSuggestion.current = false;
               }, 200);
             }}
-            onSubmitEditing={() => addTyped(field)}
+            // Return turns typed text into a chip; on an empty field it
+            // moves on to the subject.
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              if (inputFor(field).trim()) addTyped(field);
+              else subjectRef.current?.focus();
+            }}
             blurOnSubmit={false}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -2383,12 +2392,24 @@ export default function ComposeScreen({ route, navigation }: Props) {
           <View style={styles.fieldRow}>
             <Text style={styles.fieldLabel}>{t('email_composer.subject', 'Subject')}</Text>
             <TextInput
+              ref={subjectRef}
               disableFullscreenUI
               style={styles.subjectInput}
               placeholder={t('email_composer.subject_placeholder', 'Subject')}
               placeholderTextColor={c.textMuted}
               value={subject}
               onChangeText={setSubject}
+              // Unfocused, a long subject shows from its start ("Re: …"), not
+              // scrolled to its end.
+              selection={subjectFocused ? undefined : SELECTION_START}
+              onFocus={() => setSubjectFocused(true)}
+              onBlur={() => setSubjectFocused(false)}
+              returnKeyType="next"
+              blurOnSubmit={false}
+              onSubmitEditing={() => {
+                if (plainTextMode) plainBodyRef.current?.focus();
+                else editorRef.current?.focus();
+              }}
             />
           </View>
 
@@ -2407,6 +2428,7 @@ export default function ComposeScreen({ route, navigation }: Props) {
 
           {plainTextMode ? (
             <TextInput
+              ref={plainBodyRef}
               disableFullscreenUI
               style={styles.plainEditor}
               multiline
@@ -2875,6 +2897,8 @@ export default function ComposeScreen({ route, navigation }: Props) {
     </View>
   );
 }
+
+const SELECTION_START = { start: 0, end: 0 };
 
 /** Gap between the tablet composer panel and the screen edges. */
 const PANEL_MARGIN = 24;
