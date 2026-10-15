@@ -716,7 +716,9 @@ function makeStyles(c: ThemePalette) {
   },
   searchInput: { flex: 1, ...typography.body, color: c.text, paddingVertical: 0 },
 
-  chipBar: { flexGrow: 0, marginBottom: spacing.sm },
+  // flexShrink 0: in a short (landscape) window the column squeezed the
+  // horizontal scroller and cut the chips off at the bottom.
+  chipBar: { flexGrow: 0, flexShrink: 0, marginBottom: spacing.sm },
   chipBarContent: {
     paddingHorizontal: spacing.lg,
     gap: spacing.sm,
