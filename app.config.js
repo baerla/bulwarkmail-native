@@ -99,6 +99,9 @@ module.exports = {
     ],
     extra: {
       commit: COMMIT,
+      // Settings → About → Source code. A modified build sets SOURCE_CODE_URL
+      // to where its own source is (AGPL §13); the default is upstream.
+      sourceCodeUrl: process.env.SOURCE_CODE_URL || 'https://github.com/bulwarkmail/native',
     },
   },
 };

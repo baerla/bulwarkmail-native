@@ -96,7 +96,9 @@ describe('settings search index (English catalog)', () => {
     contacts: 'ContactsSettings.tsx',
     files: 'FilesSettings.tsx',
     sidebar_apps: 'SidebarAppsSettings.tsx',
-    about_data: 'AboutDataSettings.tsx',
+    about_data: 'StorageSettings.tsx',
+    about: 'AboutSettings.tsx',
+    debug: 'TroubleshootingSettings.tsx',
     updates: 'UpdatesSettings.tsx',
   };
 

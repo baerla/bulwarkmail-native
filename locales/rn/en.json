@@ -627,6 +627,24 @@
     "send_now_failed": "Could not send now"
   },
   "settings": {
+    "about": {
+      "check_now": "Check now",
+      "checked_at": "Checked {when}",
+      "licences": "Open-source licences",
+      "licences_desc": "AGPL-3.0 for the app, and the libraries it uses",
+      "never_checked": "Not checked yet",
+      "privacy": "Privacy",
+      "privacy_desc": "What stays on this phone and what goes to your server",
+      "report_problem": "Report a problem",
+      "report_problem_desc": "Opens an issue on GitHub with the version filled in",
+      "server": "Server",
+      "server_value": "{host} · signed in as {user}",
+      "source_code": "Source code",
+      "this_device": "This device",
+      "this_device_desc": "What the app is connected to and how to get help.",
+      "up_to_date": "Up to date",
+      "updates": "Updates"
+    },
     "account": {
       "accounts": {
         "description_mobile": "Reorder how accounts appear in the account switcher, pick the default, or sign one out.",
@@ -653,6 +671,7 @@
       }
     },
     "appearance": {
+      "description_mobile": "Customize how the app looks",
       "language": {
         "restart_for_direction": "Restart the app to apply the new text direction.",
         "system_default": "System default"
@@ -661,9 +680,18 @@
         "description_mobile": "Display text labels next to toolbar icons."
       }
     },
+    "backup": {
+      "description": "Move your settings to another phone or the webmail.",
+      "export_import": "Export or import",
+      "export_import_desc": "A JSON file, same format as the webmail",
+      "reset": "Reset",
+      "reset_desc": "Back to the defaults; mail stays",
+      "title": "Settings backup"
+    },
     "badges": {
       "experimental": "Experimental",
       "not_implemented": "Not implemented",
+      "not_on_server": "Not on this server",
       "unavailable": "Unavailable"
     },
     "contacts": {
@@ -928,6 +956,12 @@
       "unified_cross_account": "Unified views across accounts",
       "unified_cross_account_description": "Combine every signed-in account in \"All inboxes\". Off keeps the unified views inside the active account and its shared folders."
     },
+    "licences": {
+      "app_desc": "The app is free software under the {licence}. You can use, study, share and change it.",
+      "libraries": "Libraries",
+      "libraries_desc": "Open-source code the app is built with.",
+      "read_licence": "Read the full licence text"
+    },
     "message_list_order": {
       "description": "Which messages come first in the list. Newest first is the tie-breaker within each group; the header toggle still flips oldest/newest.",
       "preset_chronological": "Newest first",
@@ -993,23 +1027,31 @@
       "clear_title": "Clear offline mail",
       "days_ago": "{count} d ago",
       "description": "Download recent messages so they open instantly and remain readable without a connection. Bodies only — attachments are still fetched on demand.",
+      "description_short": "Keep recent messages on this phone so they open without a connection.",
       "downloading": "Downloading {completed}/{total}…",
       "enabled": "Cache recent mail",
       "enabled_desc": "When on, the app keeps message bodies for the selected window on this device.",
       "hours_ago": "{count} h ago",
       "just_now": "just now",
+      "keep_24h": "24 hours",
+      "keep_days": "{count} days",
+      "keep_from": "Keep mail from the last",
       "last_sync": "Last sync {when}",
       "last_sync_failed": "Last sync failed: {message}",
       "max_size": "Maximum size",
       "max_size_desc": "Oldest messages are removed when the cache grows past this.",
+      "messages_offline": "{count, plural, one {# message offline} other {# messages offline}}",
       "minutes_ago": "{count} min ago",
       "never": "never",
       "nothing_cached": "Nothing cached yet",
       "queued_changes": "{count, plural, one {# change} other {# changes}} waiting to sync",
       "scanning": "Scanning recent mail…",
       "sync_now": "Sync now",
+      "synced": "Synced {when}",
       "syncing": "Syncing…",
       "title": "Offline mail",
+      "use_at_most": "Use at most",
+      "used_of": "{used} of {limit} MB",
       "window": "Window",
       "window_24h": "Last 24 hours",
       "window_days": "Last {count} days",
@@ -1018,6 +1060,22 @@
     "plugins": {
       "mobile_description": "Plugins run inside the webmail and extend it in the browser.",
       "mobile_explainer": "The mobile app has no plugin runtime. Install and manage plugins from the webmail under Settings → Plugins; themes and filters they provide are not applied here."
+    },
+    "privacy": {
+      "favicons": "Sender icons for business mail come from DuckDuckGo's icon service, which sees the sender's domain. Turn them off under Appearance → Sender favicons.",
+      "no_tracking": "The app has no analytics and no ads.",
+      "other_title": "Other connections",
+      "phone_backup": "None of it goes into Android's cloud backup.",
+      "phone_secure": "Your sign-in details are kept in the system's secure storage. Settings, the offline mail cache and changes waiting to sync are kept in the app's own storage.",
+      "phone_title": "On this phone",
+      "push": "When notifications are on, your server tells the push relay ({relay}) that something changed, and the relay wakes the app through {service}. The relay sees a device token and a change marker, never your mail. You can use your own relay under Notifications.",
+      "push_title": "Push notifications",
+      "server": "Mail, calendars, contacts and files are loaded from your server and saved back to it. Apart from the connections below, the app talks only to your server.",
+      "server_title": "Your mail server",
+      "service_apple": "Apple's push service",
+      "service_google": "Google's push service",
+      "updates": "The app asks GitHub for the latest release to tell you about updates.",
+      "updates_android": "The app asks GitHub for the latest release to tell you about updates. Turn that off under Updates."
     },
     "security": {
       "client_cert": {
@@ -1118,10 +1176,39 @@
       "mobile_description": "Sign and encrypt mail with S/MIME certificates.",
       "mobile_explainer": "S/MIME is not available in the mobile app yet. Manage keys and certificates in the webmail; signed messages are shown without verification here."
     },
+    "summary": {
+      "events_off": "events off",
+      "events_on": "events on",
+      "mail_off": "Mail off",
+      "mail_on": "Mail on",
+      "offline_off": "Offline mail off",
+      "offline_on": "Offline mail on · {days, plural, one {# day} other {# days}}, {mb} MB",
+      "version": "Version {version}",
+      "week_starts": "week starts {day}",
+      "layout": "Quick actions, swipes, list order",
+      "reading": "Read status, delete, attachments",
+      "composing": "Signature, send delay, drafts",
+      "identities": "Addresses you send from",
+      "vacation": "Automatic reply while away",
+      "filters": "Rules for incoming mail",
+      "templates": "Reusable messages",
+      "folders": "Create, rename, roles",
+      "keywords": "Tag names and colours",
+      "downloads": "File names for saved mail",
+      "security": "Password, two-factor, app passwords",
+      "content_senders": "Remote images, trusted senders",
+      "contacts": "Address books, sorting",
+      "files": "View, sorting, thumbnails",
+      "sidebar_apps": "Web apps in the side menu",
+      "updates": "Install new versions"
+    },
     "tabs": {
       "plugins": "Plugins",
       "themes": "Themes",
-      "updates": "Updates"
+      "updates": "Updates",
+      "storage": "Storage & backup",
+      "about": "About",
+      "troubleshooting": "Troubleshooting"
     },
     "templates": {
       "delete_confirm": "Permanently delete \"{name}\"?",
@@ -1140,6 +1227,12 @@
       "default_name": "Bulwark",
       "mobile_description": "Pick a colour theme. Themes follow the light/dark setting from Appearance; custom theme packages are managed in the webmail.",
       "title": "Themes"
+    },
+    "troubleshooting": {
+      "cache_desc": "When a list looks stale or wrong.",
+      "cache_title": "Cached data",
+      "row_desc": "Refresh cached data, debug logging",
+      "title": "Troubleshooting"
     },
     "vacation": {
       "warnings": {
