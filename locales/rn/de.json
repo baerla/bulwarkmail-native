@@ -128,6 +128,7 @@
       "add_placeholder": "Aufgabe hinzufügen…",
       "add_time": "Uhrzeit hinzufügen",
       "clear_due_date": "Fälligkeitsdatum entfernen",
+      "delete_confirm": "Diese Aufgabe löschen?",
       "delete_error": "Aufgabe konnte nicht gelöscht werden",
       "not_found": "Diese Aufgabe ist nicht mehr verfügbar.",
       "save_error": "Aufgabe konnte nicht gespeichert werden",

@@ -634,15 +634,32 @@ export default function CalendarScreen() {
     [t],
   );
 
+  // A single event is gone for good once deleted; ask first, as the
+  // recurrence-scope dialog already does for a series.
+  const confirmDeleteEvent = React.useCallback((event: CalendarEvent) => {
+    Alert.alert(
+      t('calendar.detail.delete_confirm', 'Delete this event?'),
+      event.title || undefined,
+      [
+        { text: t('common.cancel', 'Cancel'), style: 'cancel' },
+        {
+          text: t('calendar.recurrence_scope.delete', 'Delete'),
+          style: 'destructive',
+          onPress: () => { deleteEvent(event.id).catch(reportError); },
+        },
+      ],
+    );
+  }, [deleteEvent, reportError, t]);
+
   const handleDeleteFromDetail = React.useCallback((event: CalendarEvent) => {
     if (isReadOnlyEvent(event)) { setDetailEvent(null); return; }
     setDetailEvent(null);
     if (isRecurringSeriesMember(event)) {
       setPendingAction({ kind: 'delete', event });
     } else {
-      deleteEvent(event.id).catch(reportError);
+      confirmDeleteEvent(event);
     }
-  }, [deleteEvent, isReadOnlyEvent, reportError]);
+  }, [confirmDeleteEvent, isReadOnlyEvent]);
 
   // "This and following": end the master at the occurrence and hand back the
   // master plus its untouched rules so the caller can start a new series (or
@@ -815,9 +832,9 @@ export default function CalendarScreen() {
         setPendingAction({ kind: 'delete', event });
         return;
       }
-      await deleteEvent(event.id).catch(reportError);
+      confirmDeleteEvent(event);
     },
-    [deleteEvent, reportError],
+    [confirmDeleteEvent],
   );
 
   const onRefresh = React.useCallback(() => refresh(), [refresh]);
@@ -838,12 +855,16 @@ export default function CalendarScreen() {
 
   const handleDeleteTask = React.useCallback(
     (id: string) => {
-      deleteTask(id).catch((err: unknown) => {
+      const run = () => deleteTask(id).catch((err: unknown) => {
         Alert.alert(
           t('calendar.tasks.delete_error', 'Failed to delete task'),
           err instanceof Error ? err.message : undefined,
         );
       });
+      Alert.alert(t('calendar.tasks.delete_confirm', 'Delete this task?'), undefined, [
+        { text: t('common.cancel', 'Cancel'), style: 'cancel' },
+        { text: t('calendar.tasks.delete', 'Delete'), style: 'destructive', onPress: () => { void run(); } },
+      ]);
     },
     [deleteTask, t],
   );

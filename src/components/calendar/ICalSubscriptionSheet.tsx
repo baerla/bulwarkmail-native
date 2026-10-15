@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, Easing, TextInput, ActivityIndicator,
+  View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, Easing, TextInput, ActivityIndicator, Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, Plus, RefreshCw, Trash2, Rss, AlertTriangle } from 'lucide-react-native';
@@ -279,7 +279,24 @@ export function ICalSubscriptionSheet({ visible, onClose }: Props) {
                         )}
                       </Pressable>
                       <Pressable
-                        onPress={() => { void removeSubscription(sub.id); }}
+                        // Unsubscribing also deletes the calendar and its events.
+                        onPress={() => Alert.alert(
+                          t('calendar.subscription.unsubscribe', 'Unsubscribe'),
+                          t('calendar.subscription.confirm_delete', 'Unsubscribe from "{name}"? The calendar and all its events will be removed.', { name: sub.name }),
+                          [
+                            { text: t('common.cancel', 'Cancel'), style: 'cancel' },
+                            {
+                              text: t('calendar.subscription.unsubscribe', 'Unsubscribe'),
+                              style: 'destructive',
+                              onPress: () => {
+                                removeSubscription(sub.id).catch((err: unknown) => Alert.alert(
+                                  t('calendar.subscription.delete_error', 'Failed to remove subscription'),
+                                  err instanceof Error ? err.message : undefined,
+                                ));
+                              },
+                            },
+                          ],
+                        )}
                         hitSlop={6}
                         style={styles.subBtn}
                         accessibilityRole="button"
