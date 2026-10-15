@@ -381,7 +381,7 @@ export default function ContactsScreen({ onOpenContact, activeContactId = null }
   }, [addressBooks, groups, selectedCategory, t]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ContactsSidebarDrawer visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       <View style={styles.header}>

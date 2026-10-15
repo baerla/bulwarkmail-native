@@ -168,14 +168,10 @@ export default function FilesScreen() {
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
   const formatModified = useFormatModified();
-  // Clear of the status bar and, in landscape, the side insets; the header
-  // used a fixed 60 px top padding instead.
+  // Clear of the status bar (the header used a fixed 60 px top padding); the
+  // whole screen keeps clear of the side insets in landscape.
   const insets = useSafeAreaInsets();
-  const headerInsets = {
-    paddingTop: insets.top + spacing.sm,
-    paddingLeft: spacing.md + insets.left,
-    paddingRight: spacing.md + insets.right,
-  };
+  const headerInsets = { paddingTop: insets.top + spacing.sm, paddingHorizontal: spacing.md };
 
   // Folder navigation stack. Hierarchy is real parentId nesting (#379) — each
   // entry is the folder's node id (namespaced "accountId:nodeId" inside a
@@ -1035,7 +1031,7 @@ export default function FilesScreen() {
   // On a wide window an open file shows beside the list instead of covering it.
   const previewDocked = isSplit && previewTarget != null;
   return (
-    <View style={[styles.container, previewDocked && styles.splitRow]}>
+    <View style={[styles.container, previewDocked && styles.splitRow, { paddingLeft: insets.left, paddingRight: insets.right }]}>
       <View style={styles.listColumn}>
         {renderHeader()}
         {body}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CalendarPlus, CircleCheck, Plus } from 'lucide-react-native';
 import { componentSizes, radius, spacing, typography, type ThemePalette } from '../../theme/tokens';
@@ -39,6 +40,8 @@ export function CalendarFab({ onNewEvent, onNewTask }: CalendarFabProps) {
     action();
   };
 
+  const insets = useSafeAreaInsets();
+
   const onMainPress = () => {
     if (!onNewTask) {
       onNewEvent();
@@ -63,7 +66,8 @@ export function CalendarFab({ onNewEvent, onNewTask }: CalendarFabProps) {
           />
         </Animated.View>
       )}
-      <View style={styles.anchor} pointerEvents="box-none">
+      {/* Clear of a side inset (camera cutout, navigation bar) in landscape. */}
+      <View style={[styles.anchor, { right: spacing.lg + insets.right }]} pointerEvents="box-none">
         {open && onNewTask && (
           <Animated.View style={[styles.option, { opacity: progress, transform: [{ translateY: lift }] }]}>
             <Text style={styles.optionLabel}>{t('calendar.fab.task', 'Task')}</Text>

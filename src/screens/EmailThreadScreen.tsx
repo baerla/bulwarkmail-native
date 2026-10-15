@@ -689,7 +689,7 @@ function EmailViewer({ route, navigation, embedded = false, onActiveChange }: Pr
     : false;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {/* Toolbar */}
       <View style={[styles.toolbar, embedded && styles.toolbarEmbedded]}>
         {!embedded && (
@@ -827,7 +827,7 @@ function EmailViewer({ route, navigation, embedded = false, onActiveChange }: Pr
 
           {/* Bottom action bar (hidden while keyboard is up so quick reply stays visible) */}
           {kbObstruction === 0 && (
-            <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 4) }]}>
+            <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 4), paddingLeft: insets.left, paddingRight: insets.right }]}>
               <BottomBarButton
                 icon={<ChevronLeft size={20} color={c.textMuted} />}
                 label={t('email_viewer.previous', 'Prev')}

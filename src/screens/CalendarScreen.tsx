@@ -988,7 +988,7 @@ export default function CalendarScreen() {
   const titleDate = (monthPanelOpen && panelMonth) || visibleDate || focus.date;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Pressable
           onPress={() => setSidebarVisible(true)}

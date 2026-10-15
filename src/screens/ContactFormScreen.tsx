@@ -1070,7 +1070,7 @@ export default function ContactFormScreen() {
   if (asGroup) {
     // Groups are a name plus a member list - none of the person fields apply.
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         {header}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -1131,7 +1131,7 @@ export default function ContactFormScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {header}
 
       <KeyboardAvoidingView

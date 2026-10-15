@@ -1151,7 +1151,7 @@ export default function EmailListScreen({
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}>
       {/* Header */}
       {selectionMode ? (
         <View style={styles.header}>

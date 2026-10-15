@@ -62,7 +62,7 @@ export default function GroupDetailScreen() {
 
   if (!group) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <View style={styles.header}>
           <Pressable
             onPress={() => navigation.goBack()}
@@ -133,7 +133,7 @@ export default function GroupDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={[styles.header, inPane && styles.headerInPane]}>
         {/* In a split view's pane the list is right next to it: no back. */}
         {!inPane && (

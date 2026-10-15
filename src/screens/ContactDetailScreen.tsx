@@ -361,7 +361,7 @@ export default function ContactDetailScreen() {
   ].filter(Boolean) as MoreItem[];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={[styles.header, inPane && styles.headerInPane]}>
         {/* In a split view's pane the list is right next to it: no back. */}
         {!inPane && (
