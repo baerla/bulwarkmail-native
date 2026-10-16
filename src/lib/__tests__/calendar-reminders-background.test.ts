@@ -10,6 +10,8 @@ const h = vi.hoisted(() => ({
   events: [] as unknown[],
   eventsError: false,
   onDevice: null as ((e: { id: string }) => boolean) | null,
+  hydrate: vi.fn(async () => undefined),
+  hydrated: false,
 }));
 
 vi.mock('react-native', () => ({ Platform: { OS: 'android' }, NativeModules: {} }));
@@ -36,6 +38,9 @@ vi.mock('../calendar-events-range', () => ({
     return h.events;
   }),
 }));
+vi.mock('../../stores/settings-store', () => ({
+  useSettingsStore: { getState: () => ({ hydrated: h.hydrated, hydrate: h.hydrate }) },
+}));
 vi.mock('../calendar-reminder-owner', () => ({ readRemindedOnDevice: vi.fn(async () => h.onDevice) }));
 
 import * as Notifications from 'expo-notifications';
@@ -51,7 +56,8 @@ const req = (identifier: string, key: string, kind: string) => ({
   identifier, content: { data: { tag: DATA_TAG, key, kind, locale: 'en' } },
 });
 const setSettings = (state: Record<string, unknown>) =>
-  AsyncStorage.setItem('webmail:settings:v1', JSON.stringify({ state }));
+  // The settings store persists its snapshot flat, not under zustand's `state`.
+  AsyncStorage.setItem('webmail:settings:v1', JSON.stringify(state));
 const setActive = (id: string | null) =>
   AsyncStorage.setItem('account-registry', JSON.stringify({ state: { accounts: [], activeAccountId: id } }));
 
@@ -66,6 +72,7 @@ beforeEach(async () => {
   h.events = [];
   h.eventsError = false;
   h.onDevice = null;
+  h.hydrated = false;
   await setSettings({ calendarNotificationsEnabled: true });
   await setActive('acc-1');
 });
@@ -82,6 +89,7 @@ describe('refreshCalendarRemindersInBackground', () => {
 
   it('cancels pending event reminders when the setting is off, leaving task reminders', async () => {
     await setSettings({ calendarNotificationsEnabled: false });
+    h.events = [event('e1')]; // would be scheduled if the setting were ignored
     h.pending = [req('e', 'k1', 'event'), req('t', 'k2', 'task')];
     await refreshCalendarRemindersInBackground();
     expect(Notifications.cancelScheduledNotificationAsync).toHaveBeenCalledTimes(1);
@@ -137,6 +145,14 @@ describe('refreshCalendarRemindersInBackground', () => {
     expect(vi.mocked(Notifications.scheduleNotificationAsync).mock.calls[0][0]).toMatchObject({
       content: { title: 'Event own' },
     });
+  });
+
+  it('hydrates the settings store first, so the calendar time zone override applies to the queries', async () => {
+    h.events = [event('e1')];
+    await refreshCalendarRemindersInBackground();
+    expect(h.hydrate).toHaveBeenCalledTimes(1);
+    expect(h.hydrate.mock.invocationCallOrder[0])
+      .toBeLessThan(vi.mocked(Notifications.scheduleNotificationAsync).mock.invocationCallOrder[0]);
   });
 
   it('never rejects', async () => {

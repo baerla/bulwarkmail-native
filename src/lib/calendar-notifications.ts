@@ -11,7 +11,7 @@ import { onStateChangeType } from './state-change-bus';
 import { getUpcomingAlerts, type ScheduledAlert } from './calendar-alert-scheduler';
 import type { CalendarReminderTarget } from '../navigation/pending-calendar-open';
 import { onDeviceRemindersChange, remindedOnDevice } from '../device-sync/app/reminders';
-import { refreshPushSubscriptionTypes } from './push-notifications';
+import { readPushAccountIds, refreshPushSubscriptionTypes } from './push-notifications';
 import { setCalendarReminderJob } from './calendar-reminder-job';
 import {
   HORIZON_MS,
@@ -22,6 +22,7 @@ import {
   cancelReminders,
   ensureChannel,
   reconcileReminders,
+  withReminderLock,
 } from './calendar-reminder-reconcile';
 
 // Local reminders for calendar events and tasks. The webmail polls
@@ -138,7 +139,7 @@ export async function rescheduleCalendarNotifications(): Promise<void> {
     queued = true;
     return rescheduling;
   }
-  rescheduling = (async () => {
+  rescheduling = withReminderLock(async () => {
     try {
       const settings = useSettingsStore.getState();
       // Until the settings load, the switch holds its default, not the
@@ -184,7 +185,7 @@ export async function rescheduleCalendarNotifications(): Promise<void> {
         void rescheduleCalendarNotifications();
       }
     }
-  })();
+  });
   return rescheduling;
 }
 
@@ -294,8 +295,10 @@ export function startCalendarNotificationSync(options?: { askPermission?: boolea
     if (state.calendarNotificationsEnabled !== prev.calendarNotificationsEnabled) {
       // The calendar types are in the push subscription only while this is on
       // (pushTypesFor): they wake the app to refresh reminders in the background.
-      const accountId = useAuthStore.getState().activeAccountId;
-      if (accountId) void refreshPushSubscriptionTypes(accountId).catch(() => undefined);
+      // The setting is global, so every account's subscription follows it.
+      void readPushAccountIds()
+        .then((ids) => Promise.all(ids.map((id) => refreshPushSubscriptionTypes(id).catch(() => undefined))))
+        .catch(() => undefined);
     }
     if (
       state.calendarNotificationsEnabled !== prev.calendarNotificationsEnabled ||

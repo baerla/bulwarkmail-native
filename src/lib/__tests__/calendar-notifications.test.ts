@@ -26,6 +26,7 @@ const h = vi.hoisted(() => ({
   reminderListener: null as (() => void) | null,
   settingsListener: null as Listener | null,
   refreshPushTypes: vi.fn(async () => undefined),
+  pushAccountIds: ['app-1', 'app-2'] as string[],
   setJob: vi.fn(async () => undefined),
 }));
 
@@ -64,7 +65,10 @@ vi.mock('../../stores/settings-store', () => ({
     subscribe: vi.fn((listener: Listener) => { h.settingsListener = listener; }),
   },
 }));
-vi.mock('../push-notifications', () => ({ refreshPushSubscriptionTypes: h.refreshPushTypes }));
+vi.mock('../push-notifications', () => ({
+  refreshPushSubscriptionTypes: h.refreshPushTypes,
+  readPushAccountIds: vi.fn(async () => h.pushAccountIds),
+}));
 vi.mock('../calendar-reminder-job', () => ({ setCalendarReminderJob: h.setJob }));
 vi.mock('../../stores/calendar-store', () => ({
   useCalendarStore: {
@@ -382,7 +386,10 @@ describe('calendar reminders: push subscription', () => {
     const prev = { ...h.settings };
     h.settings = { ...h.settings, calendarNotificationsEnabled: false };
     h.settingsListener!(h.settings, prev);
+    await vi.advanceTimersByTimeAsync(0);
+    // The setting is global: every account's subscription follows it, not only the active one.
     expect(h.refreshPushTypes).toHaveBeenCalledWith('app-1');
+    expect(h.refreshPushTypes).toHaveBeenCalledWith('app-2');
   });
 
   it('leaves the push types alone for other setting changes', async () => {

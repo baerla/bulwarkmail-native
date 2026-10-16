@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 import { getCalendars } from '../api/calendar';
 import { CAPABILITIES } from '../api/types';
 import { translate } from '../i18n';
+import { useSettingsStore } from '../stores/settings-store';
 import { openClient } from '../widgets/jmap';
 import { getUpcomingAlerts, type AlertTranslate } from './calendar-alert-scheduler';
 import { loadEventsInRange } from './calendar-events-range';
@@ -15,6 +16,7 @@ import {
   cancelReminders,
   ensureChannel,
   reconcileReminders,
+  withReminderLock,
 } from './calendar-reminder-reconcile';
 import { ACCOUNT_REGISTRY_KEY, SETTINGS_STORAGE_KEY, notificationLocale } from './push-background-task';
 
@@ -33,8 +35,8 @@ async function readCalendarNotificationsEnabled(): Promise<boolean | null> {
   try {
     const raw = await AsyncStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!raw) return true; // first launch: the setting's default is on
-    const state = (JSON.parse(raw) as { state?: { calendarNotificationsEnabled?: unknown } }).state;
-    return state?.calendarNotificationsEnabled !== false;
+    const state = (JSON.parse(raw) as { calendarNotificationsEnabled?: unknown });
+    return state.calendarNotificationsEnabled !== false;
   } catch {
     return null;
   }
@@ -53,8 +55,18 @@ async function readActiveAccountId(): Promise<string | null | undefined> {
 }
 
 /** Always resolves; every failure leaves the pending reminders as they were. */
-export async function refreshCalendarRemindersInBackground(): Promise<void> {
+export function refreshCalendarRemindersInBackground(): Promise<void> {
+  return withReminderLock(refresh);
+}
+
+async function refresh(): Promise<void> {
   try {
+    // The queries are sent in the calendar time zone setting (lib/calendar-timezone
+    // reads it from this store), which a cold headless runtime has not loaded;
+    // without it floating and all-day events would get other fire times than
+    // the foreground gives them.
+    const settings = useSettingsStore.getState();
+    if (!settings.hydrated) await settings.hydrate();
     const enabled = await readCalendarNotificationsEnabled();
     // Unreadable settings: the foreground decides next time it runs.
     if (enabled === null) return;

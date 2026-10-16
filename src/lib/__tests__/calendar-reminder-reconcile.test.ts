@@ -14,7 +14,7 @@ vi.mock('expo-notifications', () => ({
 }));
 
 import * as Notifications from 'expo-notifications';
-import { reconcileReminders, cancelReminders, DATA_TAG } from '../calendar-reminder-reconcile';
+import { reconcileReminders, cancelReminders, withReminderLock, DATA_TAG } from '../calendar-reminder-reconcile';
 
 const alert = (key: string, over: Record<string, unknown> = {}) => ({
   key, eventId: key, kind: 'event', title: 'T', body: 'B',
@@ -69,5 +69,28 @@ describe('cancelReminders', () => {
     await cancelReminders(['event']);
     expect(Notifications.cancelScheduledNotificationAsync).toHaveBeenCalledTimes(1);
     expect(Notifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith('e');
+  });
+});
+
+describe('withReminderLock', () => {
+  it('runs overlapping refreshes one after the other, so a stale snapshot cannot undo a newer one', async () => {
+    const order: string[] = [];
+    let releaseFirst!: () => void;
+    const first = withReminderLock(async () => {
+      order.push('first:start');
+      await new Promise<void>((resolve) => { releaseFirst = resolve; });
+      order.push('first:end');
+    });
+    const second = withReminderLock(async () => { order.push('second'); });
+    await Promise.resolve();
+    expect(order).toEqual(['first:start']);
+    releaseFirst();
+    await Promise.all([first, second]);
+    expect(order).toEqual(['first:start', 'first:end', 'second']);
+  });
+
+  it('keeps going after a run that rejects', async () => {
+    await expect(withReminderLock(async () => { throw new Error('x'); })).rejects.toThrow('x');
+    await expect(withReminderLock(async () => 'ok')).resolves.toBe('ok');
   });
 });

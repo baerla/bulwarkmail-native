@@ -264,8 +264,8 @@ async function calendarRemindersEnabled(): Promise<boolean> {
   try {
     const raw = await AsyncStorage.getItem(SETTINGS_STORAGE_KEY);
     if (!raw) return true;
-    const state = (JSON.parse(raw) as { state?: { calendarNotificationsEnabled?: unknown } }).state;
-    return state?.calendarNotificationsEnabled !== false;
+    const state = (JSON.parse(raw) as { calendarNotificationsEnabled?: unknown });
+    return state.calendarNotificationsEnabled !== false;
   } catch {
     return true;
   }

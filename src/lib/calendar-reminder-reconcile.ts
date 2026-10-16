@@ -94,6 +94,22 @@ export async function scheduleOne(alert: ScheduledAlert, locale: string, appAcco
   });
 }
 
+let lockTail: Promise<unknown> = Promise.resolve();
+
+/**
+ * Runs `fn` after every refresh started before it has finished. The
+ * foreground sync and the headless task can share a JS runtime (and pushes
+ * start several tasks), and a refresh works from a snapshot of the pending
+ * reminders: a stale one finishing after a newer one would cancel the newer
+ * one's reminders for a moved event and schedule the old time. One refresh at
+ * a time, each loading its events after the previous one is done, rules that out.
+ */
+export function withReminderLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = lockTail.then(fn, fn);
+  lockTail = run.catch(() => undefined);
+  return run;
+}
+
 /**
  * Cancel the pending reminders this code scheduled that are no longer wanted
  * and add the missing ones. `kinds` limits which pending reminders it may

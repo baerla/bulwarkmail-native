@@ -404,7 +404,7 @@ describe('push types for device sync (#34)', () => {
   // The calendar types also feed the background reminder refresh, so they
   // follow this setting, which is on unless stored otherwise.
   const calendarReminders = (enabled: boolean) =>
-    AsyncStorage.setItem('webmail:settings:v1', JSON.stringify({ state: { calendarNotificationsEnabled: enabled } }));
+    AsyncStorage.setItem('webmail:settings:v1', JSON.stringify({ calendarNotificationsEnabled: enabled }));
 
   async function syncing(enabled: Record<string, boolean>, extra: Record<string, unknown> = {}): Promise<void> {
     await AsyncStorage.setItem(DEVICE_SYNC_KEY, JSON.stringify({
