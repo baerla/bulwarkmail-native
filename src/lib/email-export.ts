@@ -47,6 +47,11 @@ function attachmentFileOptions(): EmailFilenameOptions {
   };
 }
 
+/** The name "Save" gives an attachment of `email`: the user's attachment filename template. */
+export function attachmentSaveName(email: Email, name: string | undefined, type: string | undefined): string {
+  return attachmentDownloadFilename(email, { name, type }, attachmentFileOptions());
+}
+
 function safeAttachmentName(name: string | undefined, type: string | undefined): string {
   const fallbackExt = type?.split('/')[1]?.replace(/[^a-z0-9]/gi, '').slice(0, 8) || 'bin';
   const cleaned = (name ?? '').replace(/[\\/:*?"<>|]/g, '_').trim();
@@ -345,6 +350,20 @@ export async function cachePreviewFile(
     } catch { /* the sweep gets it */ }
     throw err;
   }
+}
+
+/**
+ * {@link cachePreviewFile} for a file already on the device (a compose
+ * attachment): copied, so the preview owns its copy and the original is never
+ * deleted with it.
+ */
+export function copyPreviewFile(uri: string, name: string | undefined, type: string | undefined): File {
+  void sweepStaleExportFiles();
+  const dir = newPreviewDir();
+  ensureDir(dir);
+  const file = new File(dir, safeAttachmentName(name, type));
+  new File(uri).copy(file);
+  return file;
 }
 
 /**
