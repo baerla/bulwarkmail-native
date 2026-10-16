@@ -11,6 +11,7 @@ import { onStateChangeType } from './state-change-bus';
 import { getUpcomingAlerts, type ScheduledAlert } from './calendar-alert-scheduler';
 import type { CalendarReminderTarget } from '../navigation/pending-calendar-open';
 import { onDeviceRemindersChange, remindedOnDevice } from '../device-sync/app/reminders';
+import { refreshPushSubscriptionTypes } from './push-notifications';
 import {
   HORIZON_MS,
   LOOKAHEAD_MS,
@@ -286,6 +287,12 @@ export function startCalendarNotificationSync(options?: { askPermission?: boolea
     }
   });
   useSettingsStore.subscribe((state, prev) => {
+    if (state.calendarNotificationsEnabled !== prev.calendarNotificationsEnabled) {
+      // The calendar types are in the push subscription only while this is on
+      // (pushTypesFor): they wake the app to refresh reminders in the background.
+      const accountId = useAuthStore.getState().activeAccountId;
+      if (accountId) void refreshPushSubscriptionTypes(accountId).catch(() => undefined);
+    }
     if (
       state.calendarNotificationsEnabled !== prev.calendarNotificationsEnabled ||
       state.hydrated !== prev.hydrated

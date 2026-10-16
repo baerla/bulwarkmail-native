@@ -20,6 +20,7 @@ import {
   DEVICE_SYNC_STORAGE_KEY,
   deviceSyncPushTypes,
   persistedAccounts,
+  STATE_TYPES_BY_AUTHORITY,
 } from '../device-sync/app/prefs';
 import { CALENDAR_AUTHORITY, CONTACTS_AUTHORITY, type Authority } from '../device-sync/types';
 import {
@@ -242,7 +243,32 @@ export async function pushTypesFor(accountId: string, session: JMAPSession | nul
   } catch {
     extra = [];
   }
+  // Calendar reminders (docs/plans/2026-10-16-calendar-reminders-adr.md): a
+  // calendar change wakes the app, whose headless task then brings the
+  // scheduled reminders up to date. Same capability rule as above.
+  if (session && CAPABILITIES.CALENDARS in (session.capabilities ?? {}) && (await calendarRemindersEnabled())) {
+    for (const type of STATE_TYPES_BY_AUTHORITY[CALENDAR_AUTHORITY]) {
+      if (!extra.includes(type)) extra.push(type);
+    }
+  }
   return [...PUSH_TYPES, ...extra];
+}
+
+// Mirrors STORAGE_KEY in `stores/settings-store.ts` (and push-background-task,
+// which imports this module, so it can't be shared from there).
+const SETTINGS_STORAGE_KEY = 'webmail:settings:v1';
+
+// `calendarNotificationsEnabled`, read from the persisted settings so the push
+// setup never creates the settings store; on unless stored otherwise.
+async function calendarRemindersEnabled(): Promise<boolean> {
+  try {
+    const raw = await AsyncStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!raw) return true;
+    const state = (JSON.parse(raw) as { state?: { calendarNotificationsEnabled?: unknown } }).state;
+    return state?.calendarNotificationsEnabled !== false;
+  } catch {
+    return true;
+  }
 }
 
 // draft-ietf-jmap-emailpush (Stalwart >= 0.16.16). `EmailDelivery` alone

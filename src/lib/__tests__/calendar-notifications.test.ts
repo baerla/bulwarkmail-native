@@ -24,6 +24,8 @@ const h = vi.hoisted(() => ({
   // Device sync (#34): which events the device's calendar app reminds of.
   onDevice: null as ((event: { id: string }) => boolean) | null,
   reminderListener: null as (() => void) | null,
+  settingsListener: null as Listener | null,
+  refreshPushTypes: vi.fn(async () => undefined),
 }));
 
 vi.mock('react-native', () => ({
@@ -56,8 +58,12 @@ vi.mock('../../stores/auth-store', () => ({
   useAuthStore: { getState: () => h.auth, subscribe: vi.fn() },
 }));
 vi.mock('../../stores/settings-store', () => ({
-  useSettingsStore: { getState: () => h.settings, subscribe: vi.fn() },
+  useSettingsStore: {
+    getState: () => h.settings,
+    subscribe: vi.fn((listener: Listener) => { h.settingsListener = listener; }),
+  },
 }));
+vi.mock('../push-notifications', () => ({ refreshPushSubscriptionTypes: h.refreshPushTypes }));
 vi.mock('../../stores/calendar-store', () => ({
   useCalendarStore: {
     getState: () => h.calendar,
@@ -115,6 +121,7 @@ beforeEach(async () => {
   h.calendarListener = null;
   h.onDevice = null;
   h.reminderListener = null;
+  h.settingsListener = null;
   h.loadEventsInRange.mockResolvedValue([upcoming]);
   mod = await import('../calendar-notifications');
   N = await import('expo-notifications');
@@ -364,5 +371,23 @@ describe('tapping a calendar reminder', () => {
     stop();
     h.responseListener!(response('later', { tag: TAG, key: 'k3', eventId: 'ev3' }));
     expect(open).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('calendar reminders: push subscription', () => {
+  it('re-applies the account\'s push types when the setting flips, so the calendar types follow it', async () => {
+    mod.startCalendarNotificationSync();
+    const prev = { ...h.settings };
+    h.settings = { ...h.settings, calendarNotificationsEnabled: false };
+    h.settingsListener!(h.settings, prev);
+    expect(h.refreshPushTypes).toHaveBeenCalledWith('app-1');
+  });
+
+  it('leaves the push types alone for other setting changes', async () => {
+    mod.startCalendarNotificationSync();
+    const prev = { ...h.settings };
+    h.settings = { ...h.settings, enableCalendarTasks: true };
+    h.settingsListener!(h.settings, prev);
+    expect(h.refreshPushTypes).not.toHaveBeenCalled();
   });
 });
