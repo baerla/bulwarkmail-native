@@ -1,9 +1,10 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, Modal, Pressable, ScrollView, Image, ActivityIndicator, Platform, useWindowDimensions,
+  View, Text, StyleSheet, Modal, Pressable, ScrollView, Image, ActivityIndicator, Platform, PixelRatio,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { X, ExternalLink, Share2, Download } from '../icons';
 import type { Email } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
@@ -11,6 +12,7 @@ import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
 import EmailBodyView from '../EmailBodyView';
 import { needsNativeImageDecoder, needsWebImageViewer, type PreviewKind } from '../../lib/file-preview';
+import { pdfPageFileName, renderPdfPage } from '../../lib/pdf-pages';
 import type { EmlPreview } from './use-body-override';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
@@ -20,7 +22,7 @@ export interface PreviewItem {
   mimeType: string;
   /** Local file:// URI of the downloaded copy (images, PDFs, media). */
   fileUri?: string;
-  /** The viewer page next to the file (images, video, audio); see preview-viewer-html. */
+  /** The viewer page next to the file (images, video, audio, Android's PDFs); see preview-viewer-html. */
   viewerUri?: string;
   /** Decoded text for text-like parts. */
   text?: string;
@@ -47,14 +49,28 @@ interface Props {
   docked?: boolean;
 }
 
+interface ViewerWebViewProps {
+  uri: string;
+  background: string;
+  onFailed: () => void;
+  /** Messages other than 'error'. */
+  onMessage?: (data: string) => void;
+  webRef?: React.Ref<WebView>;
+}
+
 /**
- * A local page in a WebView that may read only its own folder: the image
- * and media viewers. It posts 'error' when the file doesn't decode.
+ * A local page in a WebView that may read only its own folder: the image,
+ * media and PDF viewers. It posts 'error' when the file doesn't decode.
  */
-function ViewerWebView({ uri, background, onFailed }: { uri: string; background: string; onFailed: () => void }) {
+function ViewerWebView({ uri, background, onFailed, onMessage, webRef }: ViewerWebViewProps) {
   const folder = uri.slice(0, uri.lastIndexOf('/') + 1);
+  const handleMessage = (e: WebViewMessageEvent) => {
+    if (e.nativeEvent.data === 'error') onFailed();
+    else onMessage?.(e.nativeEvent.data);
+  };
   return (
     <WebView
+      ref={webRef}
       source={{ uri }}
       originWhitelist={['file://*']}
       allowFileAccess
@@ -74,7 +90,7 @@ function ViewerWebView({ uri, background, onFailed }: { uri: string; background:
       overScrollMode="never"
       bounces={false}
       onShouldStartLoadWithRequest={(req) => req.url === uri}
-      onMessage={(e) => { if (e.nativeEvent.data === 'error') onFailed(); }}
+      onMessage={handleMessage}
       onError={onFailed}
       style={[viewerStyles.fill, { backgroundColor: background }]}
       containerStyle={{ backgroundColor: background }}
@@ -82,8 +98,39 @@ function ViewerWebView({ uri, background, onFailed }: { uri: string; background:
   );
 }
 
+// Pages are rendered half again as wide as the screen's pixels, so text stays
+// sharp at the first zoom step; PdfRenderer's bitmap is capped natively.
+const PDF_PAGE_OVERSAMPLE = 1.5;
+
 /**
- * In-app preview for images, PDFs (iOS renders them in the WebView), video
+ * Android's PDF view: the viewer page asks for each page as it comes near
+ * the screen, and the page is rendered next to it by the platform's
+ * PdfRenderer (pdf-pages.ts).
+ */
+function PdfPagesView({ fileUri, viewerUri, background, onFailed }: {
+  fileUri: string;
+  viewerUri: string;
+  background: string;
+  onFailed: () => void;
+}) {
+  const ref = React.useRef<WebView>(null);
+  const { width } = useWindowDimensions();
+  const pagePx = PixelRatio.getPixelSizeForLayoutSize(Math.min(width, 1000)) * PDF_PAGE_OVERSAMPLE;
+  const folder = viewerUri.slice(0, viewerUri.lastIndexOf('/') + 1);
+  const onMessage = (data: string) => {
+    const m = /^page:(\d+)$/.exec(data);
+    if (!m) return;
+    const index = Number(m[1]);
+    const name = pdfPageFileName(index);
+    renderPdfPage(fileUri, index, pagePx, folder + name)
+      .then(() => ref.current?.injectJavaScript(`window.__pdfPage(${index}, ${JSON.stringify(name)});true;`))
+      .catch(() => undefined);
+  };
+  return <ViewerWebView webRef={ref} uri={viewerUri} background={background} onFailed={onFailed} onMessage={onMessage} />;
+}
+
+/**
+ * In-app preview for images, PDFs (iOS's WebView shows them, Android renders the pages), video
  * and audio (the WebView's player), text, Markdown and HTML documents and
  * embedded messages. Files that don't decode, and types without a preview,
  * offer another app instead. Used by every place that opens a file.
@@ -133,7 +180,7 @@ export function AttachmentPreviewModal({
     || (!!failure?.native && !item.viewerUri)
   );
   const mediaFailed = (item?.kind === 'video' || item?.kind === 'audio') && !!failure?.web;
-  const pdfInline = item?.kind === 'pdf' && Platform.OS === 'ios' && !!item.fileUri;
+  const pdfInline = item?.kind === 'pdf' && !!item.fileUri && (Platform.OS === 'ios' || !!item.viewerUri) && !failure?.web;
   // The fallback screen has its own Open button; the header adds one elsewhere.
   const showsFallback = !!item && (
     item.kind === 'none' || (item.kind === 'pdf' && !pdfInline) || imageFailed || mediaFailed
@@ -216,6 +263,17 @@ export function AttachmentPreviewModal({
           />
         );
       case 'pdf':
+        if (pdfInline && item.fileUri && item.viewerUri) {
+          return (
+            <PdfPagesView
+              key={item.viewerUri}
+              fileUri={item.fileUri}
+              viewerUri={item.viewerUri}
+              background={c.surface}
+              onFailed={() => markFailed(item.fileUri, 'web')}
+            />
+          );
+        }
         if (pdfInline && item.fileUri) {
           return (
             <WebView
@@ -230,7 +288,7 @@ export function AttachmentPreviewModal({
             />
           );
         }
-        return renderFallback(t('email_viewer.preview.pdf_external', 'PDFs open in your PDF viewer on this device.'));
+        return renderFallback(t('email_viewer.preview.pdf_unreadable', "This PDF can't be shown here."));
       case 'text':
         return (
           <ScrollView style={styles.flex} contentContainerStyle={styles.textScroll}>

@@ -37,10 +37,11 @@ describe('filePreviewKind', () => {
     expect(filePreviewKind({ name: 'notes', type: 'text/markdown' }, ANDROID)).toBe('markdown');
   });
 
-  it('shows PDFs in-app only where the platform renders them', () => {
+  it('shows PDFs in-app on both platforms', () => {
     expect(filePreviewKind({ name: 'report.pdf', type: 'application/pdf' }, IOS)).toBe('pdf');
     expect(filePreviewKind({ name: 'report.pdf', type: 'application/octet-stream' }, IOS)).toBe('pdf');
-    expect(filePreviewKind({ name: 'report.pdf', type: 'application/pdf' }, ANDROID)).toBe('none');
+    expect(filePreviewKind({ name: 'report.pdf', type: 'application/pdf' }, ANDROID)).toBe('pdf');
+    expect(filePreviewKind({ name: 'REPORT.PDF', type: '' }, ANDROID)).toBe('pdf');
   });
 
   it('plays the video formats each platform plays', () => {

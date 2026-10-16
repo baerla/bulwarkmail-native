@@ -11,7 +11,8 @@ import {
 } from '../../lib/file-preview';
 import type { PreviewKind } from '../../lib/file-preview';
 import { markdownToHtml } from '../../lib/markdown-html';
-import { imageViewerHtml, mediaViewerHtml, type ViewerColors } from '../../lib/preview-viewer-html';
+import { imageViewerHtml, mediaViewerHtml, pdfViewerHtml, type ViewerColors } from '../../lib/preview-viewer-html';
+import { closePdfPages, openPdfPages, PdfOpenError } from '../../lib/pdf-pages';
 import { useLocaleStore } from '../../stores/locale-store';
 import { useColors, useResolvedTheme } from '../../theme/colors';
 import type { PreviewItem } from './AttachmentPreviewModal';
@@ -74,16 +75,22 @@ function writeViewer(local: File, html: string): string {
   return page.uri;
 }
 
+interface Notices {
+  tooLarge: string;
+  pdfProtected: string;
+  pdfUnreadable: string;
+}
+
 async function buildItem(
   kind: Exclude<PreviewKind, 'none'>,
   source: PreviewSource,
   local: File,
-  tooLarge: string,
+  notices: Notices,
   colors: ViewerColors,
 ): Promise<PreviewItem> {
   const base = { name: source.name, mimeType: source.type };
   // The source may not know its size; the copy does.
-  if (exceedsPreviewLimit(kind, local.size)) return { ...base, kind: 'none', notice: tooLarge };
+  if (exceedsPreviewLimit(kind, local.size)) return { ...base, kind: 'none', notice: notices.tooLarge };
   switch (kind) {
     case 'text':
       return { ...base, kind, text: await local.text() };
@@ -98,6 +105,17 @@ async function buildItem(
     case 'video':
     case 'audio':
       return { ...base, kind, fileUri: local.uri, viewerUri: writeViewer(local, mediaViewerHtml(kind, local.name, colors)) };
+    case 'pdf': {
+      // iOS's WebView shows the PDF itself; Android renders its pages.
+      if (Platform.OS !== 'android') return { ...base, kind, fileUri: local.uri };
+      try {
+        const pages = await openPdfPages(local.uri);
+        return { ...base, kind, fileUri: local.uri, viewerUri: writeViewer(local, pdfViewerHtml(local.name, pages, colors)) };
+      } catch (e) {
+        const protectedPdf = e instanceof PdfOpenError && e.reason === 'protected';
+        return { ...base, kind: 'none', notice: protectedPdf ? notices.pdfProtected : notices.pdfUnreadable };
+      }
+    }
     default:
       return { ...base, kind, fileUri: local.uri };
   }
@@ -141,7 +159,9 @@ export function useFilePreview(opts: {
     seq.current += 1;
     const open = session.current;
     session.current = null;
-    if (open && !open.handedOff) discardPreviewFile(open.file);
+    if (!open) return;
+    closePdfPages(open.file.uri);
+    if (!open.handedOff) discardPreviewFile(open.file);
   }, []);
   React.useEffect(() => end, [end]);
 
@@ -181,9 +201,14 @@ export function useFilePreview(opts: {
           return;
         }
         session.current = { file: local, handedOff: false };
-        const next = await buildItem(
-          kind, src, local, t('files.preview_too_large', 'This file is too large to preview.'), colors.current,
-        );
+        const next = await buildItem(kind, src, local, {
+          tooLarge: t('files.preview_too_large', 'This file is too large to preview.'),
+          pdfProtected: t(
+            'email_viewer.preview.pdf_protected',
+            'This PDF is password-protected. Open it in another app to enter the password.',
+          ),
+          pdfUnreadable: t('email_viewer.preview.pdf_unreadable', "This PDF can't be shown here."),
+        }, colors.current);
         if (current()) setItem(next);
       } catch (e) {
         if (!current()) return;

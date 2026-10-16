@@ -408,7 +408,9 @@
       "open_external": "Openen in app",
       "pdf_external": "PDF's worden geopend in de PDF-viewer op dit apparaat.",
       "unsupported": "Geen voorbeeld voor dit bestandstype.",
-      "media_unsupported": "Dit bestand kan hier niet worden afgespeeld."
+      "media_unsupported": "Dit bestand kan hier niet worden afgespeeld.",
+      "pdf_protected": "Deze pdf is beveiligd met een wachtwoord. Open hem in een andere app om het wachtwoord in te voeren.",
+      "pdf_unreadable": "Deze pdf kan hier niet worden weergegeven."
     },
     "received_via": "aan {name}",
     "remove_color": "Label verwijderen",

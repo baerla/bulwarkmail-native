@@ -408,7 +408,9 @@
       "open_external": "在應用程式中開啟",
       "pdf_external": "PDF 會在此裝置的 PDF 檢視器中開啟。",
       "unsupported": "無法預覽此檔案類型。",
-      "media_unsupported": "無法在此播放這個檔案。"
+      "media_unsupported": "無法在此播放這個檔案。",
+      "pdf_protected": "此 PDF 受密碼保護。請在其他應用程式中開啟以輸入密碼。",
+      "pdf_unreadable": "無法在此顯示這個 PDF。"
     },
     "received_via": "寄給 {name}",
     "remove_color": "移除標籤",

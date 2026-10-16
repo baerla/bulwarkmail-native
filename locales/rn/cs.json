@@ -408,7 +408,9 @@
       "open_external": "Otevřít v aplikaci",
       "pdf_external": "Soubory PDF se otevírají v prohlížeči PDF na tomto zařízení.",
       "unsupported": "Pro tento typ souboru není náhled k dispozici.",
-      "media_unsupported": "Tento soubor zde nelze přehrát."
+      "media_unsupported": "Tento soubor zde nelze přehrát.",
+      "pdf_protected": "Toto PDF je chráněné heslem. Otevřete ho v jiné aplikaci a zadejte heslo.",
+      "pdf_unreadable": "Toto PDF zde nelze zobrazit."
     },
     "received_via": "pro {name}",
     "remove_color": "Odebrat štítek",

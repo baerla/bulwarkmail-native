@@ -408,7 +408,9 @@
       "open_external": "Obre en una aplicació",
       "pdf_external": "Els PDF s'obren amb el visualitzador de PDF d'aquest dispositiu.",
       "unsupported": "No hi ha previsualització per a aquest tipus de fitxer.",
-      "media_unsupported": "Aquest fitxer no es pot reproduir aquí."
+      "media_unsupported": "Aquest fitxer no es pot reproduir aquí.",
+      "pdf_protected": "Aquest PDF està protegit amb contrasenya. Obre'l en una altra aplicació per introduir-la.",
+      "pdf_unreadable": "Aquest PDF no es pot mostrar aquí."
     },
     "received_via": "per a {name}",
     "remove_color": "Elimina l'etiqueta",

@@ -408,7 +408,9 @@
       "open_external": "Ouvrir dans une app",
       "pdf_external": "Les PDF s'ouvrent dans votre lecteur PDF sur cet appareil.",
       "unsupported": "Aucun aperçu pour ce type de fichier.",
-      "media_unsupported": "Ce fichier ne peut pas être lu ici."
+      "media_unsupported": "Ce fichier ne peut pas être lu ici.",
+      "pdf_protected": "Ce PDF est protégé par un mot de passe. Ouvrez-le dans une autre application pour le saisir.",
+      "pdf_unreadable": "Ce PDF ne peut pas être affiché ici."
     },
     "received_via": "à {name}",
     "remove_color": "Retirer l'étiquette",

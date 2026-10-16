@@ -408,7 +408,9 @@
       "open_external": "Åbn i app",
       "pdf_external": "PDF'er åbnes i din PDF-fremviser på denne enhed.",
       "unsupported": "Ingen forhåndsvisning for denne filtype.",
-      "media_unsupported": "Denne fil kan ikke afspilles her."
+      "media_unsupported": "Denne fil kan ikke afspilles her.",
+      "pdf_protected": "Denne PDF er beskyttet med adgangskode. Åbn den i en anden app for at indtaste adgangskoden.",
+      "pdf_unreadable": "Denne PDF kan ikke vises her."
     },
     "received_via": "til {name}",
     "remove_color": "Fjern tag",

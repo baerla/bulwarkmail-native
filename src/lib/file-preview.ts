@@ -11,7 +11,7 @@ export interface FilePreviewOptions {
   /**
    * The platform's viewers decide what plays: video and audio play in the
    * system WebView (Chromium on Android, WebKit on iOS), whose formats
-   * differ, and only iOS renders PDFs in-app.
+   * differ.
    */
   platform: 'ios' | 'android';
 }
@@ -139,9 +139,8 @@ export function filePreviewKind(file: Pick<PreviewableFile, 'name' | 'type'>, op
       || (ios && (IOS_IMAGE_MIME.has(mime) || IOS_IMAGE_EXT.has(ext)));
     return shown ? 'image' : 'none';
   }
-  if (mime === 'application/pdf' || (!media && ext === 'pdf')) {
-    return opts.platform === 'ios' ? 'pdf' : 'none';
-  }
+  // iOS's WebView shows PDFs; Android renders their pages (pdf-pages.ts).
+  if (mime === 'application/pdf' || (!media && ext === 'pdf')) return 'pdf';
   for (const kind of ['video', 'audio'] as const) {
     const formats = MEDIA[kind][opts.platform];
     if (mime.startsWith(`${kind}/`)) return formats.mime.has(mime) || formats.ext.has(ext) ? kind : 'none';

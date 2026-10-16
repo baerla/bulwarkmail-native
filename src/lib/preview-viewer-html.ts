@@ -102,3 +102,41 @@ export function mediaViewerHtml(kind: 'video' | 'audio', fileName: string, color
     + `<audio id="m" src="${src}" controls autoplay preload="auto"></audio></div>${script}`,
   );
 }
+
+/**
+ * Android's PDF viewer: one placeholder per page at the page's proportions,
+ * filled with an image the app renders when the page comes near the screen
+ * (it posts `page:<index>` and the app answers by calling
+ * `window.__pdfPage(index, src)`). The WebView zooms the whole document, and a
+ * badge shows the page at the middle of the screen.
+ */
+export function pdfViewerHtml(
+  fileName: string,
+  pages: ReadonlyArray<{ width: number; height: number }>,
+  colors: ViewerColors,
+): string {
+  const sizes = JSON.stringify(pages.map((p) => [Math.max(1, Math.round(p.width)), Math.max(1, Math.round(p.height))]));
+  return page(
+    fileName,
+    { ...colors, background: colors.surface },
+    'width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=6,user-scalable=yes',
+    'body{height:auto;min-height:100%}'
+    + '#doc{padding:8px 8px 56px;display:flex;flex-direction:column;align-items:center;gap:8px}'
+    + '.page{width:100%;max-width:1000px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);position:relative}'
+    + '.page img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .15s}'
+    + '.page img.on{opacity:1}'
+    + `#badge{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);padding:4px 12px;border-radius:999px;`
+    + `background:rgba(0,0,0,.65);color:#fff;font-size:13px;font-variant-numeric:tabular-nums;transition:opacity .3s}`
+    + '#badge.hide{opacity:0}',
+    '<div id="doc"></div><div id="badge"></div>'
+    + `<script>${REPORT}(function(){var sizes=${sizes},doc=document.getElementById('doc'),badge=document.getElementById('badge'),asked={},els=[];`
+    + `sizes.forEach(function(s,i){var d=document.createElement('div');d.className='page';d.style.aspectRatio=s[0]+'/'+s[1];d.dataset.i=i;`
+    + `var img=document.createElement('img');img.alt='';img.onload=function(){img.className='on'};d.appendChild(img);doc.appendChild(d);els.push(d)});`
+    + `var io=new IntersectionObserver(function(es){es.forEach(function(e){var i=+e.target.dataset.i;if(e.isIntersecting&&!asked[i]){asked[i]=1;report('page:'+i)}})},{rootMargin:'100% 0px'});`
+    + `els.forEach(function(el){io.observe(el)});`
+    + `window.__pdfPage=function(i,src){var img=els[i]&&els[i].firstChild;if(img)img.src=src};`
+    + `var t;function where(){var mid=innerHeight/2,n=1;for(var i=0;i<els.length;i++){var r=els[i].getBoundingClientRect();if(r.top<=mid){n=i+1}else break}`
+    + `badge.textContent=n+' / '+els.length;badge.className='';clearTimeout(t);t=setTimeout(function(){badge.className='hide'},1200)}`
+    + `addEventListener('scroll',where,{passive:true});where();report('loaded')})();</script>`,
+  );
+}

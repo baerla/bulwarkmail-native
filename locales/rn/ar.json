@@ -408,7 +408,9 @@
       "open_external": "فتح في تطبيق",
       "pdf_external": "تُفتح ملفات PDF في عارض PDF على هذا الجهاز.",
       "unsupported": "لا توجد معاينة لهذا النوع من الملفات.",
-      "media_unsupported": "لا يمكن تشغيل هذا الملف هنا."
+      "media_unsupported": "لا يمكن تشغيل هذا الملف هنا.",
+      "pdf_protected": "ملف PDF هذا محمي بكلمة مرور. افتحه في تطبيق آخر لإدخال كلمة المرور.",
+      "pdf_unreadable": "لا يمكن عرض ملف PDF هذا هنا."
     },
     "received_via": "إلى {name}",
     "remove_color": "إزالة الوسم",

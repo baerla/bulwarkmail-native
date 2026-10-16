@@ -408,7 +408,9 @@
       "open_external": "アプリで開く",
       "pdf_external": "PDF はこのデバイスの PDF ビューアーで開きます。",
       "unsupported": "このファイル形式はプレビューできません。",
-      "media_unsupported": "このファイルはここでは再生できません。"
+      "media_unsupported": "このファイルはここでは再生できません。",
+      "pdf_protected": "このPDFはパスワードで保護されています。パスワードを入力するには別のアプリで開いてください。",
+      "pdf_unreadable": "このPDFはここでは表示できません。"
     },
     "received_via": "{name}宛",
     "remove_color": "ラベルを削除",

@@ -408,7 +408,9 @@
       "open_external": "Uygulamada aç",
       "pdf_external": "PDF dosyaları bu cihazdaki PDF görüntüleyicide açılır.",
       "unsupported": "Bu dosya türü için önizleme yok.",
-      "media_unsupported": "Bu dosya burada oynatılamıyor."
+      "media_unsupported": "Bu dosya burada oynatılamıyor.",
+      "pdf_protected": "Bu PDF parola korumalı. Parolayı girmek için başka bir uygulamada açın.",
+      "pdf_unreadable": "Bu PDF burada gösterilemiyor."
     },
     "received_via": "alıcı: {name}",
     "remove_color": "Etiketi kaldır",

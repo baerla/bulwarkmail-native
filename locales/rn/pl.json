@@ -408,7 +408,9 @@
       "open_external": "Otwórz w aplikacji",
       "pdf_external": "Pliki PDF otwierają się w przeglądarce PDF na tym urządzeniu.",
       "unsupported": "Brak podglądu dla tego typu pliku.",
-      "media_unsupported": "Tego pliku nie można tutaj odtworzyć."
+      "media_unsupported": "Tego pliku nie można tutaj odtworzyć.",
+      "pdf_protected": "Ten plik PDF jest chroniony hasłem. Otwórz go w innej aplikacji, aby wpisać hasło.",
+      "pdf_unreadable": "Tego pliku PDF nie można tutaj wyświetlić."
     },
     "received_via": "do {name}",
     "remove_color": "Usuń etykietę",

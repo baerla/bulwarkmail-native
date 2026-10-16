@@ -408,7 +408,9 @@
       "open_external": "פתח באפליקציה",
       "pdf_external": "קובצי PDF נפתחים במציג ה-PDF במכשיר זה.",
       "unsupported": "אין תצוגה מקדימה לסוג קובץ זה.",
-      "media_unsupported": "לא ניתן להפעיל את הקובץ הזה כאן."
+      "media_unsupported": "לא ניתן להפעיל את הקובץ הזה כאן.",
+      "pdf_protected": "קובץ ה-PDF הזה מוגן בסיסמה. פתחו אותו באפליקציה אחרת כדי להזין את הסיסמה.",
+      "pdf_unreadable": "לא ניתן להציג את קובץ ה-PDF הזה כאן."
     },
     "received_via": "אל {name}",
     "remove_color": "הסר תג",

@@ -408,7 +408,9 @@
       "open_external": "Abrir en una app",
       "pdf_external": "Los PDF se abren en el visor de PDF de este dispositivo.",
       "unsupported": "No hay vista previa para este tipo de archivo.",
-      "media_unsupported": "Este archivo no se puede reproducir aquí."
+      "media_unsupported": "Este archivo no se puede reproducir aquí.",
+      "pdf_protected": "Este PDF está protegido con contraseña. Ábrelo en otra aplicación para introducirla.",
+      "pdf_unreadable": "Este PDF no se puede mostrar aquí."
     },
     "received_via": "para {name}",
     "remove_color": "Eliminar etiqueta",

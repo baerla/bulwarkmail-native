@@ -414,7 +414,9 @@
       "open_external": "In App öffnen",
       "pdf_external": "PDFs werden in Ihrem PDF-Viewer auf diesem Gerät geöffnet.",
       "unsupported": "Keine Vorschau für diesen Dateityp.",
-      "media_unsupported": "Diese Datei kann hier nicht abgespielt werden."
+      "media_unsupported": "Diese Datei kann hier nicht abgespielt werden.",
+      "pdf_protected": "Diese PDF ist passwortgeschützt. Öffne sie in einer anderen App, um das Passwort einzugeben.",
+      "pdf_unreadable": "Diese PDF kann hier nicht angezeigt werden."
     },
     "received_via": "an {name}",
     "remove_color": "Label entfernen",
