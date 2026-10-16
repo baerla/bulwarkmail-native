@@ -224,6 +224,8 @@ export function useFilePreview(opts: {
           zipUnreadable: t('email_viewer.preview.archive_unreadable', "This archive can't be opened here."),
         }, colors.current);
         if (current()) setItem(next);
+        // Closed while the PDF was opening: end() ran before the document was.
+        else closePdfPages(local.uri);
       } catch (e) {
         if (!current()) return;
         close();
