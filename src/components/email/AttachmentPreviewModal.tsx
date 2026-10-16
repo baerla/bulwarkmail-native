@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, Modal, Pressable, ScrollView, Image, ActivityIndicator, Platform, PixelRatio,
+  View, Text, StyleSheet, Modal, Pressable, ScrollView, Image, ActivityIndicator, Platform, PixelRatio, Alert,
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,10 +10,17 @@ import type { Email } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
+import { useSettingsStore } from '../../stores/settings-store';
 import EmailBodyView from '../EmailBodyView';
-import { needsNativeImageDecoder, needsWebImageViewer, type PreviewKind } from '../../lib/file-preview';
+import {
+  handoffMimeType, needsNativeImageDecoder, needsWebImageViewer, type PreviewKind,
+} from '../../lib/file-preview';
 import { pdfPageFileName, renderPdfPage } from '../../lib/pdf-pages';
+import type { ZipArchive } from '../../lib/zip-preview';
+import { formatFullDateTime } from '../../lib/email-date';
 import type { EmlPreview } from './use-body-override';
+import { useFilePreview } from './use-file-preview';
+import { ArchiveSummary, PreviewPartList, type PreviewPart } from './PreviewPartList';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
 export interface PreviewItem {
@@ -30,6 +37,8 @@ export interface PreviewItem {
   html?: string;
   /** Parsed embedded message for .eml previews. */
   eml?: EmlPreview;
+  /** A ZIP's directory, for archive previews. */
+  archive?: ZipArchive;
   /** Replaces "No preview for this file type." on the fallback screen (e.g. the file is too large). */
   notice?: string;
 }
@@ -131,9 +140,11 @@ function PdfPagesView({ fileUri, viewerUri, background, onFailed }: {
 
 /**
  * In-app preview for images, PDFs (iOS's WebView shows them, Android renders the pages), video
- * and audio (the WebView's player), text, Markdown and HTML documents and
- * embedded messages. Files that don't decode, and types without a preview,
- * offer another app instead. Used by every place that opens a file.
+ * and audio (the WebView's player), text, Markdown and HTML documents,
+ * embedded messages and ZIP archives. The files inside an archive or a
+ * message open in a preview of their own on top. Files that don't decode,
+ * and types without a preview, offer another app instead. Used by every
+ * place that opens a file.
  */
 export function AttachmentPreviewModal({
   item, loading, title, onClose, onOpenExternal, onShare, onDownload, docked = false,
@@ -141,7 +152,45 @@ export function AttachmentPreviewModal({
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
+  const locale = useLocaleStore((s) => s.locale);
+  const timeFormat = useSettingsStore((s) => s.timeFormat);
   const { width } = useWindowDimensions();
+  // Files inside this one (archive entries, an .eml's attachments).
+  const nested = useFilePreview();
+  const { open: openNested } = nested;
+  const openPart = React.useCallback(async (part: PreviewPart) => {
+    try {
+      const bytes = await part.read();
+      await openNested({
+        from: 'bytes',
+        bytes,
+        name: part.name,
+        type: part.type || handoffMimeType(part.name, ''),
+        size: bytes.byteLength,
+      });
+    } catch (e) {
+      Alert.alert(t('email_viewer.attachment_failed', 'Could not open attachment'), e instanceof Error ? e.message : String(e));
+    }
+  }, [openNested, t]);
+  const archive = item?.kind === 'archive' ? item.archive : undefined;
+  const archiveParts = React.useMemo<PreviewPart[]>(() => {
+    if (!archive) return [];
+    return archive.entries.map((entry) => ({
+      key: entry.path,
+      name: entry.name,
+      folder: entry.folder,
+      size: entry.size,
+      read: () => archive.read(entry.path),
+    }));
+  }, [archive]);
+  const emlAttachments = item?.kind === 'eml' ? item.eml?.attachments : undefined;
+  const emlParts = React.useMemo<PreviewPart[]>(() => (emlAttachments ?? []).map((att, i) => ({
+    key: `${i}-${att.name}`,
+    name: att.name,
+    type: att.type,
+    size: att.size,
+    read: async () => att.bytes,
+  })), [emlAttachments]);
   // Which viewers failed for the open file, keyed by its URI so the next one
   // starts clean: React Native's Image falls back to the WebView viewer, and
   // a WebView that can't decode the file falls back to another app.
@@ -196,10 +245,11 @@ export function AttachmentPreviewModal({
     </View>
   );
 
-  const renderDocument = (header?: React.ReactNode) => (
+  const renderDocument = (header?: React.ReactNode, footer?: React.ReactNode) => (
     <ScrollView style={styles.flex}>
       {header}
       {docEmail && <EmailBodyView email={docEmail} bodyOverride={{ html: item?.html ?? item?.eml?.html, text: item?.eml?.text }} />}
+      {footer}
     </ScrollView>
   );
 
@@ -303,12 +353,30 @@ export function AttachmentPreviewModal({
           <View style={styles.emlHeader}>
             <Text style={styles.emlSubject}>{item.eml?.subject || t('email_viewer.no_subject', '(No Subject)')}</Text>
             {item.eml?.from ? <Text style={styles.emlMeta}>{item.eml.from}</Text> : null}
-            {item.eml?.date ? <Text style={styles.emlMeta}>{item.eml.date}</Text> : null}
+            {item.eml?.date ? <Text style={styles.emlMeta}>{formatFullDateTime(item.eml.date, timeFormat, locale) || item.eml.date}</Text> : null}
           </View>,
+          emlParts.length > 0 ? (
+            <PreviewPartList
+              inline
+              parts={emlParts}
+              onOpen={openPart}
+              header={<ArchiveSummary count={emlParts.length} truncated={false} />}
+            />
+          ) : null,
+        );
+      case 'archive':
+        if (!item.archive) break;
+        return (
+          <PreviewPartList
+            parts={archiveParts}
+            onOpen={openPart}
+            header={<ArchiveSummary count={archiveParts.length} truncated={item.archive.truncated} />}
+          />
         );
       default:
-        return renderFallback(item.notice ?? t('email_viewer.preview.unsupported', 'No preview for this file type.'));
+        break;
     }
+    return renderFallback(item.notice ?? t('email_viewer.preview.unsupported', 'No preview for this file type.'));
   };
 
   const content = (
@@ -359,6 +427,7 @@ export function AttachmentPreviewModal({
           </Pressable>
         </View>
         {renderBody()}
+        {nested.modalProps.item || nested.modalProps.loading ? <AttachmentPreviewModal {...nested.modalProps} /> : null}
       </SafeAreaView>
   );
   if (docked) return item || loading ? content : null;

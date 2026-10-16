@@ -93,8 +93,16 @@ describe('filePreviewKind', () => {
     expect(filePreviewKind({ name: 'cover.mp3', type: 'image/jpeg' }, ANDROID)).toBe('image');
   });
 
-  it('leaves archives, office documents and binaries to other apps', () => {
-    expect(filePreviewKind({ name: 'archive.zip', type: 'application/zip' }, IOS)).toBe('none');
+  it('lists the files in a ZIP, but not in the formats built on ZIP', () => {
+    expect(filePreviewKind({ name: 'archive.zip', type: 'application/zip' }, IOS)).toBe('archive');
+    expect(filePreviewKind({ name: 'photos', type: 'application/x-zip-compressed' }, ANDROID)).toBe('archive');
+    expect(filePreviewKind({ name: 'Archive.ZIP', type: 'application/octet-stream' }, ANDROID)).toBe('archive');
+    expect(filePreviewKind({ name: 'app.apk', type: 'application/vnd.android.package-archive' }, ANDROID)).toBe('none');
+  });
+
+  it('leaves other archives, office documents and binaries to other apps', () => {
+    expect(filePreviewKind({ name: 'backup.7z', type: 'application/x-7z-compressed' }, IOS)).toBe('none');
+    expect(filePreviewKind({ name: 'logs.tar.gz', type: 'application/gzip' }, ANDROID)).toBe('none');
     expect(filePreviewKind({ name: 'sheet.xlsx', type: 'application/octet-stream' }, IOS)).toBe('none');
     expect(filePreviewKind({ name: 'contract.docx', type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }, ANDROID)).toBe('none');
     expect(filePreviewKind({ name: 'data.bin', type: undefined }, IOS)).toBe('none');

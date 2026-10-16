@@ -410,7 +410,11 @@
       "unsupported": "Энэ төрлийн файлыг урьдчилан харах боломжгүй.",
       "media_unsupported": "Энэ файлыг энд тоглуулах боломжгүй.",
       "pdf_protected": "Энэ PDF нууц үгээр хамгаалагдсан. Нууц үг оруулахын тулд өөр апп-аар нээнэ үү.",
-      "pdf_unreadable": "Энэ PDF-ийг энд харуулах боломжгүй."
+      "pdf_unreadable": "Энэ PDF-ийг энд харуулах боломжгүй.",
+      "archive_files": "{count, plural, one {# файл} other {# файл}}",
+      "archive_first_files": "Эхний {count} файл",
+      "archive_protected": "Энэ архив нууц үгээр хамгаалагдсан. Нууц үг оруулахын тулд өөр апп-аар нээнэ үү.",
+      "archive_unreadable": "Энэ архивыг энд нээх боломжгүй."
     },
     "received_via": "Хэнд: {name}",
     "remove_color": "Тагийг хасах",

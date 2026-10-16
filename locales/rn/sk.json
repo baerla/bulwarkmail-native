@@ -410,7 +410,11 @@
       "unsupported": "Pre tento typ súboru nie je k dispozícii náhľad.",
       "media_unsupported": "Tento súbor tu nie je možné prehrať.",
       "pdf_protected": "Toto PDF je chránené heslom. Otvorte ho v inej aplikácii a zadajte heslo.",
-      "pdf_unreadable": "Toto PDF tu nie je možné zobraziť."
+      "pdf_unreadable": "Toto PDF tu nie je možné zobraziť.",
+      "archive_files": "{count, plural, one {# súbor} few {# súbory} many {# súboru} other {# súborov}}",
+      "archive_first_files": "Prvých {count} súborov",
+      "archive_protected": "Tento archív je chránený heslom. Otvorte ho v inej aplikácii a zadajte heslo.",
+      "archive_unreadable": "Tento archív tu nie je možné otvoriť."
     },
     "received_via": "pre {name}",
     "remove_color": "Odstrániť štítok",

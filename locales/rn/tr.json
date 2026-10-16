@@ -410,7 +410,11 @@
       "unsupported": "Bu dosya türü için önizleme yok.",
       "media_unsupported": "Bu dosya burada oynatılamıyor.",
       "pdf_protected": "Bu PDF parola korumalı. Parolayı girmek için başka bir uygulamada açın.",
-      "pdf_unreadable": "Bu PDF burada gösterilemiyor."
+      "pdf_unreadable": "Bu PDF burada gösterilemiyor.",
+      "archive_files": "{count, plural, one {# dosya} other {# dosya}}",
+      "archive_first_files": "İlk {count} dosya",
+      "archive_protected": "Bu arşiv parola korumalı. Parolayı girmek için başka bir uygulamada açın.",
+      "archive_unreadable": "Bu arşiv burada açılamıyor."
     },
     "received_via": "alıcı: {name}",
     "remove_color": "Etiketi kaldır",

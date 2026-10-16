@@ -5,7 +5,7 @@
 // everything else goes to the OS "Open with" chooser.
 
 export type PreviewKind =
-  | 'image' | 'pdf' | 'text' | 'markdown' | 'html' | 'eml' | 'video' | 'audio' | 'none';
+  | 'image' | 'pdf' | 'text' | 'markdown' | 'html' | 'eml' | 'video' | 'audio' | 'archive' | 'none';
 
 export interface FilePreviewOptions {
   /**
@@ -26,14 +26,16 @@ interface PreviewableFile {
  * Largest file each preview kind loads. Text is rendered in one selectable
  * `<Text>`, which gets slow to lay out past a few hundred KB; HTML and
  * Markdown go through the mail sanitiser in JS; parsing an .eml and decoding
- * an image hold the whole file in memory. PDFs are paged by their viewer and
- * media stream from the downloaded copy. Larger files open in another app.
+ * an image hold the whole file in memory, and so does listing a ZIP. PDFs
+ * are paged by their viewer and media stream from the downloaded copy.
+ * Larger files open in another app.
  */
 export const FILE_PREVIEW_MAX_BYTES: Record<Exclude<PreviewKind, 'none'>, number> = {
   text: 512 * 1024,
   markdown: 1024 * 1024,
   html: 5 * 1024 * 1024,
   eml: 10 * 1024 * 1024,
+  archive: 50 * 1024 * 1024,
   image: 25 * 1024 * 1024,
   pdf: 100 * 1024 * 1024,
   audio: 500 * 1024 * 1024,
@@ -94,6 +96,7 @@ const MEDIA: Record<'video' | 'audio', Record<FilePreviewOptions['platform'], { 
   },
 };
 
+const ZIP_MIME = new Set(['application/zip', 'application/x-zip-compressed', 'application/x-zip']);
 const HTML_MIME = new Set(['text/html', 'application/xhtml+xml']);
 const HTML_EXT = new Set(['html', 'htm', 'xhtml', 'xht']);
 const MARKDOWN_MIME = new Set(['text/markdown', 'text/x-markdown']);
@@ -128,6 +131,8 @@ export function filePreviewKind(file: Pick<PreviewableFile, 'name' | 'type'>, op
   const media = /^(image|audio|video)\//.test(mime);
 
   if (mime === 'message/rfc822' || ext === 'eml') return 'eml';
+  // ZIPs list their files; formats built on ZIP (docx, apk) are not ZIPs here.
+  if (ZIP_MIME.has(mime) || ((!mime || mime.startsWith('application/x-')) && ext === 'zip')) return 'archive';
   if (HTML_MIME.has(mime) || HTML_EXT.has(ext)) return 'html';
   if (MARKDOWN_MIME.has(mime) || MARKDOWN_EXT.has(ext)) return 'markdown';
 

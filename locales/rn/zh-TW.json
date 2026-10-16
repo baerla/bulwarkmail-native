@@ -410,7 +410,11 @@
       "unsupported": "無法預覽此檔案類型。",
       "media_unsupported": "無法在此播放這個檔案。",
       "pdf_protected": "此 PDF 受密碼保護。請在其他應用程式中開啟以輸入密碼。",
-      "pdf_unreadable": "無法在此顯示這個 PDF。"
+      "pdf_unreadable": "無法在此顯示這個 PDF。",
+      "archive_files": "{count, plural, other {# 個檔案}}",
+      "archive_first_files": "前 {count} 個檔案",
+      "archive_protected": "此壓縮檔受密碼保護。請在其他應用程式中開啟以輸入密碼。",
+      "archive_unreadable": "無法在此開啟這個壓縮檔。"
     },
     "received_via": "寄給 {name}",
     "remove_color": "移除標籤",

@@ -13,6 +13,7 @@ import type { PreviewKind } from '../../lib/file-preview';
 import { markdownToHtml } from '../../lib/markdown-html';
 import { imageViewerHtml, mediaViewerHtml, pdfViewerHtml, type ViewerColors } from '../../lib/preview-viewer-html';
 import { closePdfPages, openPdfPages, PdfOpenError } from '../../lib/pdf-pages';
+import { openZip, ZipEncryptedError } from '../../lib/zip-preview';
 import { useLocaleStore } from '../../stores/locale-store';
 import { useColors, useResolvedTheme } from '../../theme/colors';
 import type { PreviewItem } from './AttachmentPreviewModal';
@@ -79,6 +80,8 @@ interface Notices {
   tooLarge: string;
   pdfProtected: string;
   pdfUnreadable: string;
+  zipProtected: string;
+  zipUnreadable: string;
 }
 
 async function buildItem(
@@ -100,6 +103,12 @@ async function buildItem(
       return { ...base, kind, html: await local.text() };
     case 'eml':
       return { ...base, kind, eml: await emlPreviewFromBytes(await local.bytes()) };
+    case 'archive':
+      try {
+        return { ...base, kind, archive: await openZip(await local.bytes()) };
+      } catch (e) {
+        return { ...base, kind: 'none', notice: e instanceof ZipEncryptedError ? notices.zipProtected : notices.zipUnreadable };
+      }
     case 'image':
       return { ...base, kind, fileUri: local.uri, viewerUri: writeViewer(local, imageViewerHtml(local.name, colors)) };
     case 'video':
@@ -208,6 +217,11 @@ export function useFilePreview(opts: {
             'This PDF is password-protected. Open it in another app to enter the password.',
           ),
           pdfUnreadable: t('email_viewer.preview.pdf_unreadable', "This PDF can't be shown here."),
+          zipProtected: t(
+            'email_viewer.preview.archive_protected',
+            'This archive is password-protected. Open it in another app to enter the password.',
+          ),
+          zipUnreadable: t('email_viewer.preview.archive_unreadable', "This archive can't be opened here."),
         }, colors.current);
         if (current()) setItem(next);
       } catch (e) {

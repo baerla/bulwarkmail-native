@@ -410,7 +410,11 @@
       "unsupported": "No hi ha previsualització per a aquest tipus de fitxer.",
       "media_unsupported": "Aquest fitxer no es pot reproduir aquí.",
       "pdf_protected": "Aquest PDF està protegit amb contrasenya. Obre'l en una altra aplicació per introduir-la.",
-      "pdf_unreadable": "Aquest PDF no es pot mostrar aquí."
+      "pdf_unreadable": "Aquest PDF no es pot mostrar aquí.",
+      "archive_files": "{count, plural, one {# fitxer} other {# fitxers}}",
+      "archive_first_files": "Els primers {count} fitxers",
+      "archive_protected": "Aquest arxiu està protegit amb contrasenya. Obre'l en una altra aplicació per introduir-la.",
+      "archive_unreadable": "Aquest arxiu no es pot obrir aquí."
     },
     "received_via": "per a {name}",
     "remove_color": "Elimina l'etiqueta",

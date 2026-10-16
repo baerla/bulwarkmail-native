@@ -410,7 +410,11 @@
       "unsupported": "Geen voorbeeld voor dit bestandstype.",
       "media_unsupported": "Dit bestand kan hier niet worden afgespeeld.",
       "pdf_protected": "Deze pdf is beveiligd met een wachtwoord. Open hem in een andere app om het wachtwoord in te voeren.",
-      "pdf_unreadable": "Deze pdf kan hier niet worden weergegeven."
+      "pdf_unreadable": "Deze pdf kan hier niet worden weergegeven.",
+      "archive_files": "{count, plural, one {# bestand} other {# bestanden}}",
+      "archive_first_files": "De eerste {count} bestanden",
+      "archive_protected": "Dit archief is beveiligd met een wachtwoord. Open het in een andere app om het wachtwoord in te voeren.",
+      "archive_unreadable": "Dit archief kan hier niet worden geopend."
     },
     "received_via": "aan {name}",
     "remove_color": "Label verwijderen",

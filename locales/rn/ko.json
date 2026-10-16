@@ -410,7 +410,11 @@
       "unsupported": "이 파일 형식은 미리보기를 지원하지 않아요.",
       "media_unsupported": "이 파일은 여기서 재생할 수 없습니다.",
       "pdf_protected": "이 PDF는 암호로 보호되어 있습니다. 암호를 입력하려면 다른 앱에서 여세요.",
-      "pdf_unreadable": "이 PDF는 여기서 표시할 수 없습니다."
+      "pdf_unreadable": "이 PDF는 여기서 표시할 수 없습니다.",
+      "archive_files": "{count, plural, other {파일 #개}}",
+      "archive_first_files": "처음 {count}개 파일",
+      "archive_protected": "이 압축 파일은 암호로 보호되어 있습니다. 암호를 입력하려면 다른 앱에서 여세요.",
+      "archive_unreadable": "이 압축 파일은 여기서 열 수 없습니다."
     },
     "received_via": "받는 사람: {name}",
     "remove_color": "태그 제거",

@@ -410,7 +410,11 @@
       "unsupported": "Šim faila tipam nav priekšskatījuma.",
       "media_unsupported": "Šo failu šeit nevar atskaņot.",
       "pdf_protected": "Šis PDF ir aizsargāts ar paroli. Atveriet to citā lietotnē, lai ievadītu paroli.",
-      "pdf_unreadable": "Šo PDF šeit nevar parādīt."
+      "pdf_unreadable": "Šo PDF šeit nevar parādīt.",
+      "archive_files": "{count, plural, zero {# failu} one {# fails} other {# faili}}",
+      "archive_first_files": "Pirmie {count} faili",
+      "archive_protected": "Šis arhīvs ir aizsargāts ar paroli. Atveriet to citā lietotnē, lai ievadītu paroli.",
+      "archive_unreadable": "Šo arhīvu šeit nevar atvērt."
     },
     "received_via": "kam: {name}",
     "remove_color": "Noņemt tagu",

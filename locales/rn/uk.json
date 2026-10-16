@@ -410,7 +410,11 @@
       "unsupported": "Для цього типу файлів немає попереднього перегляду.",
       "media_unsupported": "Цей файл не можна відтворити тут.",
       "pdf_protected": "Цей PDF захищено паролем. Відкрийте його в іншому застосунку, щоб ввести пароль.",
-      "pdf_unreadable": "Цей PDF не можна показати тут."
+      "pdf_unreadable": "Цей PDF не можна показати тут.",
+      "archive_files": "{count, plural, one {# файл} few {# файли} many {# файлів} other {# файлу}}",
+      "archive_first_files": "Перші {count} файлів",
+      "archive_protected": "Цей архів захищено паролем. Відкрийте його в іншому застосунку, щоб ввести пароль.",
+      "archive_unreadable": "Цей архів не можна відкрити тут."
     },
     "received_via": "на {name}",
     "remove_color": "Прибрати тег",
