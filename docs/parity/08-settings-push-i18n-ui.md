@@ -56,7 +56,7 @@ Legend: RN? = key exists in RN store; Honored = read by RN app code outside `sto
 | emailNotificationSound (true) | same | yes | **no** | Stored, never read; Android channel sound is whatever the OS default is |
 | notificationSoundChoice (default/cheerful/involved/swift/relax) | same (default/chime/ping/pop/none) | yes | **no** | Different option set, never read, preview button has no `onPress` (`RN: NotificationSettings.tsx:205-210`) |
 | pushRelayUrl ('' = admin default) | (AsyncStorage `push:relayBaseUrl:v1`, free text) | separate | yes | See push findings |
-| calendarNotificationsEnabled / calendarNotificationSound | same | yes | **no** | Stored, never read (calendar-alerts lib does not consult them). Owner: calendar agent for the alarm side |
+| calendarNotificationsEnabled / calendarNotificationSound | same | yes | partial | `calendarNotificationsEnabled` is read by the reminder scheduler, the background refresh and `pushTypesFor`; `calendarNotificationSound` is still never read |
 | calendarInvitationParsingEnabled | same | yes | yes | CalendarInvitationBanner |
 | protocolOpenMode | – | no | – | N/A (web protocol handlers) |
 | toolbarPosition | – | no | – | N/A |
@@ -83,7 +83,7 @@ Legend: RN? = key exists in RN store; Honored = read by RN app code outside `sto
 | – | files* (8 keys) | RN-only | 6 of 8 | filesFolderLayout, filesShowThumbnails never read. Owner: files agent |
 | – | bottomQuickActions, swipeMode, offlineCache* | RN-only | yes | |
 
-RN toggles that are stored but never read (fix: either wire them or remove the control): `mailLayout`, `calendarShowTimeInMonth`, `calendarHoverPreview`, `showTasksOnCalendar`, `emailNotificationSound`, `notificationSoundChoice`, `calendarNotificationsEnabled`, `calendarNotificationSound`, `sidebarApps`, `keepAppsLoaded`, `activeThemeId`, `smimeDefaultEncrypt`, `smimeRememberUnlocked`, `smimeAutoImport`, `pluginEnabled`, `filesFolderLayout`, `filesShowThumbnails`.
+RN toggles that are stored but never read (fix: either wire them or remove the control): `mailLayout`, `calendarShowTimeInMonth`, `calendarHoverPreview`, `showTasksOnCalendar`, `emailNotificationSound`, `notificationSoundChoice`, `calendarNotificationSound`, `sidebarApps`, `keepAppsLoaded`, `activeThemeId`, `smimeDefaultEncrypt`, `smimeRememberUnlocked`, `smimeAutoImport`, `pluginEnabled`, `filesFolderLayout`, `filesShowThumbnails`.
 
 ## Findings
 

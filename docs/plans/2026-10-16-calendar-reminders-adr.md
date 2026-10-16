@@ -1,6 +1,6 @@
 # ADR: Exact, background-refreshed local notifications for calendar reminders
 
-- **Status:** Accepted. Not yet implemented; see the [handoff](2026-10-16-calendar-reminders-handoff.md).
+- **Status:** Accepted and implemented (Android parts not yet verified on a device); see the [handoff](2026-10-16-calendar-reminders-handoff.md).
 - **Date:** 2026-10-16
 - **Plan:** [2026-10-16-calendar-reminders-plan.md](2026-10-16-calendar-reminders-plan.md)
 

@@ -246,10 +246,10 @@ RN has a solid read path (month/week/agenda, shared-calendar namespacing, per-vi
   - What RN does: `createEvent` merges the `/set` echo over the payload (`src/api/calendar.ts:272-274`) and appends without expansion (`src/stores/calendar-store.ts:286-304`).
   - Fix hint: after create, `CalendarEvent/get` the id (RN `getEvents([id])`) and, if `recurrenceRules` is set, run `expandRecurringEvents` for `loadedRange` or call `refresh()`.
 
-- [ ] **Push: FCM subscription excludes `CalendarEvent`/`Calendar` types** — `P3` — `partial` — deferred: local reminders (8e1d03c) are resynced at launch, on `Calendar`/`CalendarEvent` state changes and on return to the foreground (4b903ed), but nothing refreshes them in the background; adding the calendar types to the push subscription lives in `src/lib/push-notifications.ts` (push area) and would need a background refresh + reschedule hook
+- [x] **Push: FCM subscription excludes `CalendarEvent`/`Calendar` types** — `P3` — `partial` — fixed: the calendar types join the push subscription while calendar notifications are on (`pushTypesFor`), and a calendar push or a 6-hourly job runs the headless task `BulwarkCalendarReminders`, which reschedules the event reminders without opening the app (Android; iOS has no push and still refreshes in the foreground). Reminders use exact alarms (`USE_EXACT_ALARM`), so they fire on the minute in Doze. See `docs/plans/2026-10-16-calendar-reminders-adr.md`
   - What WEB does: push subscription covers calendar types so the sidebar refreshes on external changes (FEATURES.md "JMAP push keeps everything in sync").
-  - What RN does: foreground EventSource/polling dispatches to `useCalendarStore.handleStateChange` (`App.tsx:390-397`, `src/stores/calendar-store.ts:261-284`) — at parity while the app is open; the background push subscription carries only `['EmailDelivery']` since 00faceb (`src/lib/push-notifications.ts`), so calendar changes never wake the app.
-  - Fix hint: leave as is unless background calendar refresh becomes needed.
+  - What RN does: foreground EventSource/polling dispatches to `useCalendarStore.handleStateChange` (`App.tsx:390-397`, `src/stores/calendar-store.ts:261-284`) — at parity while the app is open; in the background the subscription adds `CalendarEvent`/`Calendar` for the reminders, and the native push router starts `BulwarkCalendarReminderJobService` for them (it refreshes reminders only, never the in-app stores).
+  - Fix hint: none.
 
 ### Alerts / notifications
 
