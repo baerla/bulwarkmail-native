@@ -30,6 +30,14 @@ AppRegistry.registerHeadlessTask('BulwarkDeviceSync', () => async (data: import(
   await runDeviceSyncTask(data);
 });
 
+// Calendar reminders (Android): a calendar push or the 6-hourly job runs this to
+// bring the scheduled reminders up to date without opening the app. Required on
+// first use so an app start does not load it.
+AppRegistry.registerHeadlessTask('BulwarkCalendarReminders', () => async () => {
+  const { refreshCalendarRemindersInBackground } = require('./src/lib/calendar-reminders-background') as typeof import('./src/lib/calendar-reminders-background');
+  await refreshCalendarRemindersInBackground();
+});
+
 // Home-screen widgets (Android): every widget event runs this headless task.
 registerWidgetTaskHandler(widgetTaskHandler);
 // ...and leaving the app refreshes them in one (BulwarkWidgetRefreshService).
