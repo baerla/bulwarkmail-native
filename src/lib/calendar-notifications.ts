@@ -12,6 +12,7 @@ import { getUpcomingAlerts, type ScheduledAlert } from './calendar-alert-schedul
 import type { CalendarReminderTarget } from '../navigation/pending-calendar-open';
 import { onDeviceRemindersChange, remindedOnDevice } from '../device-sync/app/reminders';
 import { refreshPushSubscriptionTypes } from './push-notifications';
+import { setCalendarReminderJob } from './calendar-reminder-job';
 import {
   HORIZON_MS,
   LOOKAHEAD_MS,
@@ -145,9 +146,12 @@ export async function rescheduleCalendarNotifications(): Promise<void> {
       if (!settings.hydrated) return;
       if (!settings.calendarNotificationsEnabled || isSignedOut()) {
         await cancelAllCalendarNotifications();
+        await setCalendarReminderJob(false);
         return;
       }
       if (!(await ensurePermission())) return;
+      // Keeps the reminders fresh while the app stays closed (idempotent).
+      void setCalendarReminderJob(true);
       const { locale, t } = useLocaleStore.getState();
       await ensureChannel(locale, t);
 

@@ -18,6 +18,10 @@ import org.json.JSONObject
  * names no type (older relays), or when an account's entry is unreadable, so
  * a contact change never ends in a mail notification. The push task's guard
  * (`carriesNoMail` in src/lib/push-background-task.ts) applies the same rules.
+ *
+ * A calendar type also asks for the calendar reminders to be brought up to
+ * date (`calendarReminders`), whether or not any device sync routes it: the
+ * reminders are local notifications that follow the server's events.
  */
 object PushRouting {
     /** An Android account and the authorities it syncs, fed by one JMAP account. */
@@ -27,6 +31,8 @@ object PushRouting {
         /** (Android account name, authority) pairs to request a sync for. */
         val syncs: Set<Pair<String, String>>,
         val startMailTask: Boolean,
+        /** Some account's changed types include a calendar type. */
+        val calendarReminders: Boolean = false,
     )
 
     private const val STATE_CHANGE_KIND = "jmap-state-change"
@@ -47,6 +53,7 @@ object PushRouting {
         // Only a StateChange can say it carries no mail.
         var mail = data["kind"] != STATE_CHANGE_KIND || changed == null
         val syncs = LinkedHashSet<Pair<String, String>>()
+        var calendarReminders = false
         for ((jmapAccountId, types) in changed.orEmpty()) {
             if (types == null) {
                 // One account's entry is unreadable: it may be mail.
@@ -56,6 +63,7 @@ object PushRouting {
             if (types.any { it in MAIL_TYPES }) mail = true
             val contacts = types.any { it in CONTACT_TYPES }
             val calendar = types.any { it in CALENDAR_TYPES }
+            if (calendar) calendarReminders = true
             for (route in routes[jmapAccountId].orEmpty()) {
                 if (contacts && DeviceSyncAccounts.CONTACTS_AUTHORITY in route.authorities) {
                     syncs += route.accountName to DeviceSyncAccounts.CONTACTS_AUTHORITY
@@ -65,7 +73,7 @@ object PushRouting {
                 }
             }
         }
-        return Decision(syncs, mail)
+        return Decision(syncs, mail, calendarReminders)
     }
 
     /**
@@ -133,6 +141,9 @@ object PushRouting {
  * BulwarkUnifiedPushService) with the routes JS stored through
  * `setPushRoutes`.
  */
+/** What a push asks the services to start: the mail push task, the calendar reminder refresh. */
+data class PushRouteResult(val startMailTask: Boolean, val calendarReminders: Boolean)
+
 object DeviceSyncPushRouter {
     private const val TAG = "BulwarkDeviceSync"
     private const val PREFS = "bulwark_device_sync"
@@ -149,11 +160,11 @@ object DeviceSyncPushRouter {
 
     /**
      * Requests the syncs the push asks for, with constant (empty) extras so
-     * repeated pushes coalesce into one pending sync. Returns whether the mail
-     * push task should run; any failure here says yes, so mail never depends
-     * on device sync.
+     * repeated pushes coalesce into one pending sync. Reports whether the mail
+     * push task should run, which any failure here says yes to so mail never
+     * depends on device sync, and whether the calendar reminders need a refresh.
      */
-    fun route(context: Context, data: Map<String, String>): Boolean = try {
+    fun route(context: Context, data: Map<String, String>): PushRouteResult = try {
         val routes = PushRouting.parseRoutes(
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_ROUTES, null),
         )
@@ -165,9 +176,9 @@ object DeviceSyncPushRouter {
                 Log.w(TAG, "Push: no sync requested for $authority", e)
             }
         }
-        decision.startMailTask
+        PushRouteResult(decision.startMailTask, decision.calendarReminders)
     } catch (e: Exception) {
         Log.w(TAG, "Push not routed", e)
-        true
+        PushRouteResult(startMailTask = true, calendarReminders = false)
     }
 }

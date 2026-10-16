@@ -34,7 +34,9 @@ class BulwarkUnifiedPushService : PushService() {
 
         // Same routing as FCM: contact and calendar changes request device
         // syncs, and only mail starts the push task.
-        val mail = DeviceSyncPushRouter.route(applicationContext, data)
+        val routed = DeviceSyncPushRouter.route(applicationContext, data)
+        val mail = routed.startMailTask
+        if (routed.calendarReminders) BulwarkCalendarReminderJobService.scheduleNow(applicationContext)
         if (mail && !BulwarkMessagingService.isAppInForeground()) {
             BulwarkMessagingService.startHeadlessTask(applicationContext, data)
         }

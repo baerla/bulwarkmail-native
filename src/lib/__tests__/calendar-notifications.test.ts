@@ -26,6 +26,7 @@ const h = vi.hoisted(() => ({
   reminderListener: null as (() => void) | null,
   settingsListener: null as Listener | null,
   refreshPushTypes: vi.fn(async () => undefined),
+  setJob: vi.fn(async () => undefined),
 }));
 
 vi.mock('react-native', () => ({
@@ -64,6 +65,7 @@ vi.mock('../../stores/settings-store', () => ({
   },
 }));
 vi.mock('../push-notifications', () => ({ refreshPushSubscriptionTypes: h.refreshPushTypes }));
+vi.mock('../calendar-reminder-job', () => ({ setCalendarReminderJob: h.setJob }));
 vi.mock('../../stores/calendar-store', () => ({
   useCalendarStore: {
     getState: () => h.calendar,
@@ -389,5 +391,32 @@ describe('calendar reminders: push subscription', () => {
     h.settings = { ...h.settings, enableCalendarTasks: true };
     h.settingsListener!(h.settings, prev);
     expect(h.refreshPushTypes).not.toHaveBeenCalled();
+  });
+});
+
+describe('calendar reminders: periodic background job', () => {
+  it('schedules the periodic job when reminders are on and the user is signed in', async () => {
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(true);
+    expect(h.setJob).not.toHaveBeenCalledWith(false);
+  });
+
+  it('cancels the periodic job when the setting is off', async () => {
+    h.settings.calendarNotificationsEnabled = false;
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(false);
+    expect(h.setJob).not.toHaveBeenCalledWith(true);
+  });
+
+  it('cancels the periodic job when signed out', async () => {
+    h.auth = { ...h.auth, isAuthenticated: false };
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(false);
+  });
+
+  it('does not schedule it without notification permission', async () => {
+    h.permission = { granted: false, canAskAgain: false };
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).not.toHaveBeenCalledWith(true);
   });
 });
