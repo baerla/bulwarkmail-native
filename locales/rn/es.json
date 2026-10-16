@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Abrir en una app",
       "pdf_external": "Los PDF se abren en el visor de PDF de este dispositivo.",
-      "unsupported": "No hay vista previa para este tipo de archivo."
+      "unsupported": "No hay vista previa para este tipo de archivo.",
+      "media_unsupported": "Este archivo no se puede reproducir aquí."
     },
     "received_via": "para {name}",
     "remove_color": "Eliminar etiqueta",

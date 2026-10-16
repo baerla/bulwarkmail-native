@@ -10,7 +10,7 @@ import { spacing, radius, typography, componentSizes, type ThemePalette } from '
 import { useColors } from '../../theme/colors';
 import { useLocaleStore } from '../../stores/locale-store';
 import EmailBodyView from '../EmailBodyView';
-import type { PreviewKind } from '../../lib/attachment-display';
+import { needsNativeImageDecoder, needsWebImageViewer, type PreviewKind } from '../../lib/file-preview';
 import type { EmlPreview } from './use-body-override';
 import { MODAL_ORIENTATIONS } from '../../lib/modal-orientations';
 
@@ -18,10 +18,14 @@ export interface PreviewItem {
   kind: PreviewKind;
   name: string;
   mimeType: string;
-  /** Local file:// URI for images and PDFs. */
+  /** Local file:// URI of the downloaded copy (images, PDFs, media). */
   fileUri?: string;
+  /** The viewer page next to the file (images, video, audio); see preview-viewer-html. */
+  viewerUri?: string;
   /** Decoded text for text-like parts. */
   text?: string;
+  /** The document for HTML and Markdown files, shown through the mail sanitiser. */
+  html?: string;
   /** Parsed embedded message for .eml previews. */
   eml?: EmlPreview;
   /** Replaces "No preview for this file type." on the fallback screen (e.g. the file is too large). */
@@ -34,7 +38,7 @@ interface Props {
   /** Header title while the item is still loading. */
   title?: string;
   onClose: () => void;
-  /** Hand the file to an external app (PDF on Android, unsupported types, the header's Open button). */
+  /** Hand the file to another app (types without a preview, the header's Open button). */
   onOpenExternal: () => void;
   onShare: () => void;
   /** Save a copy; adds a Download button to the header. */
@@ -44,10 +48,45 @@ interface Props {
 }
 
 /**
- * In-app preview for images, PDFs (iOS renders them in the WebView; Android
- * has no built-in PDF renderer, so it offers the external viewer), text and
- * embedded messages. Anything else goes to the external viewer / share sheet.
- * Used by the reader's attachment chips and the Files tab.
+ * A local page in a WebView that may read only its own folder: the image
+ * and media viewers. It posts 'error' when the file doesn't decode.
+ */
+function ViewerWebView({ uri, background, onFailed }: { uri: string; background: string; onFailed: () => void }) {
+  const folder = uri.slice(0, uri.lastIndexOf('/') + 1);
+  return (
+    <WebView
+      source={{ uri }}
+      originWhitelist={['file://*']}
+      allowFileAccess
+      allowingReadAccessToURL={folder}
+      javaScriptEnabled
+      domStorageEnabled={false}
+      cacheEnabled={false}
+      incognito
+      allowsInlineMediaPlayback
+      mediaPlaybackRequiresUserAction={false}
+      allowsFullscreenVideo
+      allowsPictureInPictureMediaPlayback
+      allowsAirPlayForMediaPlayback
+      setSupportMultipleWindows={false}
+      setBuiltInZoomControls
+      setDisplayZoomControls={false}
+      overScrollMode="never"
+      bounces={false}
+      onShouldStartLoadWithRequest={(req) => req.url === uri}
+      onMessage={(e) => { if (e.nativeEvent.data === 'error') onFailed(); }}
+      onError={onFailed}
+      style={[viewerStyles.fill, { backgroundColor: background }]}
+      containerStyle={{ backgroundColor: background }}
+    />
+  );
+}
+
+/**
+ * In-app preview for images, PDFs (iOS renders them in the WebView), video
+ * and audio (the WebView's player), text, Markdown and HTML documents and
+ * embedded messages. Files that don't decode, and types without a preview,
+ * offer another app instead. Used by every place that opens a file.
  */
 export function AttachmentPreviewModal({
   item, loading, title, onClose, onOpenExternal, onShare, onDownload, docked = false,
@@ -56,31 +95,49 @@ export function AttachmentPreviewModal({
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
   const { width } = useWindowDimensions();
-  // An image the platform can't decode would stay blank; fall back to the
-  // external viewer instead. Keyed by URI so the next item starts clean.
-  const [failedImageUri, setFailedImageUri] = React.useState<string | null>(null);
+  // Which viewers failed for the open file, keyed by its URI so the next one
+  // starts clean: React Native's Image falls back to the WebView viewer, and
+  // a WebView that can't decode the file falls back to another app.
+  const [failed, setFailed] = React.useState<{ uri: string; native?: boolean; web?: boolean } | null>(null);
+  const markFailed = React.useCallback((uri: string | undefined, which: 'native' | 'web') => {
+    if (!uri) return;
+    setFailed((prev) => ({ ...(prev?.uri === uri ? prev : {}), uri, [which]: true }));
+  }, []);
   // The image fits the area it is shown in (a pane, a landscape window),
   // not a box derived from the window width that ran past the screen.
   const [imageArea, setImageArea] = React.useState<{ width: number; height: number } | null>(null);
 
-  const emlEmail = React.useMemo<Email | null>(() => {
-    if (!item?.eml) return null;
+  const docEmail = React.useMemo<Email | null>(() => {
+    if (!item || (!item.eml && item.html == null)) return null;
     return {
-      id: `eml-preview-${item.name}`,
+      id: `file-preview-${item.kind}-${item.fileUri ?? item.name}`,
       threadId: '',
       mailboxIds: {},
       keywords: {},
       size: 0,
-      receivedAt: item.eml.date ?? new Date().toISOString(),
+      receivedAt: item.eml?.date ?? new Date().toISOString(),
       hasAttachment: false,
-      subject: item.eml.subject,
+      subject: item.eml?.subject ?? item.name,
     };
   }, [item]);
 
-  const imageFailed = item?.kind === 'image' && !!item.fileUri && failedImageUri === item.fileUri;
+  const failure = item?.fileUri && failed?.uri === item.fileUri ? failed : null;
+  // Android's WebView zooms; React Native's Image there doesn't. iOS zooms
+  // the native image in its ScrollView. Each side's gaps go to the other.
+  const imageInWeb = item?.kind === 'image' && !!item.viewerUri && !failure?.web && (
+    failure?.native
+    || (Platform.OS === 'android' ? !needsNativeImageDecoder(item) : needsWebImageViewer(item))
+  );
+  const imageFailed = item?.kind === 'image' && (
+    !!failure?.web && (!!failure.native || !item.viewerUri || needsWebImageViewer(item))
+    || (!!failure?.native && !item.viewerUri)
+  );
+  const mediaFailed = (item?.kind === 'video' || item?.kind === 'audio') && !!failure?.web;
   const pdfInline = item?.kind === 'pdf' && Platform.OS === 'ios' && !!item.fileUri;
   // The fallback screen has its own Open button; the header adds one elsewhere.
-  const showsFallback = !!item && (item.kind === 'none' || (item.kind === 'pdf' && !pdfInline) || imageFailed);
+  const showsFallback = !!item && (
+    item.kind === 'none' || (item.kind === 'pdf' && !pdfInline) || imageFailed || mediaFailed
+  );
 
   const renderFallback = (message: string) => (
     <View style={styles.centered}>
@@ -90,6 +147,13 @@ export function AttachmentPreviewModal({
         <Text style={styles.buttonText}>{t('email_viewer.preview.open_external', 'Open in app')}</Text>
       </Pressable>
     </View>
+  );
+
+  const renderDocument = (header?: React.ReactNode) => (
+    <ScrollView style={styles.flex}>
+      {header}
+      {docEmail && <EmailBodyView email={docEmail} bodyOverride={{ html: item?.html ?? item?.eml?.html, text: item?.eml?.text }} />}
+    </ScrollView>
   );
 
   const renderBody = () => {
@@ -104,6 +168,16 @@ export function AttachmentPreviewModal({
       case 'image':
         if (imageFailed) {
           return renderFallback(t('email_viewer.preview.unsupported', 'No preview for this file type.'));
+        }
+        if (imageInWeb && item.viewerUri) {
+          return (
+            <ViewerWebView
+              key={item.viewerUri}
+              uri={item.viewerUri}
+              background={c.background}
+              onFailed={() => markFailed(item.fileUri, 'web')}
+            />
+          );
         }
         return (
           <ScrollView
@@ -124,9 +198,22 @@ export function AttachmentPreviewModal({
                 : { width: width - spacing.lg * 2, height: width * 1.2 }}
               resizeMode="contain"
               accessibilityLabel={item.name}
-              onError={() => setFailedImageUri(item.fileUri ?? null)}
+              onError={() => markFailed(item.fileUri, 'native')}
             />
           </ScrollView>
+        );
+      case 'video':
+      case 'audio':
+        if (mediaFailed || !item.viewerUri) {
+          return renderFallback(t('email_viewer.preview.media_unsupported', "This file can't be played here."));
+        }
+        return (
+          <ViewerWebView
+            key={item.viewerUri}
+            uri={item.viewerUri}
+            background={item.kind === 'video' ? '#000' : c.background}
+            onFailed={() => markFailed(item.fileUri, 'web')}
+          />
         );
       case 'pdf':
         if (pdfInline && item.fileUri) {
@@ -150,21 +237,16 @@ export function AttachmentPreviewModal({
             <Text selectable style={styles.text}>{item.text ?? ''}</Text>
           </ScrollView>
         );
+      case 'html':
+      case 'markdown':
+        return renderDocument();
       case 'eml':
-        return (
-          <ScrollView style={styles.flex}>
-            <View style={styles.emlHeader}>
-              <Text style={styles.emlSubject}>{item.eml?.subject || t('email_viewer.no_subject', '(No Subject)')}</Text>
-              {item.eml?.from ? <Text style={styles.emlMeta}>{item.eml.from}</Text> : null}
-              {item.eml?.date ? <Text style={styles.emlMeta}>{item.eml.date}</Text> : null}
-            </View>
-            {emlEmail && (
-              <EmailBodyView
-                email={emlEmail}
-                bodyOverride={{ html: item.eml?.html, text: item.eml?.text }}
-              />
-            )}
-          </ScrollView>
+        return renderDocument(
+          <View style={styles.emlHeader}>
+            <Text style={styles.emlSubject}>{item.eml?.subject || t('email_viewer.no_subject', '(No Subject)')}</Text>
+            {item.eml?.from ? <Text style={styles.emlMeta}>{item.eml.from}</Text> : null}
+            {item.eml?.date ? <Text style={styles.emlMeta}>{item.eml.date}</Text> : null}
+          </View>,
         );
       default:
         return renderFallback(item.notice ?? t('email_viewer.preview.unsupported', 'No preview for this file type.'));
@@ -228,6 +310,8 @@ export function AttachmentPreviewModal({
     </Modal>
   );
 }
+
+const viewerStyles = StyleSheet.create({ fill: { flex: 1 } });
 
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({

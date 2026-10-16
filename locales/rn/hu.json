@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Megnyitás alkalmazásban",
       "pdf_external": "A PDF-fájlok az eszköz PDF-megjelenítőjében nyílnak meg.",
-      "unsupported": "Ehhez a fájltípushoz nincs előnézet."
+      "unsupported": "Ehhez a fájltípushoz nincs előnézet.",
+      "media_unsupported": "Ez a fájl itt nem játszható le."
     },
     "received_via": "címzett: {name}",
     "remove_color": "Címke eltávolítása",

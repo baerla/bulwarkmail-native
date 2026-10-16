@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "פתח באפליקציה",
       "pdf_external": "קובצי PDF נפתחים במציג ה-PDF במכשיר זה.",
-      "unsupported": "אין תצוגה מקדימה לסוג קובץ זה."
+      "unsupported": "אין תצוגה מקדימה לסוג קובץ זה.",
+      "media_unsupported": "לא ניתן להפעיל את הקובץ הזה כאן."
     },
     "received_via": "אל {name}",
     "remove_color": "הסר תג",

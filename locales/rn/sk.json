@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Otvoriť v aplikácii",
       "pdf_external": "Súbory PDF sa otvárajú v prehliadači PDF na tomto zariadení.",
-      "unsupported": "Pre tento typ súboru nie je k dispozícii náhľad."
+      "unsupported": "Pre tento typ súboru nie je k dispozícii náhľad.",
+      "media_unsupported": "Tento súbor tu nie je možné prehrať."
     },
     "received_via": "pre {name}",
     "remove_color": "Odstrániť štítok",

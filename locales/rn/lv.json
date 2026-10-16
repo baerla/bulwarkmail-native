@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Atvērt lietotnē",
       "pdf_external": "PDF faili tiek atvērti šīs ierīces PDF skatītājā.",
-      "unsupported": "Šim faila tipam nav priekšskatījuma."
+      "unsupported": "Šim faila tipam nav priekšskatījuma.",
+      "media_unsupported": "Šo failu šeit nevar atskaņot."
     },
     "received_via": "kam: {name}",
     "remove_color": "Noņemt tagu",

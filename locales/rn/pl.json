@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Otwórz w aplikacji",
       "pdf_external": "Pliki PDF otwierają się w przeglądarce PDF na tym urządzeniu.",
-      "unsupported": "Brak podglądu dla tego typu pliku."
+      "unsupported": "Brak podglądu dla tego typu pliku.",
+      "media_unsupported": "Tego pliku nie można tutaj odtworzyć."
     },
     "received_via": "do {name}",
     "remove_color": "Usuń etykietę",

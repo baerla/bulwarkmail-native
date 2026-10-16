@@ -424,7 +424,8 @@
     "preview": {
       "open_external": "Open in app",
       "pdf_external": "PDFs open in your PDF viewer on this device.",
-      "unsupported": "No preview for this file type."
+      "unsupported": "No preview for this file type.",
+      "media_unsupported": "This file can't be played here."
     },
     "received_via": "to {name}",
     "remove_color": "Remove tag",

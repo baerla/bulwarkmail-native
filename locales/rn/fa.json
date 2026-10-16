@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "باز کردن در برنامه",
       "pdf_external": "فایل‌های PDF در نمایشگر PDF این دستگاه باز می‌شوند.",
-      "unsupported": "برای این نوع فایل پیش‌نمایشی وجود ندارد."
+      "unsupported": "برای این نوع فایل پیش‌نمایشی وجود ندارد.",
+      "media_unsupported": "این فایل اینجا پخش نمی‌شود."
     },
     "received_via": "به {name}",
     "remove_color": "حذف برچسب",

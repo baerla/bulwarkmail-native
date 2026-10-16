@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Uygulamada aç",
       "pdf_external": "PDF dosyaları bu cihazdaki PDF görüntüleyicide açılır.",
-      "unsupported": "Bu dosya türü için önizleme yok."
+      "unsupported": "Bu dosya türü için önizleme yok.",
+      "media_unsupported": "Bu dosya burada oynatılamıyor."
     },
     "received_via": "alıcı: {name}",
     "remove_color": "Etiketi kaldır",

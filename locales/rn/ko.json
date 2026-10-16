@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "앱에서 열기",
       "pdf_external": "PDF는 이 기기의 PDF 뷰어에서 열려요.",
-      "unsupported": "이 파일 형식은 미리보기를 지원하지 않아요."
+      "unsupported": "이 파일 형식은 미리보기를 지원하지 않아요.",
+      "media_unsupported": "이 파일은 여기서 재생할 수 없습니다."
     },
     "received_via": "받는 사람: {name}",
     "remove_color": "태그 제거",

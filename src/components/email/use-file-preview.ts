@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, Platform } from 'react-native';
-import type { File } from 'expo-file-system';
+import { File } from 'expo-file-system';
 import type { Email } from '../../api/types';
 import {
   cachePreviewFile, copyPreviewFile, discardPreviewFile, saveLocalFileCopy, shareAttachment,
@@ -9,12 +9,15 @@ import {
 import {
   exceedsPreviewLimit, inAppPreviewKind, type FilePreviewOptions,
 } from '../../lib/file-preview';
-import type { PreviewKind } from '../../lib/attachment-display';
+import type { PreviewKind } from '../../lib/file-preview';
+import { markdownToHtml } from '../../lib/markdown-html';
+import { imageViewerHtml, mediaViewerHtml, type ViewerColors } from '../../lib/preview-viewer-html';
 import { useLocaleStore } from '../../stores/locale-store';
+import { useColors, useResolvedTheme } from '../../theme/colors';
 import type { PreviewItem } from './AttachmentPreviewModal';
 import { emlPreviewFromBytes } from './use-body-override';
 
-export const PREVIEW_OPTIONS: FilePreviewOptions = { inlinePdf: Platform.OS === 'ios' };
+export const PREVIEW_OPTIONS: FilePreviewOptions = { platform: Platform.OS === 'ios' ? 'ios' : 'android' };
 
 interface PreviewSourceBase {
   /** Display name, shown in the header and given to the cached copy. */
@@ -62,11 +65,21 @@ function handOff(source: PreviewSource): Promise<void> {
   }
 }
 
+// The viewer page sits next to the file it shows (see preview-viewer-html).
+function writeViewer(local: File, html: string): string {
+  const page = new File(local.parentDirectory, '__preview.html');
+  if (page.exists) page.delete();
+  page.create();
+  page.write(html);
+  return page.uri;
+}
+
 async function buildItem(
   kind: Exclude<PreviewKind, 'none'>,
   source: PreviewSource,
   local: File,
   tooLarge: string,
+  colors: ViewerColors,
 ): Promise<PreviewItem> {
   const base = { name: source.name, mimeType: source.type };
   // The source may not know its size; the copy does.
@@ -74,8 +87,17 @@ async function buildItem(
   switch (kind) {
     case 'text':
       return { ...base, kind, text: await local.text() };
+    case 'markdown':
+      return { ...base, kind, html: markdownToHtml(await local.text()) };
+    case 'html':
+      return { ...base, kind, html: await local.text() };
     case 'eml':
       return { ...base, kind, eml: await emlPreviewFromBytes(await local.bytes()) };
+    case 'image':
+      return { ...base, kind, fileUri: local.uri, viewerUri: writeViewer(local, imageViewerHtml(local.name, colors)) };
+    case 'video':
+    case 'audio':
+      return { ...base, kind, fileUri: local.uri, viewerUri: writeViewer(local, mediaViewerHtml(kind, local.name, colors)) };
     default:
       return { ...base, kind, fileUri: local.uri };
   }
@@ -97,6 +119,12 @@ export function useFilePreview(opts: {
   onClose?: () => void;
 } = {}) {
   const t = useLocaleStore((s) => s.t);
+  const c = useColors();
+  const scheme = useResolvedTheme();
+  // Read when a preview is built; the viewer page keeps the theme it opened with.
+  const viewerColors: ViewerColors = { scheme, background: c.background, text: c.text, textMuted: c.textMuted, surface: c.surface };
+  const colors = React.useRef(viewerColors);
+  colors.current = viewerColors;
   const onCloseRef = React.useRef(opts.onClose);
   onCloseRef.current = opts.onClose;
   const [item, setItem] = React.useState<PreviewItem | null>(null);
@@ -153,7 +181,9 @@ export function useFilePreview(opts: {
           return;
         }
         session.current = { file: local, handedOff: false };
-        const next = await buildItem(kind, src, local, t('files.preview_too_large', 'This file is too large to preview.'));
+        const next = await buildItem(
+          kind, src, local, t('files.preview_too_large', 'This file is too large to preview.'), colors.current,
+        );
         if (current()) setItem(next);
       } catch (e) {
         if (!current()) return;

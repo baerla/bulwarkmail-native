@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Åbn i app",
       "pdf_external": "PDF'er åbnes i din PDF-fremviser på denne enhed.",
-      "unsupported": "Ingen forhåndsvisning for denne filtype."
+      "unsupported": "Ingen forhåndsvisning for denne filtype.",
+      "media_unsupported": "Denne fil kan ikke afspilles her."
     },
     "received_via": "til {name}",
     "remove_color": "Fjern tag",

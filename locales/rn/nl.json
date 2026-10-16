@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Openen in app",
       "pdf_external": "PDF's worden geopend in de PDF-viewer op dit apparaat.",
-      "unsupported": "Geen voorbeeld voor dit bestandstype."
+      "unsupported": "Geen voorbeeld voor dit bestandstype.",
+      "media_unsupported": "Dit bestand kan hier niet worden afgespeeld."
     },
     "received_via": "aan {name}",
     "remove_color": "Label verwijderen",

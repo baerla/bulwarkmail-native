@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Deschideți într-o aplicație",
       "pdf_external": "Fișierele PDF se deschid în vizualizatorul PDF de pe acest dispozitiv.",
-      "unsupported": "Nu există previzualizare pentru acest tip de fișier."
+      "unsupported": "Nu există previzualizare pentru acest tip de fișier.",
+      "media_unsupported": "Acest fișier nu poate fi redat aici."
     },
     "received_via": "către {name}",
     "remove_color": "Eliminați eticheta",

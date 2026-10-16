@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "在應用程式中開啟",
       "pdf_external": "PDF 會在此裝置的 PDF 檢視器中開啟。",
-      "unsupported": "無法預覽此檔案類型。"
+      "unsupported": "無法預覽此檔案類型。",
+      "media_unsupported": "無法在此播放這個檔案。"
     },
     "received_via": "寄給 {name}",
     "remove_color": "移除標籤",

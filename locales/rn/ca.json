@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "Obre en una aplicació",
       "pdf_external": "Els PDF s'obren amb el visualitzador de PDF d'aquest dispositiu.",
-      "unsupported": "No hi ha previsualització per a aquest tipus de fitxer."
+      "unsupported": "No hi ha previsualització per a aquest tipus de fitxer.",
+      "media_unsupported": "Aquest fitxer no es pot reproduir aquí."
     },
     "received_via": "per a {name}",
     "remove_color": "Elimina l'etiqueta",

@@ -407,7 +407,8 @@
     "preview": {
       "open_external": "在应用中打开",
       "pdf_external": "PDF 将在此设备的 PDF 查看器中打开。",
-      "unsupported": "无法预览此类文件。"
+      "unsupported": "无法预览此类文件。",
+      "media_unsupported": "无法在此播放该文件。"
     },
     "received_via": "发给 {name}",
     "remove_color": "删除标签",
