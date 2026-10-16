@@ -82,7 +82,9 @@ class BulwarkPdfModule(reactContext: ReactApplicationContext) : ReactContextBase
                         bitmap.eraseColor(Color.WHITE)
                         page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                         val out = fileOf(outUri)
-                        out.parentFile?.mkdirs()
+                        // The preview's folder is gone once it closed; a page
+                        // still queued then must not bring it back.
+                        if (out.parentFile?.isDirectory != true) throw IllegalStateException("preview closed")
                         FileOutputStream(out).use { stream -> bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream) }
                     } finally {
                         bitmap.recycle()
