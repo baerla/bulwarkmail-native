@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   filePreviewKind, inAppPreviewKind, exceedsPreviewLimit, FILE_PREVIEW_MAX_BYTES,
-  needsNativeImageDecoder, needsWebImageViewer,
+  needsNativeImageDecoder, needsWebImageViewer, handoffMimeType,
 } from '../file-preview';
 
 const IOS = { platform: 'ios' } as const;
@@ -143,5 +143,26 @@ describe('preview size limits', () => {
     expect(inAppPreviewKind({ name: 'pano.jpg', type: 'image/jpeg', size: 40 * 1024 * 1024 }, ANDROID)).toBe('none');
     expect(inAppPreviewKind({ name: 'pano.jpg', type: 'image/jpeg', size: 4 * 1024 * 1024 }, ANDROID)).toBe('image');
     expect(inAppPreviewKind({ name: 'film.mp4', type: 'video/mp4', size: 300 * 1024 * 1024 }, ANDROID)).toBe('video');
+  });
+});
+
+describe('handoffMimeType', () => {
+  it('keeps a real declared type', () => {
+    expect(handoffMimeType('a.pdf', 'application/pdf')).toBe('application/pdf');
+    expect(handoffMimeType('scan', 'image/png')).toBe('image/png');
+    expect(handoffMimeType('a.zip', 'application/x-zip-compressed')).toBe('application/zip');
+  });
+
+  it('names the format when the declared type does not, so Android finds a viewer', () => {
+    expect(handoffMimeType('contract.docx', 'application/octet-stream'))
+      .toBe('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    expect(handoffMimeType('invoice.PDF', '')).toBe('application/pdf');
+    expect(handoffMimeType('invoice.pdf', 'application/x-as400attachment')).toBe('application/pdf');
+    expect(handoffMimeType('photo.jpg', 'application/x-unknown')).toBe('image/jpeg');
+  });
+
+  it('falls back to the declared type or octet-stream for unknown names', () => {
+    expect(handoffMimeType('data.bin', '')).toBe('application/octet-stream');
+    expect(handoffMimeType('data.xyz', 'application/x-foo')).toBe('application/x-foo');
   });
 });

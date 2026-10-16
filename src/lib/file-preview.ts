@@ -179,3 +179,81 @@ export function needsWebImageViewer(file: Pick<PreviewableFile, 'name' | 'type'>
   const mime = baseMime(file.type);
   return /^image\/(svg\+xml|x-icon|vnd\.microsoft\.icon|ico)$/.test(mime) || /\.(svg|ico)$/i.test(file.name);
 }
+
+// Types for handing a file to another app when the sender declared none, or
+// a catch-all: Android picks the apps for "Open with" by type, and finds
+// none for application/octet-stream.
+const EXT_TO_MIME: Record<string, string> = {
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt: 'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  odt: 'application/vnd.oasis.opendocument.text',
+  ods: 'application/vnd.oasis.opendocument.spreadsheet',
+  odp: 'application/vnd.oasis.opendocument.presentation',
+  rtf: 'application/rtf',
+  epub: 'application/epub+zip',
+  zip: 'application/zip',
+  '7z': 'application/x-7z-compressed',
+  rar: 'application/vnd.rar',
+  gz: 'application/gzip',
+  tar: 'application/x-tar',
+  apk: 'application/vnd.android.package-archive',
+  txt: 'text/plain',
+  csv: 'text/csv',
+  html: 'text/html',
+  htm: 'text/html',
+  md: 'text/markdown',
+  json: 'application/json',
+  xml: 'application/xml',
+  ics: 'text/calendar',
+  vcf: 'text/vcard',
+  eml: 'message/rfc822',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  avif: 'image/avif',
+  bmp: 'image/bmp',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  svg: 'image/svg+xml',
+  ico: 'image/x-icon',
+  mp3: 'audio/mpeg',
+  m4a: 'audio/mp4',
+  aac: 'audio/aac',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  opus: 'audio/ogg',
+  flac: 'audio/flac',
+  amr: 'audio/amr',
+  mp4: 'video/mp4',
+  m4v: 'video/mp4',
+  mov: 'video/quicktime',
+  webm: 'video/webm',
+  mkv: 'video/x-matroska',
+  avi: 'video/x-msvideo',
+  wmv: 'video/x-ms-wmv',
+  '3gp': 'video/3gpp',
+};
+
+/**
+ * The type to hand a file to another app with: the declared one, unless it
+ * is generic or a catch-all that names no format, in which case the one the
+ * file name implies.
+ */
+export function handoffMimeType(name: string | undefined, type: string | null | undefined): string {
+  const declared = baseMime(type);
+  const fromName = EXT_TO_MIME[extension(name || '')];
+  if (!fromName) return type || 'application/octet-stream';
+  if (GENERIC_MIME.has(declared)) return fromName;
+  // An "x-" application type the name contradicts, such as x-as400attachment.
+  if (/^application\/x-/.test(declared) && declared !== fromName) return fromName;
+  return type || fromName;
+}
