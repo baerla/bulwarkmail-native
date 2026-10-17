@@ -360,8 +360,8 @@ export default function FilesScreen() {
     }
   }, [t]);
 
-  // Tap on a file: the in-app preview for the types it shows (images, text
-  // and code, .eml, PDFs on iOS), the other app for the rest.
+  // Tap on a file: the in-app preview for the types it shows (lib/file-preview),
+  // the other app for the rest.
   const openFile = useCallback((row: FileRow) => {
     if (canPreviewInApp(row)) setPreviewTarget(row);
     else void openFileWith(row);

@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Otwórz w aplikacji",
       "pdf_external": "Pliki PDF otwierają się w przeglądarce PDF na tym urządzeniu.",
-      "unsupported": "Brak podglądu dla tego typu pliku."
+      "unsupported": "Brak podglądu dla tego typu pliku.",
+      "media_unsupported": "Tego pliku nie można tutaj odtworzyć.",
+      "pdf_protected": "Ten plik PDF jest chroniony hasłem. Otwórz go w innej aplikacji, aby wpisać hasło.",
+      "pdf_unreadable": "Tego pliku PDF nie można tutaj wyświetlić.",
+      "archive_files": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}",
+      "archive_first_files": "Pierwsze {count} plików",
+      "archive_protected": "To archiwum jest chronione hasłem. Otwórz je w innej aplikacji, aby wpisać hasło.",
+      "archive_unreadable": "Tego archiwum nie można tutaj otworzyć."
     },
     "received_via": "do {name}",
     "remove_color": "Usuń etykietę",

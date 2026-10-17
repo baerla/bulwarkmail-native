@@ -424,7 +424,14 @@
     "preview": {
       "open_external": "Open in app",
       "pdf_external": "PDFs open in your PDF viewer on this device.",
-      "unsupported": "No preview for this file type."
+      "unsupported": "No preview for this file type.",
+      "media_unsupported": "This file can't be played here.",
+      "pdf_protected": "This PDF is password-protected. Open it in another app to enter the password.",
+      "pdf_unreadable": "This PDF can't be shown here.",
+      "archive_files": "{count, plural, one {# file} other {# files}}",
+      "archive_first_files": "The first {count} files",
+      "archive_protected": "This archive is password-protected. Open it in another app to enter the password.",
+      "archive_unreadable": "This archive can't be opened here."
     },
     "received_via": "to {name}",
     "remove_color": "Remove tag",

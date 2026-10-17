@@ -17,7 +17,6 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
 import * as Clipboard from 'expo-clipboard';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../theme/tokens';
 import { useColors } from '../theme/colors';
@@ -83,6 +82,8 @@ import type { EmailAddress, Identity } from '../api/types';
 import type { RootStackParamList } from '../navigation/types';
 import { MODAL_ORIENTATIONS } from '../lib/modal-orientations';
 import ToggleSwitch from '../components/ToggleSwitch';
+import { AttachmentPreviewModal } from '../components/email/AttachmentPreviewModal';
+import { useFilePreview } from '../components/email/use-file-preview';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Compose'>;
 
@@ -398,6 +399,7 @@ function OptionsSheet({
 }
 
 export default function ComposeScreen({ route, navigation }: Props) {
+  const filePreview = useFilePreview();
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const t = useLocaleStore((s) => s.t);
@@ -1745,22 +1747,14 @@ export default function ComposeScreen({ route, navigation }: Props) {
     await insertInlineImages(result.assets);
   };
 
-  // Open a chip: local files straight from their URI, server blobs after a
-  // download into the cache.
+  // Open a chip in the file preview: local files from their URI, server
+  // blobs (forwarded, from a draft) after a download.
   const previewAttachment = async (entry: AttachmentEntry) => {
     try {
-      let uri = entry.uri;
-      if (!uri && entry.blobId) {
-        const buf = await jmapClient.fetchBlobArrayBuffer(entry.blobId, entry.name, entry.type);
-        const dir = FileSystem.cacheDirectory ?? '';
-        uri = `${dir}${entry.localId}-${entry.name.replace(/[^\w.-]+/g, '_')}`;
-        await FileSystem.writeAsStringAsync(uri, bytesToBase64(new Uint8Array(buf)), {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-      }
-      if (!uri) return;
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(uri, { mimeType: entry.type, dialogTitle: entry.name });
+      if (entry.uri) {
+        await filePreview.open({ from: 'local', uri: entry.uri, name: entry.name, type: entry.type, size: entry.size });
+      } else if (entry.blobId) {
+        await filePreview.open({ from: 'blob', blobId: entry.blobId, name: entry.name, type: entry.type, size: entry.size });
       }
     } catch (err) {
       Alert.alert(t('email_composer.attach', 'Attach'), err instanceof Error ? err.message : String(err));
@@ -2959,6 +2953,8 @@ export default function ComposeScreen({ route, navigation }: Props) {
         selectedIdentityId={selectedIdentityId}
         onPick={(identity) => { setSelectedIdentityId(identity.id); setFromOverride(null); }}
       />
+
+      <AttachmentPreviewModal {...filePreview.modalProps} />
     </SafeAreaView>
   );
   if (!isSplit) return composer;

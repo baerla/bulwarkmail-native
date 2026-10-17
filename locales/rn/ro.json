@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Deschideți într-o aplicație",
       "pdf_external": "Fișierele PDF se deschid în vizualizatorul PDF de pe acest dispozitiv.",
-      "unsupported": "Nu există previzualizare pentru acest tip de fișier."
+      "unsupported": "Nu există previzualizare pentru acest tip de fișier.",
+      "media_unsupported": "Acest fișier nu poate fi redat aici.",
+      "pdf_protected": "Acest PDF este protejat cu parolă. Deschide-l în altă aplicație pentru a introduce parola.",
+      "pdf_unreadable": "Acest PDF nu poate fi afișat aici.",
+      "archive_files": "{count, plural, one {# fișier} few {# fișiere} other {# de fișiere}}",
+      "archive_first_files": "Primele {count} fișiere",
+      "archive_protected": "Această arhivă este protejată cu parolă. Deschide-o în altă aplicație pentru a introduce parola.",
+      "archive_unreadable": "Această arhivă nu poate fi deschisă aici."
     },
     "received_via": "către {name}",
     "remove_color": "Eliminați eticheta",

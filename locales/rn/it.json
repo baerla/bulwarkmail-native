@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Apri in un'app",
       "pdf_external": "I PDF si aprono nel lettore PDF di questo dispositivo.",
-      "unsupported": "Nessuna anteprima per questo tipo di file."
+      "unsupported": "Nessuna anteprima per questo tipo di file.",
+      "media_unsupported": "Questo file non può essere riprodotto qui.",
+      "pdf_protected": "Questo PDF è protetto da password. Aprilo in un'altra app per inserirla.",
+      "pdf_unreadable": "Questo PDF non può essere visualizzato qui.",
+      "archive_files": "{count, plural, one {# file} other {# file}}",
+      "archive_first_files": "I primi {count} file",
+      "archive_protected": "Questo archivio è protetto da password. Aprilo in un'altra app per inserirla.",
+      "archive_unreadable": "Questo archivio non può essere aperto qui."
     },
     "received_via": "a {name}",
     "remove_color": "Rimuovi etichetta",

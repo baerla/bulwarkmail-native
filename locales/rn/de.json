@@ -413,7 +413,14 @@
     "preview": {
       "open_external": "In App öffnen",
       "pdf_external": "PDFs werden in Ihrem PDF-Viewer auf diesem Gerät geöffnet.",
-      "unsupported": "Keine Vorschau für diesen Dateityp."
+      "unsupported": "Keine Vorschau für diesen Dateityp.",
+      "media_unsupported": "Diese Datei kann hier nicht abgespielt werden.",
+      "pdf_protected": "Diese PDF ist passwortgeschützt. Öffne sie in einer anderen App, um das Passwort einzugeben.",
+      "pdf_unreadable": "Diese PDF kann hier nicht angezeigt werden.",
+      "archive_files": "{count, plural, one {# Datei} other {# Dateien}}",
+      "archive_first_files": "Die ersten {count} Dateien",
+      "archive_protected": "Dieses Archiv ist passwortgeschützt. Öffne es in einer anderen App, um das Passwort einzugeben.",
+      "archive_unreadable": "Dieses Archiv kann hier nicht geöffnet werden."
     },
     "received_via": "an {name}",
     "remove_color": "Label entfernen",

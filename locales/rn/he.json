@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "פתח באפליקציה",
       "pdf_external": "קובצי PDF נפתחים במציג ה-PDF במכשיר זה.",
-      "unsupported": "אין תצוגה מקדימה לסוג קובץ זה."
+      "unsupported": "אין תצוגה מקדימה לסוג קובץ זה.",
+      "media_unsupported": "לא ניתן להפעיל את הקובץ הזה כאן.",
+      "pdf_protected": "קובץ ה-PDF הזה מוגן בסיסמה. פתחו אותו באפליקציה אחרת כדי להזין את הסיסמה.",
+      "pdf_unreadable": "לא ניתן להציג את קובץ ה-PDF הזה כאן.",
+      "archive_files": "{count, plural, one {קובץ אחד} two {שני קבצים} other {# קבצים}}",
+      "archive_first_files": "{count} הקבצים הראשונים",
+      "archive_protected": "הארכיון הזה מוגן בסיסמה. פתחו אותו באפליקציה אחרת כדי להזין את הסיסמה.",
+      "archive_unreadable": "לא ניתן לפתוח את הארכיון הזה כאן."
     },
     "received_via": "אל {name}",
     "remove_color": "הסר תג",

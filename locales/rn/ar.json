@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "فتح في تطبيق",
       "pdf_external": "تُفتح ملفات PDF في عارض PDF على هذا الجهاز.",
-      "unsupported": "لا توجد معاينة لهذا النوع من الملفات."
+      "unsupported": "لا توجد معاينة لهذا النوع من الملفات.",
+      "media_unsupported": "لا يمكن تشغيل هذا الملف هنا.",
+      "pdf_protected": "ملف PDF هذا محمي بكلمة مرور. افتحه في تطبيق آخر لإدخال كلمة المرور.",
+      "pdf_unreadable": "لا يمكن عرض ملف PDF هذا هنا.",
+      "archive_files": "{count, plural, zero {لا ملفات} one {ملف واحد} two {ملفان} few {# ملفات} many {# ملفًا} other {# ملف}}",
+      "archive_first_files": "أول {count} ملف",
+      "archive_protected": "هذا الأرشيف محمي بكلمة مرور. افتحه في تطبيق آخر لإدخال كلمة المرور.",
+      "archive_unreadable": "لا يمكن فتح هذا الأرشيف هنا."
     },
     "received_via": "إلى {name}",
     "remove_color": "إزالة الوسم",

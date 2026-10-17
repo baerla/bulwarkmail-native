@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "在应用中打开",
       "pdf_external": "PDF 将在此设备的 PDF 查看器中打开。",
-      "unsupported": "无法预览此类文件。"
+      "unsupported": "无法预览此类文件。",
+      "media_unsupported": "无法在此播放该文件。",
+      "pdf_protected": "此 PDF 受密码保护。请在其他应用中打开以输入密码。",
+      "pdf_unreadable": "无法在此显示该 PDF。",
+      "archive_files": "{count, plural, other {# 个文件}}",
+      "archive_first_files": "前 {count} 个文件",
+      "archive_protected": "此压缩包受密码保护。请在其他应用中打开以输入密码。",
+      "archive_unreadable": "无法在此打开该压缩包。"
     },
     "received_via": "发给 {name}",
     "remove_color": "删除标签",

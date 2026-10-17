@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "باز کردن در برنامه",
       "pdf_external": "فایل‌های PDF در نمایشگر PDF این دستگاه باز می‌شوند.",
-      "unsupported": "برای این نوع فایل پیش‌نمایشی وجود ندارد."
+      "unsupported": "برای این نوع فایل پیش‌نمایشی وجود ندارد.",
+      "media_unsupported": "این فایل اینجا پخش نمی‌شود.",
+      "pdf_protected": "این PDF با رمز عبور محافظت شده است. برای وارد کردن رمز، آن را در برنامهٔ دیگری باز کنید.",
+      "pdf_unreadable": "این PDF اینجا نمایش داده نمی‌شود.",
+      "archive_files": "{count, plural, one {# فایل} other {# فایل}}",
+      "archive_first_files": "{count} فایل نخست",
+      "archive_protected": "این بایگانی با رمز عبور محافظت شده است. برای وارد کردن رمز، آن را در برنامهٔ دیگری باز کنید.",
+      "archive_unreadable": "این بایگانی اینجا باز نمی‌شود."
     },
     "received_via": "به {name}",
     "remove_color": "حذف برچسب",

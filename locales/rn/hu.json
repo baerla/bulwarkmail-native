@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Megnyitás alkalmazásban",
       "pdf_external": "A PDF-fájlok az eszköz PDF-megjelenítőjében nyílnak meg.",
-      "unsupported": "Ehhez a fájltípushoz nincs előnézet."
+      "unsupported": "Ehhez a fájltípushoz nincs előnézet.",
+      "media_unsupported": "Ez a fájl itt nem játszható le.",
+      "pdf_protected": "Ez a PDF jelszóval védett. Nyisd meg egy másik alkalmazásban a jelszó megadásához.",
+      "pdf_unreadable": "Ez a PDF itt nem jeleníthető meg.",
+      "archive_files": "{count, plural, one {# fájl} other {# fájl}}",
+      "archive_first_files": "Az első {count} fájl",
+      "archive_protected": "Ez az archívum jelszóval védett. Nyisd meg egy másik alkalmazásban a jelszó megadásához.",
+      "archive_unreadable": "Ez az archívum itt nem nyitható meg."
     },
     "received_via": "címzett: {name}",
     "remove_color": "Címke eltávolítása",

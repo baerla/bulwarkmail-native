@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Åpne i app",
       "pdf_external": "PDF-filer åpnes i PDF-leseren på denne enheten.",
-      "unsupported": "Ingen forhåndsvisning for denne filtypen."
+      "unsupported": "Ingen forhåndsvisning for denne filtypen.",
+      "media_unsupported": "Denne filen kan ikke spilles av her.",
+      "pdf_protected": "Denne PDF-en er passordbeskyttet. Åpne den i en annen app for å skrive inn passordet.",
+      "pdf_unreadable": "Denne PDF-en kan ikke vises her.",
+      "archive_files": "{count, plural, one {# fil} other {# filer}}",
+      "archive_first_files": "De første {count} filene",
+      "archive_protected": "Dette arkivet er passordbeskyttet. Åpne det i en annen app for å skrive inn passordet.",
+      "archive_unreadable": "Dette arkivet kan ikke åpnes her."
     },
     "received_via": "til {name}",
     "remove_color": "Fjern etiketten",

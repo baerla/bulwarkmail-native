@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "Ouvrir dans une app",
       "pdf_external": "Les PDF s'ouvrent dans votre lecteur PDF sur cet appareil.",
-      "unsupported": "Aucun aperçu pour ce type de fichier."
+      "unsupported": "Aucun aperçu pour ce type de fichier.",
+      "media_unsupported": "Ce fichier ne peut pas être lu ici.",
+      "pdf_protected": "Ce PDF est protégé par un mot de passe. Ouvrez-le dans une autre application pour le saisir.",
+      "pdf_unreadable": "Ce PDF ne peut pas être affiché ici.",
+      "archive_files": "{count, plural, one {# fichier} other {# fichiers}}",
+      "archive_first_files": "Les {count} premiers fichiers",
+      "archive_protected": "Cette archive est protégée par un mot de passe. Ouvrez-la dans une autre application pour le saisir.",
+      "archive_unreadable": "Cette archive ne peut pas être ouverte ici."
     },
     "received_via": "à {name}",
     "remove_color": "Retirer l'étiquette",

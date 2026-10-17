@@ -407,7 +407,14 @@
     "preview": {
       "open_external": "アプリで開く",
       "pdf_external": "PDF はこのデバイスの PDF ビューアーで開きます。",
-      "unsupported": "このファイル形式はプレビューできません。"
+      "unsupported": "このファイル形式はプレビューできません。",
+      "media_unsupported": "このファイルはここでは再生できません。",
+      "pdf_protected": "このPDFはパスワードで保護されています。パスワードを入力するには別のアプリで開いてください。",
+      "pdf_unreadable": "このPDFはここでは表示できません。",
+      "archive_files": "{count, plural, other {# 個のファイル}}",
+      "archive_first_files": "最初の {count} 個のファイル",
+      "archive_protected": "このアーカイブはパスワードで保護されています。パスワードを入力するには別のアプリで開いてください。",
+      "archive_unreadable": "このアーカイブはここでは開けません。"
     },
     "received_via": "{name}宛",
     "remove_color": "ラベルを削除",
