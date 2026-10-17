@@ -29,7 +29,13 @@ class BulwarkMessagingService : FirebaseMessagingService() {
 
         // Contact and calendar changes become syncs of the Android accounts
         // they feed (device sync, #34); only mail needs the push task.
-        val mail = DeviceSyncPushRouter.route(applicationContext, data)
+        val routed = DeviceSyncPushRouter.route(applicationContext, data)
+        val mail = routed.startMailTask
+
+        // A calendar change brings the local reminders up to date, in a job of
+        // its own: the app is mostly closed and the reminders must follow the
+        // server's events.
+        if (routed.calendarReminders) BulwarkCalendarReminderJobService.scheduleNow(applicationContext)
 
         // Hand off to JS via a headless task only when the app isn't already
         // running in the foreground - HeadlessJsTaskContext throws if started

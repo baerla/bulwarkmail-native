@@ -24,6 +24,10 @@ const h = vi.hoisted(() => ({
   // Device sync (#34): which events the device's calendar app reminds of.
   onDevice: null as ((event: { id: string }) => boolean) | null,
   reminderListener: null as (() => void) | null,
+  settingsListener: null as Listener | null,
+  refreshPushTypes: vi.fn(async () => undefined),
+  pushAccountIds: ['app-1', 'app-2'] as string[],
+  setJob: vi.fn(async () => undefined),
 }));
 
 vi.mock('react-native', () => ({
@@ -56,8 +60,16 @@ vi.mock('../../stores/auth-store', () => ({
   useAuthStore: { getState: () => h.auth, subscribe: vi.fn() },
 }));
 vi.mock('../../stores/settings-store', () => ({
-  useSettingsStore: { getState: () => h.settings, subscribe: vi.fn() },
+  useSettingsStore: {
+    getState: () => h.settings,
+    subscribe: vi.fn((listener: Listener) => { h.settingsListener = listener; }),
+  },
 }));
+vi.mock('../push-notifications', () => ({
+  refreshPushSubscriptionTypes: h.refreshPushTypes,
+  readPushAccountIds: vi.fn(async () => h.pushAccountIds),
+}));
+vi.mock('../calendar-reminder-job', () => ({ setCalendarReminderJob: h.setJob }));
 vi.mock('../../stores/calendar-store', () => ({
   useCalendarStore: {
     getState: () => h.calendar,
@@ -115,6 +127,7 @@ beforeEach(async () => {
   h.calendarListener = null;
   h.onDevice = null;
   h.reminderListener = null;
+  h.settingsListener = null;
   h.loadEventsInRange.mockResolvedValue([upcoming]);
   mod = await import('../calendar-notifications');
   N = await import('expo-notifications');
@@ -364,5 +377,53 @@ describe('tapping a calendar reminder', () => {
     stop();
     h.responseListener!(response('later', { tag: TAG, key: 'k3', eventId: 'ev3' }));
     expect(open).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('calendar reminders: push subscription', () => {
+  it('re-applies the account\'s push types when the setting flips, so the calendar types follow it', async () => {
+    mod.startCalendarNotificationSync();
+    const prev = { ...h.settings };
+    h.settings = { ...h.settings, calendarNotificationsEnabled: false };
+    h.settingsListener!(h.settings, prev);
+    await vi.advanceTimersByTimeAsync(0);
+    // The setting is global: every account's subscription follows it, not only the active one.
+    expect(h.refreshPushTypes).toHaveBeenCalledWith('app-1');
+    expect(h.refreshPushTypes).toHaveBeenCalledWith('app-2');
+  });
+
+  it('leaves the push types alone for other setting changes', async () => {
+    mod.startCalendarNotificationSync();
+    const prev = { ...h.settings };
+    h.settings = { ...h.settings, enableCalendarTasks: true };
+    h.settingsListener!(h.settings, prev);
+    expect(h.refreshPushTypes).not.toHaveBeenCalled();
+  });
+});
+
+describe('calendar reminders: periodic background job', () => {
+  it('schedules the periodic job when reminders are on and the user is signed in', async () => {
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(true);
+    expect(h.setJob).not.toHaveBeenCalledWith(false);
+  });
+
+  it('cancels the periodic job when the setting is off', async () => {
+    h.settings.calendarNotificationsEnabled = false;
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(false);
+    expect(h.setJob).not.toHaveBeenCalledWith(true);
+  });
+
+  it('cancels the periodic job when signed out', async () => {
+    h.auth = { ...h.auth, isAuthenticated: false };
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).toHaveBeenCalledWith(false);
+  });
+
+  it('does not schedule it without notification permission', async () => {
+    h.permission = { granted: false, canAskAgain: false };
+    await mod.rescheduleCalendarNotifications();
+    expect(h.setJob).not.toHaveBeenCalledWith(true);
   });
 });

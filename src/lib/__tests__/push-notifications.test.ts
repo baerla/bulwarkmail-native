@@ -401,6 +401,11 @@ describe('push types for device sync (#34)', () => {
     types,
   });
 
+  // The calendar types also feed the background reminder refresh, so they
+  // follow this setting, which is on unless stored otherwise.
+  const calendarReminders = (enabled: boolean) =>
+    AsyncStorage.setItem('webmail:settings:v1', JSON.stringify({ calendarNotificationsEnabled: enabled }));
+
   async function syncing(enabled: Record<string, boolean>, extra: Record<string, unknown> = {}): Promise<void> {
     await AsyncStorage.setItem(DEVICE_SYNC_KEY, JSON.stringify({
       state: { accounts: { [ACCOUNT_ID]: { enabled, ...extra } } },
@@ -417,6 +422,7 @@ describe('push types for device sync (#34)', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     await AsyncStorage.clear();
+    await calendarReminders(false);
     await AsyncStorage.setItem(deviceClientIdKey(ACCOUNT_ID), OUR_DCID);
     (jmapClient as { currentSession: unknown }).currentSession = SYNC_SESSION;
     DETACHED.session = SYNC_SESSION;
@@ -443,6 +449,35 @@ describe('push types for device sync (#34)', () => {
     // Removed in Android Settings: nothing to route any more.
     await syncing({ [CONTACTS]: true }, { removedInAndroidSettings: true });
     expect(await pushTypesFor(ACCOUNT_ID, SYNC_SESSION as unknown as JMAPSession)).toEqual(['EmailDelivery']);
+  });
+
+  it('adds the calendar types for reminders when calendar notifications are on and the server has calendars', async () => {
+    await calendarReminders(true);
+    expect(await pushTypesFor(ACCOUNT_ID, SYNC_SESSION as unknown as JMAPSession))
+      .toEqual(['EmailDelivery', 'CalendarEvent', 'Calendar']);
+    // No setting stored at all: the default is on.
+    await AsyncStorage.removeItem('webmail:settings:v1');
+    expect(await pushTypesFor(ACCOUNT_ID, SYNC_SESSION as unknown as JMAPSession))
+      .toEqual(['EmailDelivery', 'CalendarEvent', 'Calendar']);
+  });
+
+  it('leaves the calendar types out when calendar notifications are off', async () => {
+    await calendarReminders(false);
+    expect(await pushTypesFor(ACCOUNT_ID, SYNC_SESSION as unknown as JMAPSession)).toEqual(['EmailDelivery']);
+  });
+
+  it('leaves the calendar types out when the server has no calendars', async () => {
+    await calendarReminders(true);
+    const mailOnly = { capabilities: { 'urn:ietf:params:jmap:core': {} } };
+    expect(await pushTypesFor(ACCOUNT_ID, mailOnly as unknown as JMAPSession)).toEqual(['EmailDelivery']);
+    expect(await pushTypesFor(ACCOUNT_ID, null)).toEqual(['EmailDelivery']);
+  });
+
+  it('lists each calendar type once when device sync wants them too', async () => {
+    await calendarReminders(true);
+    await syncing({ [CONTACTS]: true, [CALENDAR]: true });
+    expect(await pushTypesFor(ACCOUNT_ID, SYNC_SESSION as unknown as JMAPSession))
+      .toEqual(['EmailDelivery', 'ContactCard', 'AddressBook', 'CalendarEvent', 'Calendar']);
   });
 
   it('adds only the types of what the server offers', async () => {

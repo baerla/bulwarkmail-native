@@ -167,6 +167,32 @@ class PushRoutingTest {
     }
 
     @Test
+    fun `a calendar-only change asks for the reminder refresh and no mail task, routed or not`() {
+        val routed = PushRouting.decide(stateChange("""{"team":{"CalendarEvent":"s1"}}"""), routes)
+        assertTrue(routed.calendarReminders)
+        assertFalse(routed.startMailTask)
+        // No device sync routes this account: the reminders still follow the server.
+        val unrouted = PushRouting.decide(stateChange("""{"elsewhere":{"Calendar":"s1"}}"""), routes)
+        assertTrue(unrouted.calendarReminders)
+        assertTrue(unrouted.syncs.isEmpty())
+        assertFalse(unrouted.startMailTask)
+    }
+
+    @Test
+    fun `mail and calendar together ask for both`() {
+        val decision = PushRouting.decide(stateChange("""{"c":{"EmailDelivery":"s1","CalendarEvent":"s2"}}"""), routes)
+        assertTrue(decision.startMailTask)
+        assertTrue(decision.calendarReminders)
+    }
+
+    @Test
+    fun `mail and contact changes leave the reminders alone`() {
+        assertFalse(PushRouting.decide(stateChange("""{"c":{"EmailDelivery":"s1","ContactCard":"s2"}}"""), routes).calendarReminders)
+        // Unreadable or missing maps are mail, never a reminder refresh.
+        assertFalse(PushRouting.decide(mapOf("kind" to "jmap-state-change"), routes).calendarReminders)
+    }
+
+    @Test
     fun `stored routes are validated strictly and read leniently`() {
         val bad = listOf(
             "[]",

@@ -1,4 +1,4 @@
-import { jmapClient } from './jmap-client';
+import { jmapClient, type JMAPClient } from './jmap-client';
 import { CAPABILITIES } from './types';
 import type { Calendar, CalendarEvent, CalendarRights } from './types';
 import { assertSetResult } from './jmap-result';
@@ -243,9 +243,9 @@ function methodResult<T = any>(res: any, index = 0): T {
 
 // Other session accounts that expose the calendars capability hold calendars
 // shared with the user (JMAP surfaces shared data under the sharer's account).
-function sharedCalendarAccountIds(): string[] {
-  const session = jmapClient.currentSession;
-  const primary = jmapClient.accountId;
+function sharedCalendarAccountIds(client: JMAPClient): string[] {
+  const session = client.currentSession;
+  const primary = client.accountId;
   return Object.entries(session?.accounts ?? {})
     .filter(([id, info]) =>
       id !== primary && !!info.accountCapabilities?.[CAPABILITIES.CALENDARS])
@@ -260,9 +260,9 @@ function sharedCalendarAccountIds(): string[] {
 const SYNTHETIC_ID_PROBE_CALL_ID = 'synthetic-id-probe';
 const syntheticIdSupport = new Map<string, Promise<boolean>>();
 
-function syntheticIdProbeKey(): string | null {
+function syntheticIdProbeKey(client: JMAPClient = jmapClient): string | null {
   try {
-    return `${jmapClient.currentSession?.apiUrl ?? ''}|${jmapClient.accountId}`;
+    return `${client.currentSession?.apiUrl ?? ''}|${client.accountId}`;
   } catch {
     return null;
   }
@@ -304,13 +304,13 @@ function rememberSyntheticIdProbe(key: string, pending: Promise<any>): void {
  * carries the probe along (getCalendars), so the usual start-up pays no
  * extra round trip.
  */
-export function supportsSyntheticCalendarIds(): Promise<boolean> {
-  const key = syntheticIdProbeKey();
+export function supportsSyntheticCalendarIds(client: JMAPClient = jmapClient): Promise<boolean> {
+  const key = syntheticIdProbeKey(client);
   if (!key) return Promise.resolve(false);
   if (!syntheticIdSupport.has(key)) {
     rememberSyntheticIdProbe(
       key,
-      jmapClient.request([syntheticIdProbeCall(jmapClient.accountId)], USING),
+      client.request([syntheticIdProbeCall(client.accountId)], USING),
     );
   }
   return syntheticIdSupport.get(key)!;
@@ -320,13 +320,13 @@ export function resetSyntheticIdSupport(): void {
   syntheticIdSupport.clear();
 }
 
-export async function getCalendars(): Promise<Calendar[]> {
-  const accountId = jmapClient.accountId;
-  const probeKey = syntheticIdProbeKey();
+export async function getCalendars(client: JMAPClient = jmapClient): Promise<Calendar[]> {
+  const accountId = client.accountId;
+  const probeKey = syntheticIdProbeKey(client);
   const carriesProbe = !!probeKey && !syntheticIdSupport.has(probeKey);
   const methodCalls: [string, Record<string, unknown>, string][] = [['Calendar/get', { accountId }, '0']];
   if (carriesProbe) methodCalls.push(syntheticIdProbeCall(accountId));
-  const pending = jmapClient.request(methodCalls, USING);
+  const pending = client.request(methodCalls, USING);
   if (carriesProbe) rememberSyntheticIdProbe(probeKey!, pending);
   const res = await pending;
   const own = methodResult<{ list: Calendar[] }>(res).list ?? [];
@@ -335,11 +335,11 @@ export async function getCalendars(): Promise<Calendar[]> {
   // there (revoked share, transient error) must not hide the user's own
   // calendars, so each shared account is fetched best-effort.
   const shared = await Promise.all(
-    sharedCalendarAccountIds().map(async (sharedAccountId) => {
+    sharedCalendarAccountIds(client).map(async (sharedAccountId) => {
       // Don't re-probe an account the server already rejected this session.
       if (calendarAccessDenied.has(sharedAccountId)) return [];
       try {
-        const sharedRes = await jmapClient.request(
+        const sharedRes = await client.request(
           [['Calendar/get', { accountId: sharedAccountId }, '0']],
           USING,
         );
@@ -386,8 +386,9 @@ export async function queryEvents(
   after: string,
   before: string,
   accountId?: string,
+  client: JMAPClient = jmapClient,
 ): Promise<string[]> {
-  const account = accountId || jmapClient.accountId;
+  const account = accountId || client.accountId;
   const timeZone = getUserTimeZone();
   const conditions: Record<string, unknown>[] = [];
   if (calendarIds.length > 0) conditions.push(buildInCalendarFilter(calendarIds));
@@ -409,7 +410,7 @@ export async function queryEvents(
     };
     if (timeZone) args.timeZone = timeZone;
     if (filter) args.filter = filter;
-    const res = await jmapClient.request(
+    const res = await client.request(
       [['CalendarEvent/query', args, '0']],
       USING,
     );
@@ -434,8 +435,9 @@ export async function queryExpandedEvents(
   after: string,
   before: string,
   accountId?: string,
+  client: JMAPClient = jmapClient,
 ): Promise<string[] | null> {
-  const account = accountId || jmapClient.accountId;
+  const account = accountId || client.accountId;
   const timeZone = getUserTimeZone();
   const filter = {
     after: toLocalDateTime(after, timeZone),
@@ -451,7 +453,7 @@ export async function queryExpandedEvents(
       position: ids.length,
     };
     if (timeZone) args.timeZone = timeZone;
-    const res = await jmapClient.request([['CalendarEvent/query', args, '0']], USING);
+    const res = await client.request([['CalendarEvent/query', args, '0']], USING);
     const entry = res?.methodResponses?.[0];
     if (
       entry?.[0] === 'error'
@@ -477,6 +479,7 @@ export async function queryExpandedEvents(
 export async function hydrateExpandedOccurrences(
   events: CalendarEvent[],
   accountId?: string,
+  client: JMAPClient = jmapClient,
 ): Promise<CalendarEvent[]> {
   const baseIds = Array.from(new Set(
     events
@@ -484,12 +487,12 @@ export async function hydrateExpandedOccurrences(
       .map((event) => event.baseEventId as string),
   ));
   if (baseIds.length === 0) return events;
-  const account = accountId || jmapClient.accountId;
+  const account = accountId || client.accountId;
   const timeZone = getUserTimeZone();
-  const batchSize = jmapClient.getMaxObjectsInGet();
+  const batchSize = client.getMaxObjectsInGet();
   const bases = new Map<string, Partial<CalendarEvent>>();
   for (let i = 0; i < baseIds.length; i += batchSize) {
-    const res = await jmapClient.request(
+    const res = await client.request(
       [['CalendarEvent/get', {
         accountId: account,
         ids: baseIds.slice(i, i + batchSize),
@@ -546,15 +549,16 @@ export async function getEvents(
   accountId?: string,
   // `expanded`: the ids are server-expanded occurrences (queryExpandedEvents).
   options?: { expanded?: boolean },
+  client: JMAPClient = jmapClient,
 ): Promise<CalendarEvent[]> {
   if (ids.length === 0) return [];
-  const account = accountId || jmapClient.accountId;
+  const account = accountId || client.accountId;
   const timeZone = getUserTimeZone();
-  const batchSize = jmapClient.getMaxObjectsInGet();
+  const batchSize = client.getMaxObjectsInGet();
   const all: CalendarEvent[] = [];
   for (let i = 0; i < ids.length; i += batchSize) {
     const batch = ids.slice(i, i + batchSize);
-    const res = await jmapClient.request(
+    const res = await client.request(
       [['CalendarEvent/get', {
         accountId: account,
         ids: batch,

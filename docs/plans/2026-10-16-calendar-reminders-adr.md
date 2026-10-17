@@ -1,6 +1,6 @@
 # ADR: Exact, background-refreshed local notifications for calendar reminders
 
-- **Status:** Accepted. Not yet implemented; see the [handoff](2026-10-16-calendar-reminders-handoff.md).
+- **Status:** Accepted and implemented (Android parts not yet verified on a device); see the [handoff](2026-10-16-calendar-reminders-handoff.md).
 - **Date:** 2026-10-16
 - **Plan:** [2026-10-16-calendar-reminders-plan.md](2026-10-16-calendar-reminders-plan.md)
 
@@ -117,5 +117,7 @@ Scheduling every signed-in account is a separate change, because the foreground 
 - When calendar notifications are on, more pushes wake the device: every calendar change, including the app's own writes. A fixed job id debounces them, and calendar-only pushes never post a mail notification (`carriesNoMail`, `PushRouting.decide`).
 - expo-notifications must work in a headless React context. Verify this on a device.
 - `USE_EXACT_ALARM` would need a policy declaration if the app ever ships on Google Play.
+- A relay that forwards no `changed` map (older relays) gives `PushRouting.decide` nothing to route, so such a calendar push counts as possible mail and starts the mail task and no reminder refresh. Those setups rely on the 6-hourly job.
+- Every calendar-capable account subscribes to the calendar types while the setting is on (it is on by default), where before only device-sync accounts did.
 - iOS is unchanged. It still refreshes only in the foreground, because it has no push or background task in this app.
 - Users who rely on Android's own calendar keep using the "Reminder owner: device" option from B, and Bulwark skips those events as before.

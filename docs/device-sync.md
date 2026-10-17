@@ -1615,6 +1615,14 @@ app's system settings when Android no longer asks.
   top of `pushBackgroundTask` (`carriesNoMail`) applies the same rules,
   tested with the same cases, so a contact or calendar change can never take
   the legacy "notify the newest unread mail" path.
+- **Calendar reminders:** the calendar types are in the subscription for the
+  reminders too, independent of device sync, while "calendar notifications"
+  is on and the session advertises `urn:ietf:params:jmap:calendars`
+  (`pushTypesFor` adds them once). The router sets `calendarReminders` for any
+  calendar type, routed or not, and the services schedule the one-off job of
+  `BulwarkCalendarReminderJobService`, which runs the headless task
+  `BulwarkCalendarReminders` (local reminders only; no device sync is
+  involved). Flipping the setting updates the subscription.
 
 ## Failure matrix
 

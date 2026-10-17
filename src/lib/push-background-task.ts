@@ -24,13 +24,13 @@ import {
 // Mirrors STORAGE_KEY in `stores/settings-store.ts`. The headless task can't
 // import the Zustand store (would pull in React) so we read AsyncStorage
 // directly. Keep this in sync if the store key ever changes.
-const SETTINGS_STORAGE_KEY = 'webmail:settings:v1';
+export const SETTINGS_STORAGE_KEY = 'webmail:settings:v1';
 // Mirrors STORAGE_KEY in `stores/locale-store.ts`, for the same reason.
 const LOCALE_STORAGE_KEY = 'webmail:locale:v1';
 // Mirrors the persist name in `stores/account-store.ts`. Used to map the
 // relay's `accountLabel` (= username) back to a local account when the JMAP
 // account id is not known yet.
-const ACCOUNT_REGISTRY_KEY = 'account-registry';
+export const ACCOUNT_REGISTRY_KEY = 'account-registry';
 
 // How many recently-notified ids to remember per account. Enough to cover a
 // burst of deliveries without growing the AsyncStorage record unbounded.

@@ -99,6 +99,18 @@ class BulwarkFcmModule(reactContext: ReactApplicationContext)
         promise.resolve(payload?.toMap())
     }
 
+    /** Schedules the 6-hourly calendar reminder refresh; resolves false if Android refused the job. */
+    @ReactMethod
+    fun scheduleCalendarReminderJob(promise: Promise) {
+        promise.resolve(BulwarkCalendarReminderJobService.schedulePeriodic(reactApplicationContext))
+    }
+
+    @ReactMethod
+    fun cancelCalendarReminderJob(promise: Promise) {
+        BulwarkCalendarReminderJobService.cancelPeriodic(reactApplicationContext)
+        promise.resolve(null)
+    }
+
     @ReactMethod
     fun getInitialShare(promise: Promise) {
         val payload = ShareIntentStore.consume()
