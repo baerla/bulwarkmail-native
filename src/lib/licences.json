@@ -48,97 +48,97 @@
     },
     {
       "name": "expo",
-      "version": "56.0.23",
+      "version": "57.0.30",
       "license": "MIT",
       "url": "https://github.com/expo/expo/tree/main/packages/expo"
     },
     {
       "name": "expo-camera",
-      "version": "56.0.8",
+      "version": "57.0.6",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/camera/"
     },
     {
       "name": "expo-clipboard",
-      "version": "56.0.4",
+      "version": "57.0.2",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/clipboard"
     },
     {
       "name": "expo-crypto",
-      "version": "56.0.5",
+      "version": "57.0.4",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/crypto/"
     },
     {
       "name": "expo-document-picker",
-      "version": "56.0.4",
+      "version": "57.0.3",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/document-picker/"
     },
     {
       "name": "expo-file-system",
-      "version": "56.0.11",
+      "version": "57.0.7",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/filesystem/"
     },
     {
       "name": "expo-haptics",
-      "version": "56.0.3",
+      "version": "57.0.3",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/haptics/"
     },
     {
       "name": "expo-image-manipulator",
-      "version": "56.0.26",
+      "version": "57.0.21",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/imagemanipulator/"
     },
     {
       "name": "expo-image-picker",
-      "version": "56.0.25",
+      "version": "57.0.20",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/imagepicker/"
     },
     {
       "name": "expo-intent-launcher",
-      "version": "56.0.4",
+      "version": "57.0.1",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/intent-launcher/"
     },
     {
       "name": "expo-localization",
-      "version": "56.0.6",
+      "version": "57.0.2",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/localization/"
     },
     {
       "name": "expo-notifications",
-      "version": "56.0.26",
+      "version": "57.0.23",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/notifications/"
     },
     {
       "name": "expo-secure-store",
-      "version": "56.0.4",
+      "version": "57.0.4",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/securestore/"
     },
     {
       "name": "expo-sharing",
-      "version": "56.0.26",
+      "version": "57.0.23",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/sharing/"
     },
     {
       "name": "expo-status-bar",
-      "version": "56.0.4",
+      "version": "57.0.1",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/status-bar/"
     },
     {
       "name": "expo-web-browser",
-      "version": "56.0.6",
+      "version": "57.0.3",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/webbrowser/"
     },
@@ -162,7 +162,7 @@
     },
     {
       "name": "react-native",
-      "version": "0.85.3",
+      "version": "0.86.3",
       "license": "MIT",
       "url": "https://reactnative.dev/"
     },
