@@ -12,8 +12,9 @@ The webmail is the reference implementation. Many comments cite webmail issue nu
 
 ```bash
 npm install            # also applies patches/ via patch-package (postinstall)
-npx expo start         # dev server; `a` Android, `i` iOS
-npm run android        # expo run:android (native build)
+npm run android        # expo run:android: build + install the debug app, start Metro
+npm run ios            # expo run:ios (macOS + Xcode; prebuilds the gitignored ios/)
+npx expo start         # Metro only, for an already installed debug build
 npm run typecheck      # tsc --noEmit  (CI runs this)
 npm test               # vitest run    (CI runs this)
 npx vitest run src/lib/__tests__/mailto.test.ts   # single file
@@ -22,6 +23,8 @@ npm run i18n:harvest   # add new t('key', 'Fallback') keys to locales/rn/en.json
 npm run widgets:sync   # regenerate Android widget providers from src/widgets/catalog.json
 npm run bump           # release: bump VERSION, commit, tag, push, create GitHub release (needs gh auth, clean tree)
 ```
+
+The app cannot run in Expo Go: it uses custom native modules (`NativeModules.BulwarkFcm`, `BulwarkWidgets`, `BulwarkDeviceSync`, …) and has no `expo-dev-client`. Opening it via `npx expo start` → `a` tries Expo Go and fails (e.g. `TypeError: fetch failed`); use `npm run android`.
 
 Tests only match `src/**/__tests__/**/*.test.ts` and run in a `node` environment. There are no component-render tests. `src/test-setup.ts` globally mocks `react-native`, AsyncStorage (in memory), SecureStore, netinfo and the Expo native modules so stores and libs load under Node. A test that needs real behaviour from one of them re-mocks it locally. Keep logic you want tested in `src/lib`, `src/api`, `src/stores` or `src/device-sync`, out of components.
 
