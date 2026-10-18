@@ -178,7 +178,7 @@ export async function migrateLegacyPushKeys(): Promise<void> {
     await writePushAccountIds([...ids, legacyAccountId]);
   }
 
-  await AsyncStorage.multiRemove([
+  await AsyncStorage.removeMany([
     LEGACY_PUSH_ACCOUNT_ID_KEY,
     LEGACY_DEVICE_CLIENT_ID_KEY,
     LEGACY_SUBSCRIPTION_ID_KEY,
@@ -1155,7 +1155,7 @@ async function deregisterFromRelay(
 }
 
 async function clearAccountPushKeys(accountId: string): Promise<void> {
-  await AsyncStorage.multiRemove([
+  await AsyncStorage.removeMany([
     subscriptionIdKey(accountId),
     deviceClientIdKey(accountId),
     lastNotifiedKey(accountId),
@@ -1332,7 +1332,7 @@ export async function teardownPushNotifications(): Promise<void> {
     await clearAccountPushKeys(accountId);
   }
 
-  await AsyncStorage.multiRemove([PUSH_ACCOUNT_IDS_KEY, PUSH_JMAP_ACCOUNT_IDS_KEY]);
+  await AsyncStorage.removeMany([PUSH_ACCOUNT_IDS_KEY, PUSH_JMAP_ACCOUNT_IDS_KEY]);
 
   const native = getNative();
   if (native) {

@@ -6,7 +6,7 @@
   "libraries": [
     {
       "name": "@react-native-async-storage/async-storage",
-      "version": "2.2.0",
+      "version": "3.1.1",
       "license": "MIT",
       "url": "https://github.com/react-native-async-storage/async-storage"
     },

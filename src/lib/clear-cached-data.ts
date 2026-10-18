@@ -33,7 +33,7 @@ export async function clearCachedData(): Promise<void> {
     store.persist.clearStorage();
   }
   try {
-    await AsyncStorage.multiRemove(CACHE_STORAGE_KEYS);
+    await AsyncStorage.removeMany(CACHE_STORAGE_KEYS);
   } catch {
     // storage errors are non-fatal - the re-fetch below still refreshes state
   }

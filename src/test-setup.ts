@@ -27,13 +27,13 @@ vi.mock('@react-native-async-storage/async-storage', () => ({
       memory.clear();
     }),
     getAllKeys: vi.fn(async () => Array.from(memory.keys())),
-    multiGet: vi.fn(async (keys: string[]) =>
-      keys.map((k) => [k, memory.get(k) ?? null] as [string, string | null]),
+    getMany: vi.fn(async (keys: string[]) =>
+      Object.fromEntries(keys.map((k) => [k, memory.get(k) ?? null])),
     ),
-    multiSet: vi.fn(async (pairs: [string, string][]) => {
-      for (const [k, v] of pairs) memory.set(k, v);
+    setMany: vi.fn(async (entries: Record<string, string>) => {
+      for (const [k, v] of Object.entries(entries)) memory.set(k, v);
     }),
-    multiRemove: vi.fn(async (keys: string[]) => {
+    removeMany: vi.fn(async (keys: string[]) => {
       for (const k of keys) memory.delete(k);
     }),
   },
