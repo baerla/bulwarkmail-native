@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
     overflow: 'hidden',
   },
-  outline: { ...StyleSheet.absoluteFillObject, borderWidth: 1 },
+  outline: { ...StyleSheet.absoluteFill, borderWidth: 1 },
   blockTitle: { fontSize: 12, lineHeight: 15, fontWeight: '500' },
   blockTime: { fontSize: 10.5, lineHeight: 13, fontWeight: '400', opacity: 0.85 },
   struck: { textDecorationLine: 'line-through' },

@@ -110,7 +110,7 @@ export function CalendarFab({ onNewEvent, onNewTask }: CalendarFabProps) {
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
     scrim: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: 'rgba(0,0,0,0.55)',
       zIndex: 20,
     },

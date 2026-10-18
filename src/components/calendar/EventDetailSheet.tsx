@@ -602,7 +602,7 @@ function statusLabel(status: string | undefined, t: TranslateFn): string {
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   overlayPress: { flex: 1 },

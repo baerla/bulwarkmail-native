@@ -1206,7 +1206,7 @@ export const DOCKED_WIDTH = 272;
 function makeStyles(c: ThemePalette) {
   return StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   overlayPress: { flex: 1 },
@@ -1487,7 +1487,7 @@ function makeStyles(c: ThemePalette) {
 
   // Long-press action sheet / name prompt
   sheetOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   sheet: {

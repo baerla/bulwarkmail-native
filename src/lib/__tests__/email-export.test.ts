@@ -45,7 +45,7 @@ vi.mock('expo-file-system', () => {
     create() {}
     delete() { fsState.deleted.push(this.uri); }
     write() {}
-    copy(dest: { uri: string }) { fsState.copies.push([this.uri, dest.uri]); }
+    copySync(dest: { uri: string }) { fsState.copies.push([this.uri, dest.uri]); }
     static downloadFileAsync = vi.fn(async () => undefined);
   }
   class Directory {

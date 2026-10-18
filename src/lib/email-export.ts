@@ -311,7 +311,7 @@ export async function saveLocalFileCopy(file: File, mimeType: string, filename =
   const name = safeAttachmentName(filename, mimeType);
   const dest = new File(Paths.document, name);
   if (dest.exists) dest.delete();
-  file.copy(dest);
+  file.copySync(dest);
   await offerSavedFile(dest, name, mimeType);
 }
 
@@ -363,7 +363,7 @@ export function copyPreviewFile(uri: string, name: string | undefined, type: str
   const dir = newPreviewDir();
   ensureDir(dir);
   const file = new File(dir, safeAttachmentName(name, type));
-  new File(uri).copy(file);
+  new File(uri).copySync(file);
   return file;
 }
 
