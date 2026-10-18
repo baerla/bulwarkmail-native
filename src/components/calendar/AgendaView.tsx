@@ -7,7 +7,7 @@ import {
   Text,
   View,
   type LayoutChangeEvent,
-  type ViewToken,
+  type ListViewToken,
 } from 'react-native';
 import { endOfWeek, format, startOfWeek, type Locale } from 'date-fns';
 import { displayNow, isDisplayToday } from '../../lib/calendar-timezone';
@@ -188,7 +188,7 @@ export function AgendaView({
   visibleHandlerRef.current = onVisibleDateChange;
   const lastVisibleKeyRef = React.useRef<string | null>(null);
   const onViewableItemsChanged = React.useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    ({ viewableItems }: { viewableItems: ListViewToken[] }) => {
       const section = viewableItems.find((token) => token.section)?.section as DaySection | undefined;
       if (!section || section.key === lastVisibleKeyRef.current) return;
       lastVisibleKeyRef.current = section.key;

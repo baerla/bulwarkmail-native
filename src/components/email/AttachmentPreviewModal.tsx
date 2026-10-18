@@ -4,7 +4,8 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import { type WebViewMessageEvent } from 'react-native-webview';
+import { WebView, type WebViewHandle } from '../webview';
 import { X, ExternalLink, Share2, Download } from '../icons';
 import type { Email } from '../../api/types';
 import { spacing, radius, typography, componentSizes, type ThemePalette } from '../../theme/tokens';
@@ -64,7 +65,7 @@ interface ViewerWebViewProps {
   onFailed: () => void;
   /** Messages other than 'error'. */
   onMessage?: (data: string) => void;
-  webRef?: React.Ref<WebView>;
+  webRef?: React.Ref<WebViewHandle>;
 }
 
 /**
@@ -122,7 +123,7 @@ function PdfPagesView({ fileUri, viewerUri, background, onFailed }: {
   background: string;
   onFailed: () => void;
 }) {
-  const ref = React.useRef<WebView>(null);
+  const ref = React.useRef<WebViewHandle>(null);
   const { width } = useWindowDimensions();
   const pagePx = PixelRatio.getPixelSizeForLayoutSize(Math.min(width, 1000)) * PDF_PAGE_OVERSAMPLE;
   const folder = viewerUri.slice(0, viewerUri.lastIndexOf('/') + 1);

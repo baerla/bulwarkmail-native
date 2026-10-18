@@ -905,7 +905,7 @@ export default function EmailListScreen({
   }, [setSearchQuery, addRecentSearch]);
   // A search handed over by a deep link (the search widget): run it, or with
   // no query just put the cursor in the search field.
-  const searchInputRef = React.useRef<TextInput>(null);
+  const searchInputRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
   const pendingSearch = usePendingMailSearch((s) => s.query);
   React.useEffect(() => {
     if (pendingSearch === null) return;

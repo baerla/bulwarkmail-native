@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { WebView } from '../webview';
 import {
   AlertTriangle, Eye, EyeOff, Bold, Italic, Underline, List as ListIcon,
 } from '../icons';

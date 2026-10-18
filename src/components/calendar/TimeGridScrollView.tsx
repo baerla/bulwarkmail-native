@@ -13,7 +13,7 @@ import {
   type ListRenderItemInfo,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  type ViewToken,
+  type ListViewToken,
 } from 'react-native';
 import { differenceInCalendarDays, format, type Locale } from 'date-fns';
 import type { Calendar, CalendarEvent } from '../../api/types';
@@ -247,7 +247,7 @@ function TimeGridScrollViewInner({
   // before the initial scroll lands; that would set the title to the window's
   // first month. Reports wait until the list has scrolled at all.
   const scrolledSinceMountRef = React.useRef(false);
-  const onViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+  const onViewableItemsChanged = React.useRef(({ viewableItems }: { viewableItems: ListViewToken[] }) => {
     if (!scrolledSinceMountRef.current) return;
     let first: Date | null = null;
     for (const token of viewableItems) {
@@ -277,7 +277,7 @@ function TimeGridScrollViewInner({
   }, [focus, window, mode, weekStartsOn, days.length, perScreen]);
 
   // Start the hours at the one before now, like the paged week view.
-  const vScrollRef = React.useRef<ScrollView>(null);
+  const vScrollRef = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
   React.useEffect(() => {
     const target = Math.max(0, (displayNow().getHours() - 1) * HOUR_HEIGHT);
     const frame = requestAnimationFrame(() => {

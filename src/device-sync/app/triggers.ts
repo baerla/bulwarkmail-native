@@ -81,7 +81,7 @@ export function startDeviceSyncTriggers(): () => void {
     }
   }
 
-  let appState: AppStateStatus = AppState.currentState;
+  let appState: AppStateStatus | string | null | undefined = AppState.currentState;
   const appStateSubscription = AppState.addEventListener('change', (next) => {
     const cameBack = next === 'active' && appState !== 'active';
     appState = next;

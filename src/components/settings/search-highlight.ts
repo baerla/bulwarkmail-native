@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { type ComponentRef, createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { LayoutChangeEvent, View } from 'react-native';
 
 /**
@@ -9,7 +9,7 @@ import type { LayoutChangeEvent, View } from 'react-native';
 export interface SearchHighlight {
   label: string;
   /** Scroll `view` into view; called once, by the first row that matches. */
-  reveal: (view: View) => void;
+  reveal: (view: ComponentRef<typeof View>) => void;
 }
 
 export const SearchHighlightContext = createContext<SearchHighlight | null>(null);
@@ -22,7 +22,7 @@ const HIGHLIGHT_MS = 1800;
  */
 export function useSearchHighlight(label: string) {
   const target = useContext(SearchHighlightContext);
-  const ref = useRef<View>(null);
+  const ref = useRef<ComponentRef<typeof View>>(null);
   const [highlighted, setHighlighted] = useState(false);
 
   const onLayout = useCallback((_e: LayoutChangeEvent) => {

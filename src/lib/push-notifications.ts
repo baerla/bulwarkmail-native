@@ -1419,7 +1419,7 @@ export type FcmMessageListener = (payload: {
 export function addMessageListener(listener: FcmMessageListener): () => void {
   if (Platform.OS !== 'android') return () => undefined;
   const emitter = new NativeEventEmitter(NativeModules.BulwarkFcm);
-  const sub = emitter.addListener('fcm:message', listener);
+  const sub = emitter.addListener('fcm:message', (payload: unknown) => listener(payload as Parameters<FcmMessageListener>[0]));
   return () => sub.remove();
 }
 
@@ -1428,7 +1428,7 @@ export type FcmTokenListener = (payload: { token: string }) => void;
 export function addTokenRefreshListener(listener: FcmTokenListener): () => void {
   if (Platform.OS !== 'android') return () => undefined;
   const emitter = new NativeEventEmitter(NativeModules.BulwarkFcm);
-  const sub = emitter.addListener('fcm:newToken', listener);
+  const sub = emitter.addListener('fcm:newToken', (token: unknown) => listener(token as Parameters<FcmTokenListener>[0]));
   return () => sub.remove();
 }
 
@@ -1485,6 +1485,6 @@ export function addNotificationTapListener(
 ): () => void {
   if (Platform.OS !== 'android') return () => undefined;
   const emitter = new NativeEventEmitter(NativeModules.BulwarkFcm);
-  const sub = emitter.addListener('fcm:notificationTap', listener);
+  const sub = emitter.addListener('fcm:notificationTap', (payload: unknown) => listener(payload as NotificationTapPayload));
   return () => sub.remove();
 }

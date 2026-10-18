@@ -95,7 +95,7 @@ export function addUnifiedPushEndpointListener(
   listener: (endpoint: UnifiedPushEndpoint) => void,
 ): () => void {
   if (!isUnifiedPushSupported()) return () => undefined;
-  const sub = emitter().addListener('up:newEndpoint', listener);
+  const sub = emitter().addListener('up:newEndpoint', (endpoint: unknown) => listener(endpoint as UnifiedPushEndpoint));
   return () => sub.remove();
 }
 
@@ -164,8 +164,8 @@ export async function registerUnifiedPush(params: {
       fn();
     };
 
-    const epSub = emitter().addListener('up:newEndpoint', (endpoint: UnifiedPushEndpoint) => {
-      finish(() => resolve(endpoint));
+    const epSub = emitter().addListener('up:newEndpoint', (endpoint: unknown) => {
+      finish(() => resolve(endpoint as UnifiedPushEndpoint));
     });
     cleanups.push(() => epSub.remove());
     const failSub = emitter().addListener(

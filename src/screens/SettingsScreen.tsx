@@ -204,8 +204,8 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
   const [searchQuery, setSearchQuery] = useState('');
   // A tapped search result: its pane scrolls to the setting and flashes it.
   const [pendingHighlight, setPendingHighlight] = useState<{ tab: Tab; label: string } | null>(null);
-  const paneScrollRef = React.useRef<ScrollView>(null);
-  const paneContentRef = React.useRef<View>(null);
+  const paneScrollRef = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
+  const paneContentRef = React.useRef<React.ComponentRef<typeof View>>(null);
   // Subscribe to locale so labels re-render when the user picks a different language.
   const locale = useLocaleStore((s) => s.locale);
   const t = useLocaleStore((s) => s.t);
@@ -344,7 +344,7 @@ export default function SettingsScreen({ onLogout, onBack, onTabSelect }: Settin
 
   // The first row of the open pane whose label matches the tapped result
   // calls this once it is laid out.
-  const revealHighlight = React.useCallback((view: View) => {
+  const revealHighlight = React.useCallback((view: React.ComponentRef<typeof View>) => {
     const content = paneContentRef.current;
     if (content) {
       view.measureLayout(content, (_x, y) => {

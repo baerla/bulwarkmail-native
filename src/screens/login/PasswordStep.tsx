@@ -44,8 +44,8 @@ export default function PasswordStep({
   const t = useLocaleStore((s) => s.t);
   const [showPassword, setShowPassword] = React.useState(false);
   // Return moves username → password → code, then signs in.
-  const passwordRef = React.useRef<TextInput>(null);
-  const totpRef = React.useRef<TextInput>(null);
+  const passwordRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const totpRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
 
   return (
     <View style={styles.root}>

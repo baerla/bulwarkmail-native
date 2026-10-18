@@ -748,14 +748,14 @@ export default function ContactFormScreen() {
   const [dirty, setDirty] = React.useState(!!prefill || !!initialMemberIds?.length);
   const [confirmDiscard, setConfirmDiscard] = React.useState(false);
   // Return walks the name fields in reading order, then on to the email.
-  const prefixRef = React.useRef<TextInput>(null);
-  const suffixRef = React.useRef<TextInput>(null);
-  const givenRef = React.useRef<TextInput>(null);
-  const middleRef = React.useRef<TextInput>(null);
-  const surnameRef = React.useRef<TextInput>(null);
-  const orgRef = React.useRef<TextInput>(null);
-  const fullRef = React.useRef<TextInput>(null);
-  const firstEmailRef = React.useRef<TextInput>(null);
+  const prefixRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const suffixRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const givenRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const middleRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const surnameRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const orgRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const fullRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const firstEmailRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
   const [datePickerIndex, setDatePickerIndex] = React.useState<number | null>(null);
   const [memberPickerOpen, setMemberPickerOpen] = React.useState(false);
 

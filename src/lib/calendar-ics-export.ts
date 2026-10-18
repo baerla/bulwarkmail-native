@@ -204,7 +204,7 @@ export async function shareEventICS(event: CalendarEvent): Promise<void> {
   ]);
   const file = new File(Paths.cache, icsFilename(event));
   if (file.exists) file.delete();
-  file.write(eventToICS(event));
+  file.writeSync(eventToICS(event));
   if (!(await Sharing.isAvailableAsync())) {
     throw new Error(t('files.share_unavailable', 'Sharing is not available on this device'));
   }

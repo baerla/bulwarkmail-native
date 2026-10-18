@@ -66,7 +66,7 @@ function WeekViewInner({
   const c = useColors();
   const styles = React.useMemo(() => makeStyles(c), [c]);
   const { locale, t } = useCalendarLocale();
-  const scrollRef = React.useRef<ScrollView>(null);
+  const scrollRef = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
 
   const index = React.useMemo(
     () => eventsByDay ?? buildEventDayIndex(events),

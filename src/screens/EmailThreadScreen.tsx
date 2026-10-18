@@ -1032,7 +1032,7 @@ function EmailPane({
   // Keeps the quick reply in view while the keyboard opens. Above the
   // skeleton's early return: a page opened by id alone (a notification)
   // renders the skeleton first, and a hook after it crashed the app.
-  const scrollRef = React.useRef<ScrollView>(null);
+  const scrollRef = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
   const isInputFocused = React.useRef(false);
   const cardsTopRef = React.useRef(0);
   // The cards above the open one settle over a few frames (their rows fill

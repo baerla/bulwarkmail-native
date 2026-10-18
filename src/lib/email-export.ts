@@ -209,7 +209,7 @@ async function downloadInto(
     if (dest.exists) dest.delete();
     const buffer = await response.arrayBuffer();
     dest.create();
-    dest.write(new Uint8Array(buffer));
+    dest.writeSync(new Uint8Array(buffer));
     return dest;
   };
   try {
@@ -377,7 +377,7 @@ export function writePreviewFile(bytes: Uint8Array, name: string | undefined, ty
   ensureDir(dir);
   const file = new File(dir, safeAttachmentName(name, type));
   file.create();
-  file.write(bytes);
+  file.writeSync(bytes);
   return file;
 }
 
@@ -401,7 +401,7 @@ export function writeTempFile(bytes: Uint8Array, filename: string, mimeType?: st
   const file = new File(dir, safeAttachmentName(filename, mimeType));
   if (file.exists) file.delete();
   file.create();
-  file.write(bytes);
+  file.writeSync(bytes);
   return file;
 }
 

@@ -60,7 +60,7 @@ export function useKeyboardObstruction(bottomInset: number, onWindowChange?: () 
             Keyboard.addListener('keyboardDidHide', () => setObstruction(0)),
           ];
     let lastWindow = Dimensions.get('window');
-    const dims = Dimensions.addEventListener('change', ({ window }) => {
+    const dims = Dimensions.addEventListener('change', ({ window }: { window: ReturnType<typeof Dimensions.get> }) => {
       if (window.width === lastWindow.width && window.height === lastWindow.height) return;
       lastWindow = window;
       setObstruction(0);

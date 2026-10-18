@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Linking, Platform, Text, Pressable, useWindowDimensions } from 'react-native';
-import { WebView, type WebViewMessageEvent } from 'react-native-webview';
+import { type WebViewMessageEvent } from 'react-native-webview';
+import { WebView, type WebViewHandle } from './webview';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Image as ImageIcon, ShieldCheck } from './icons';
@@ -596,7 +597,7 @@ export default function EmailBodyView({
   // A pinch-zoomed page reports its scaled height; that is not one to keep.
   const zoomedRef = React.useRef(false);
   const [cidMap, setCidMap] = React.useState<Record<string, string>>({});
-  const webviewRef = React.useRef<WebView>(null);
+  const webviewRef = React.useRef<WebViewHandle>(null);
   const settledRef = React.useRef(false);
 
   React.useEffect(() => {

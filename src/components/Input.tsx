@@ -10,7 +10,7 @@ interface InputProps extends TextInputProps {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   /** React 19 passes `ref` as a prop; it reaches the TextInput (focus chaining). */
-  ref?: React.Ref<RNTextInput>;
+  ref?: React.Ref<React.ComponentRef<typeof RNTextInput>>;
 }
 
 /**

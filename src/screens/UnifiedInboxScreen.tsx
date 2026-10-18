@@ -537,7 +537,7 @@ export default function UnifiedInboxScreen({ navigation, route }: Props) {
           onRefresh={() => { void load(); }}
           onEndReached={() => { void loadMore(); }}
           onEndReachedThreshold={0.3}
-          ListFooterComponent={loadingMore ? <ActivityIndicator style={{ padding: spacing.md }} color={c.primary} /> : null}
+          ListFooterComponent={loadingMore ? <ActivityIndicator style={{ padding: spacing.md }} color={c.primary} /> : undefined}
           // A stack screen has no tab bar: the list ends clear of the gesture bar.
           contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         />

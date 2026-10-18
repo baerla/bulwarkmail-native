@@ -675,15 +675,15 @@ export default function ComposeScreen({ route, navigation }: Props) {
   // wrapped into "Betref" / "f" in a fixed 56 dp column.
   const { fontScale } = useWindowDimensions();
   const fieldLabelWidth = React.useMemo(() => ({ width: Math.round(56 * Math.max(1, fontScale)) }), [fontScale]);
-  const subjectRef = React.useRef<TextInput>(null);
-  const plainBodyRef = React.useRef<TextInput>(null);
+  const subjectRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
+  const plainBodyRef = React.useRef<React.ComponentRef<typeof TextInput>>(null);
   const [subjectFocused, setSubjectFocused] = React.useState(false);
 
   // The composer's ScrollView and its live offset. On Android the editor page
   // hands back the caret-reveal pans it undoes (see `pinVisualViewport` in
   // editor-html); scrolling the composer by the same amount keeps the caret
   // where the pan had put it, without leaving the body drawn shifted up.
-  const bodyScrollRef = React.useRef<ScrollView>(null);
+  const bodyScrollRef = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
   const bodyScrollY = React.useRef(0);
   const onEditorViewportShift = React.useCallback((dy: number) => {
     const y = Math.max(0, bodyScrollY.current + dy);
