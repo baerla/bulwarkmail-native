@@ -12,13 +12,13 @@
     },
     {
       "name": "@react-native-community/datetimepicker",
-      "version": "8.4.4",
+      "version": "8.6.0",
       "license": "MIT",
       "url": "https://github.com/react-native-community/datetimepicker"
     },
     {
       "name": "@react-native-community/netinfo",
-      "version": "11.4.1",
+      "version": "11.5.2",
       "license": "MIT",
       "url": "https://github.com/react-native-netinfo/react-native-netinfo"
     },
@@ -48,97 +48,97 @@
     },
     {
       "name": "expo",
-      "version": "54.0.37",
+      "version": "55.0.31",
       "license": "MIT",
       "url": "https://github.com/expo/expo/tree/main/packages/expo"
     },
     {
       "name": "expo-camera",
-      "version": "17.0.10",
+      "version": "55.0.23",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/camera/"
     },
     {
       "name": "expo-clipboard",
-      "version": "8.0.8",
+      "version": "55.0.17",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/clipboard"
     },
     {
       "name": "expo-crypto",
-      "version": "15.0.9",
+      "version": "55.0.19",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/crypto/"
     },
     {
       "name": "expo-document-picker",
-      "version": "14.0.8",
+      "version": "55.0.17",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/document-picker/"
     },
     {
       "name": "expo-file-system",
-      "version": "19.0.24",
+      "version": "55.0.26",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/filesystem/"
     },
     {
       "name": "expo-haptics",
-      "version": "15.0.8",
+      "version": "55.0.18",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/haptics/"
     },
     {
       "name": "expo-image-manipulator",
-      "version": "14.0.8",
+      "version": "55.0.21",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/imagemanipulator/"
     },
     {
       "name": "expo-image-picker",
-      "version": "17.0.11",
+      "version": "55.0.24",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/imagepicker/"
     },
     {
       "name": "expo-intent-launcher",
-      "version": "13.0.8",
+      "version": "55.0.16",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/intent-launcher/"
     },
     {
       "name": "expo-localization",
-      "version": "17.0.9",
+      "version": "55.0.19",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/localization/"
     },
     {
       "name": "expo-notifications",
-      "version": "0.32.17",
+      "version": "55.0.27",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/notifications/"
     },
     {
       "name": "expo-secure-store",
-      "version": "15.0.8",
+      "version": "55.0.18",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/securestore/"
     },
     {
       "name": "expo-sharing",
-      "version": "14.0.8",
+      "version": "55.0.24",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/sharing/"
     },
     {
       "name": "expo-status-bar",
-      "version": "3.0.9",
+      "version": "55.0.6",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/status-bar/"
     },
     {
       "name": "expo-web-browser",
-      "version": "15.0.11",
+      "version": "55.0.20",
       "license": "MIT",
       "url": "https://docs.expo.dev/versions/latest/sdk/webbrowser/"
     },
@@ -156,13 +156,13 @@
     },
     {
       "name": "react",
-      "version": "19.1.0",
+      "version": "19.2.0",
       "license": "MIT",
       "url": "https://react.dev/"
     },
     {
       "name": "react-native",
-      "version": "0.81.5",
+      "version": "0.83.10",
       "license": "MIT",
       "url": "https://reactnative.dev/"
     },
@@ -180,7 +180,7 @@
     },
     {
       "name": "react-native-screens",
-      "version": "4.16.0",
+      "version": "4.23.0",
       "license": "MIT",
       "url": "https://github.com/software-mansion/react-native-screens"
     },
@@ -192,13 +192,13 @@
     },
     {
       "name": "react-native-svg",
-      "version": "15.12.1",
+      "version": "15.15.3",
       "license": "MIT",
       "url": "https://github.com/react-native-community/react-native-svg"
     },
     {
       "name": "react-native-webview",
-      "version": "13.15.0",
+      "version": "13.16.0",
       "license": "MIT",
       "url": "https://github.com/react-native-webview/react-native-webview"
     },

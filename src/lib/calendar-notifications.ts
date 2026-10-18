@@ -77,7 +77,9 @@ async function ensureChannel(): Promise<void> {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: t('calendar.notifications.channel_name', 'Calendar reminders'),
       importance: Notifications.AndroidImportance.HIGH,
-      sound: 'default',
+      // No `sound` key: expo-notifications 55 reads a string here as a sound
+      // file name ('default' logs "custom sound not found"); omitting it
+      // gives the system default sound.
       vibrationPattern: [0, 250, 250, 250],
     });
   } catch {

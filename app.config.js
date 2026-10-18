@@ -34,7 +34,6 @@ module.exports = {
     orientation: 'default',
     icon: './assets/icon.png',
     userInterfaceStyle: 'automatic',
-    newArchEnabled: true,
     splash: {
       image: './assets/splash-icon.png',
       resizeMode: 'contain',
@@ -60,7 +59,6 @@ module.exports = {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#db2d54',
       },
-      edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
       package: 'com.anonymous.bulwarkmobile',
       // The AsyncStorage database holds cached message bodies, the outbox and
