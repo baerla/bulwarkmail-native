@@ -21,3 +21,10 @@
 # top of that costs a few KB and leaves its class and method names readable
 # in a crash report from an obfuscated release build.
 -keep class com.anonymous.bulwarkmobile.** { *; }
+
+# Room (used by WorkManager, which FCM and the headless tasks start at launch)
+# creates its database through reflection: Class.forName("<name>_Impl"). With
+# the optimizing default rules R8 renames the generated *_Impl class and the
+# app dies in InitializationProvider at startup.
+-keep class * extends androidx.room.RoomDatabase { <init>(); }
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
