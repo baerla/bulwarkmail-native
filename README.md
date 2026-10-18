@@ -41,10 +41,10 @@ React Native (Expo SDK 54) client for [Bulwark Webmail](https://github.com/bulwa
 
 ```bash
 npm install
-npx expo start
+npx expo run:android   # or: npx expo run:ios (macOS with Xcode)
 ```
 
-Then press `a` for Android, `i` for iOS, or scan the QR with Expo Go.
+This builds a debug app, installs it on the running emulator, simulator or connected device, and starts Metro. The app ships its own native modules (push, client certificates, widgets, device sync), so it does not run in Expo Go. Once the debug build is installed, `npx expo start` is enough to serve JavaScript changes to it.
 
 For release APK builds and signing see [docs/android-release.md](docs/android-release.md).
 For iOS builds and TestFlight distribution see [docs/ios-release.md](docs/ios-release.md).
