@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Bulwark Mobile: a React Native (Expo SDK 54, new architecture, React 19) client for [Bulwark Webmail](https://github.com/bulwarkmail/webmail). It talks JMAP directly to the user's mail server (Stalwart is the reference server) for mail, calendar, contacts, files, Sieve filters and vacation. Beta; Android is the primary platform (sideloaded APK); iOS ships via TestFlight and lacks push, client certificates and device sync.
+Bulwark Mobile: a React Native (Expo SDK 58, React Native 0.88, React 19) client for [Bulwark Webmail](https://github.com/bulwarkmail/webmail). It talks JMAP directly to the user's mail server (Stalwart is the reference server) for mail, calendar, contacts, files, Sieve filters and vacation. Beta; Android is the primary platform (sideloaded APK); iOS ships via TestFlight and lacks push, client certificates and device sync.
 
 The webmail is the reference implementation. Many comments cite webmail issue numbers (`#702`) and "native #NN" for this repo's tracker. `PARITY_CHECKLIST.md` and `docs/parity/` track feature/bugfix parity against it, and `docs/audit-*.md` / `docs/ux-audit-*.md` hold audit findings. Tick their boxes when you fix a listed item.
 
